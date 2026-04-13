@@ -2,8 +2,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  // Durante desarrollo con mocks, saltar el guard de auth
-  if (process.env.SKIP_AUTH_MIDDLEWARE === 'true') {
+  // Saltar auth si está desactivado explícitamente o si Supabase aún no está configurado
+  const supabaseConfigured =
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (process.env.SKIP_AUTH_MIDDLEWARE === 'true' || !supabaseConfigured) {
     return NextResponse.next()
   }
 
