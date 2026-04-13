@@ -86,9 +86,9 @@ export default async function ShelterAnimalsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
-                          {animal.is_vaccinated && <span className="text-xs bg-green-100 text-green-800 rounded px-1.5 py-0.5">Vac</span>}
-                          {animal.is_neutered && <span className="text-xs bg-blue-100 text-blue-800 rounded px-1.5 py-0.5">Cas</span>}
-                          {animal.is_microchipped && <span className="text-xs bg-purple-100 text-purple-800 rounded px-1.5 py-0.5">Mic</span>}
+                          {animal.is_vaccinated && <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded px-1.5 py-0.5">Vac</span>}
+                          {animal.is_neutered && <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded px-1.5 py-0.5">Cas</span>}
+                          {animal.is_microchipped && <span className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 rounded px-1.5 py-0.5">Mic</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right">

@@ -12,6 +12,7 @@ import {
   ChevronLeft,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const SHELTER_LINKS = [
   { href: '/shelter/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -51,8 +52,8 @@ export default function ShelterSidebar() {
         ))}
       </nav>
 
-      {/* Volver al sitio */}
-      <div className="px-3 pb-4 border-t border-border pt-3">
+      {/* Volver al sitio + toggle tema */}
+      <div className="px-3 pb-4 border-t border-border pt-3 flex flex-col gap-1">
         <Link
           href="/"
           className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
@@ -60,6 +61,10 @@ export default function ShelterSidebar() {
           <ChevronLeft className="h-3.5 w-3.5" />
           Volver al sitio
         </Link>
+        <div className="flex items-center gap-2 px-3 py-1">
+          <span className="text-xs text-muted-foreground flex-1">Tema</span>
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   )

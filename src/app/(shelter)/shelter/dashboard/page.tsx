@@ -16,11 +16,11 @@ const MOCK_SHELTER_ID = 'shelter-001'
 const MOCK_SHELTER_NAME = 'Patitas Chiclayo'
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  reviewing: 'bg-blue-100 text-blue-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
-  completed: 'bg-gray-100 text-gray-600',
+  pending:   'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  reviewing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  approved:  'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  rejected:  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  completed: 'bg-muted text-muted-foreground',
 }
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Pendiente',
@@ -70,9 +70,9 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: PawPrint, label: 'Animales activos', value: activeAnimals, href: '/shelter/animals', color: 'text-primary' },
-          { icon: ClipboardList, label: 'Solicitudes pendientes', value: pendingRequests, href: '/shelter/requests', color: 'text-yellow-600' },
-          { icon: HeartHandshake, label: 'Total recaudado', value: formatPEN(totalRaised), href: '/shelter/donations', color: 'text-green-600' },
-          { icon: Wallet, label: 'Pagos por verificar', value: pendingDonations, href: '/shelter/donations', color: 'text-blue-600' },
+          { icon: ClipboardList, label: 'Solicitudes pendientes', value: pendingRequests, href: '/shelter/requests', color: 'text-yellow-600 dark:text-yellow-400' },
+          { icon: HeartHandshake, label: 'Total recaudado', value: formatPEN(totalRaised), href: '/shelter/donations', color: 'text-green-600 dark:text-green-400' },
+          { icon: Wallet, label: 'Pagos por verificar', value: pendingDonations, href: '/shelter/donations', color: 'text-blue-600 dark:text-blue-400' },
         ].map(({ icon: Icon, label, value, href, color }) => (
           <Link
             key={label}

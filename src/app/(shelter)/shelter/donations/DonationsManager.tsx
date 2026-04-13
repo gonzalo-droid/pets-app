@@ -13,10 +13,10 @@ const TABS: { value: PaymentStatus | 'all'; label: string }[] = [
 ]
 
 const STATUS_STYLES: Record<string, string> = {
-  pending:  'bg-yellow-100 text-yellow-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-700',
-  refunded: 'bg-gray-100 text-gray-600',
+  pending:  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  rejected: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  refunded: 'bg-muted text-muted-foreground',
 }
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Pendiente', approved: 'Aprobada',
@@ -160,7 +160,7 @@ export default function DonationsManager({ donations, donorNames, campaignTitles
                     <div className="flex gap-1.5 ml-2">
                       <button
                         onClick={() => approve(don.id)}
-                        className="rounded bg-green-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-green-700 transition-colors"
+                        className="rounded bg-green-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
                       >
                         Aprobar
                       </button>

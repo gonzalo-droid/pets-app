@@ -55,7 +55,7 @@ export default async function ShelterCampaignsPage() {
                   </div>
                   <span className={cn(
                     'text-xs font-medium px-2.5 py-1 rounded-full shrink-0',
-                    campaign.is_active ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'
+                    campaign.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'
                   )}>
                     {campaign.is_active ? 'Activa' : 'Inactiva'}
                   </span>

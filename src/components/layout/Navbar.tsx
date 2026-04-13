@@ -6,6 +6,7 @@ import { PawPrint, Menu, X, Heart } from 'lucide-react'
 import { useState } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const NAV_LINKS = [
   { href: '/adopt', label: 'Adoptar' },
@@ -49,6 +50,7 @@ export default function Navbar() {
 
         {/* Auth — escritorio */}
         <div className="hidden md:flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/auth/login"
             className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
@@ -64,14 +66,17 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Botón menú móvil */}
-        <button
-          className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        {/* Controles móvil */}
+        <div className="md:hidden flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
 
       {/* Menú móvil */}

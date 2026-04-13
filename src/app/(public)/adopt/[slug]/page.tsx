@@ -24,9 +24,9 @@ export async function generateMetadata({ params }: AnimalDetailPageProps): Promi
 }
 
 const HEALTH_CHIPS = [
-  { key: 'is_vaccinated', label: '💉 Vacunado', active: 'bg-green-100 text-green-800', inactive: 'bg-muted text-muted-foreground line-through' },
-  { key: 'is_neutered', label: '✂️ Castrado/a', active: 'bg-blue-100 text-blue-800', inactive: 'bg-muted text-muted-foreground line-through' },
-  { key: 'is_microchipped', label: '📡 Microchip', active: 'bg-purple-100 text-purple-800', inactive: 'bg-muted text-muted-foreground line-through' },
+  { key: 'is_vaccinated', label: '💉 Vacunado', active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400', inactive: 'bg-muted text-muted-foreground line-through' },
+  { key: 'is_neutered', label: '✂️ Castrado/a', active: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400', inactive: 'bg-muted text-muted-foreground line-through' },
+  { key: 'is_microchipped', label: '📡 Microchip', active: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400', inactive: 'bg-muted text-muted-foreground line-through' },
 ] as const
 
 const DISTRICT_NAMES: Record<string, string> = {
