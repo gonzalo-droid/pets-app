@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,7 +19,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirectTo') ?? '/'
   const [showPassword, setShowPassword] = useState(false)
@@ -148,13 +148,18 @@ export default function LoginPage() {
       {/* Register link */}
       <p className="text-center text-sm text-muted-foreground">
         ¿No tienes cuenta?{' '}
-        <Link
-          href="/auth/register"
-          className="font-medium text-primary hover:underline"
-        >
+        <Link href="/auth/register" className="font-medium text-primary hover:underline">
           Regístrate gratis
         </Link>
       </p>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
