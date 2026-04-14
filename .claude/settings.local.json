@@ -33,7 +33,11 @@
       "Bash(/usr/bin/curl -s -o /dev/null -w \"/animals → %{http_code}\\\\n\" http://localhost:3000/shelter/animals)",
       "Bash(/usr/bin/curl -s -o /dev/null -w \"/animals/new → %{http_code}\\\\n\" http://localhost:3000/shelter/animals/new)",
       "Bash(/usr/bin/curl -s -o /dev/null -w \"/requests → %{http_code}\\\\n\" http://localhost:3000/shelter/requests)",
-      "Bash(/usr/bin/curl -s -o /dev/null -w \"/campaigns → %{http_code}\\\\n\" http://localhost:3000/shelter/campaigns)"
+      "Bash(/usr/bin/curl -s -o /dev/null -w \"/campaigns → %{http_code}\\\\n\" http://localhost:3000/shelter/campaigns)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git worktree:*)"
     ]
   }
 }
