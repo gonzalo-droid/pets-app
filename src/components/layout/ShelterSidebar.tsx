@@ -10,6 +10,7 @@ import {
   Wallet,
   PawPrint,
   ChevronLeft,
+  Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -20,6 +21,7 @@ const SHELTER_LINKS = [
   { href: '/shelter/requests', label: 'Solicitudes', icon: ClipboardList },
   { href: '/shelter/campaigns', label: 'Campañas', icon: HeartHandshake },
   { href: '/shelter/donations', label: 'Donaciones', icon: Wallet },
+  { href: '/shelter/settings', label: 'Configuración', icon: Settings },
 ] as const
 
 export default function ShelterSidebar() {
