@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       // Avatares generados para albergues (mock)
       { protocol: 'https', hostname: 'api.dicebear.com' },
+      // Fotos de galería de albergues (mock)
+      { protocol: 'https', hostname: 'picsum.photos' },
     ],
   },
 }
