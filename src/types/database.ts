@@ -60,12 +60,15 @@ export interface Shelter {
   profile_id: string
   name: string
   description: string | null
+  long_description: string | null   // historia / descripción larga
   address: string | null
   ubigeo: string
   phone: string | null
   email: string | null
+  whatsapp: string | null           // número sin código de país
   instagram: string | null
   facebook: string | null
+  tiktok: string | null             // handle sin @
   avatar_url: string | null
   banner_url: string | null
   is_verified: boolean
@@ -207,4 +210,15 @@ export interface CampaignWithShelter extends DonationCampaign {
 
 export interface LostReportWithSightings extends LostFoundReport {
   sightings: LostFoundSighting[]
+}
+
+export interface ShelterPhoto {
+  id: string
+  shelter_id: string
+  url: string
+  order_index: number
+}
+
+export interface ShelterWithPhotos extends Shelter {
+  shelter_photos: ShelterPhoto[]
 }
