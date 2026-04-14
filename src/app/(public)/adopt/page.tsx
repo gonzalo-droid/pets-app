@@ -27,6 +27,7 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
   ])
 
   const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
+  const shelterIds = Object.fromEntries(shelters.map((s) => [s.id, s.id]))
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -57,6 +58,7 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
               key={animal.id}
               animal={animal}
               shelterName={shelterNames[animal.shelter_id]}
+              shelterId={shelterIds[animal.shelter_id]}
             />
           ))}
         </div>
