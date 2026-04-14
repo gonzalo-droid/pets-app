@@ -7,6 +7,7 @@ import type { AnimalWithPhotos } from '@/types'
 interface AnimalCardProps {
   animal: AnimalWithPhotos
   shelterName?: string
+  shelterId?: string
 }
 
 const HEALTH_CHIPS = [
@@ -15,7 +16,7 @@ const HEALTH_CHIPS = [
   { key: 'is_microchipped', label: 'Microchip' },
 ] as const
 
-export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
+export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCardProps) {
   const coverPhoto = animal.animal_photos.find((p) => p.is_cover) ?? animal.animal_photos[0]
   const activeChips = HEALTH_CHIPS.filter(({ key }) => animal[key])
 
@@ -84,9 +85,19 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
 
         {/* Albergue */}
         {shelterName && (
-          <p className="mt-auto pt-2 text-xs text-muted-foreground border-t border-border truncate">
-            {shelterName}
-          </p>
+          <div className="mt-auto pt-2 border-t border-border">
+            {shelterId ? (
+              <Link
+                href={`/shelters/${shelterId}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-primary hover:underline truncate block"
+              >
+                {shelterName}
+              </Link>
+            ) : (
+              <p className="text-xs text-muted-foreground truncate">{shelterName}</p>
+            )}
+          </div>
         )}
       </div>
     </Link>
