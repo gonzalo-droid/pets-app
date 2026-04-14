@@ -23,10 +23,16 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
   const activeChips = HEALTH_CHIPS.filter(({ key }) => animal[key])
 
   return (
-    <Link
-      href={`/adopt/${animal.slug}`}
-      className="group flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-md transition-all"
-    >
+    // Patrón "stretched link": div relativo, el link al animal va absolute inset-0,
+    // el link del albergue queda encima con z-10 para ser clickeable independientemente.
+    <div className="group relative flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-md transition-all">
+      {/* Link principal — cubre toda la card */}
+      <Link
+        href={`/adopt/${animal.slug}`}
+        className="absolute inset-0 z-0"
+        aria-label={`Ver ${animal.name}`}
+      />
+
       {/* Foto */}
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
         {coverPhoto ? (
@@ -44,14 +50,14 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
         )}
         {/* Badge de estado */}
         {animal.status === 'in_process' && (
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2 right-2 z-10">
             <Badge variant="secondary" className="text-xs">En proceso</Badge>
           </div>
         )}
       </div>
 
       {/* Contenido */}
-      <div className="flex flex-col gap-2 p-4 flex-1">
+      <div className="relative z-10 flex flex-col gap-2 p-4 flex-1 pointer-events-none">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-foreground text-base leading-tight">{animal.name}</h3>
           <span className="text-xs text-muted-foreground shrink-0">
@@ -85,13 +91,12 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
           </div>
         )}
 
-        {/* Albergue */}
+        {/* Albergue — pointer-events-auto para contrarrestar el none del padre */}
         {shelterName && (
-          <div className="mt-auto pt-2 border-t border-border">
+          <div className="mt-auto pt-2 border-t border-border pointer-events-auto">
             {shelterId ? (
               <Link
                 href={`/shelters/${shelterId}`}
-                onClick={(e) => e.stopPropagation()}
                 className="text-xs text-primary hover:underline truncate block"
               >
                 {shelterName}
@@ -102,6 +107,6 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
           </div>
         )}
       </div>
-    </Link>
+    </div>
   )
 }
