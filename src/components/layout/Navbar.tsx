@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PawPrint, Menu, X, Heart, LogOut, LayoutDashboard } from 'lucide-react'
+import { PawPrint, Menu, X, Heart, LogOut, LayoutDashboard, UserCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: '/adopt', label: 'Adoptar' },
   { href: '/lost', label: 'Perdidos' },
   { href: '/donate', label: 'Donar' },
+  { href: '/shelters', label: 'Albergues' },
 ] as const
 
 export default function Navbar() {
@@ -68,6 +69,15 @@ export default function Navbar() {
               <span className="text-sm text-muted-foreground">
                 {session.full_name}
               </span>
+              {session.role === 'user' && (
+                <Link
+                  href="/profile"
+                  className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                >
+                  <UserCircle className="h-4 w-4" />
+                  Mi perfil
+                </Link>
+              )}
               {session.role === 'shelter' && (
                 <Link
                   href="/shelter/dashboard"
@@ -140,6 +150,16 @@ export default function Navbar() {
               {session ? (
                 <>
                   <span className="px-3 py-1 text-sm text-muted-foreground">{session.full_name}</span>
+                  {session.role === 'user' && (
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'justify-center')}
+                    >
+                      <UserCircle className="h-4 w-4" />
+                      Mi perfil
+                    </Link>
+                  )}
                   {session.role === 'shelter' && (
                     <Link
                       href="/shelter/dashboard"

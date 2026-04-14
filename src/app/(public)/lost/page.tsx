@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import LostReportCard from '@/components/lost/LostReportCard'
 import LostFiltersPanel from '@/components/lost/LostFiltersPanel'
+import PaginationNav from '@/components/ui/pagination-nav'
 import { getLostReports } from '@/lib/mock/lost-reports'
 import type { ReportType } from '@/types'
 
@@ -13,21 +14,39 @@ export const metadata: Metadata = {
   description: 'Reportes de animales perdidos y encontrados en Lambayeque, Perú.',
 }
 
+const PAGE_SIZE = 5
+
 interface LostPageProps {
-  searchParams: Promise<{ type?: string }>
+  searchParams: Promise<{ type?: string; q?: string; page?: string }>
 }
 
 export default async function LostPage({ searchParams }: LostPageProps) {
   const params = await searchParams
   const type = params.type as ReportType | undefined
+  const q = params.q?.toLowerCase().trim()
+  const currentPage = Math.max(1, Number(params.page ?? 1))
 
-  const reports = await getLostReports({
-    type,
-    is_resolved: false,
-  })
+  const allReports = await getLostReports({ type, is_resolved: false })
 
-  const lostCount = reports.filter((r) => r.type === 'lost').length
-  const foundCount = reports.filter((r) => r.type === 'found').length
+  const filtered = q
+    ? allReports.filter(
+        (r) =>
+          r.description.toLowerCase().includes(q) ||
+          (r.last_seen_address?.toLowerCase().includes(q) ?? false)
+      )
+    : allReports
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const page = Math.min(currentPage, Math.max(1, totalPages))
+  const reports = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const lostCount = filtered.filter((r) => r.type === 'lost').length
+  const foundCount = filtered.filter((r) => r.type === 'found').length
+
+  const { page: _page, ...restParams } = params
+  const paramString = new URLSearchParams(
+    Object.fromEntries(Object.entries(restParams).filter(([, v]) => v !== undefined)) as Record<string, string>
+  ).toString()
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
@@ -41,10 +60,7 @@ export default async function LostPage({ searchParams }: LostPageProps) {
             {lostCount} reportes de perdidos · {foundCount} animales encontrados en Lambayeque
           </p>
         </div>
-        <Link
-          href="/lost/new"
-          className={cn(buttonVariants(), 'shrink-0')}
-        >
+        <Link href="/lost/new" className={cn(buttonVariants(), 'shrink-0')}>
           + Nuevo reporte
         </Link>
       </div>
@@ -58,11 +74,19 @@ export default async function LostPage({ searchParams }: LostPageProps) {
 
       {/* Lista */}
       {reports.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          {reports.map((report) => (
-            <LostReportCard key={report.id} report={report} />
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-4">
+            {reports.map((report) => (
+              <LostReportCard key={report.id} report={report} />
+            ))}
+          </div>
+          <PaginationNav
+            currentPage={page}
+            totalPages={totalPages}
+            paramString={paramString}
+            pathname="/lost"
+          />
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
           <span className="text-5xl">🔍</span>
@@ -76,7 +100,7 @@ export default async function LostPage({ searchParams }: LostPageProps) {
         </div>
       )}
 
-      {/* Aviso de contacto */}
+      {/* Aviso */}
       <div className="mt-10 rounded-xl bg-muted/30 border border-border px-5 py-4 text-sm text-muted-foreground">
         <strong className="text-foreground">¿Cómo funciona?</strong> Cada reporte muestra el
         teléfono de contacto directo. Si reconoces a un animal, comunícate con el dueño o

@@ -138,6 +138,7 @@ export interface LostFoundReport {
   reward_amount: number | null // en PEN
   contact_phone: string
   is_resolved: boolean
+  photo_urls: string[] | null
   slug: string
   created_at: string
   updated_at: string

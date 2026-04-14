@@ -23,19 +23,31 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
     <div className="flex flex-col rounded-xl border border-border bg-card p-5 gap-4 hover:border-primary/40 hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-start gap-3">
-        {campaign.shelter.avatar_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={campaign.shelter.avatar_url}
-            alt={campaign.shelter.name}
-            className="h-10 w-10 rounded-full border border-border bg-muted shrink-0"
-          />
-        )}
+        <Link
+          href={`/shelters/${campaign.shelter.id}`}
+          className="shrink-0 hover:opacity-80 transition-opacity"
+        >
+          {campaign.shelter.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={campaign.shelter.avatar_url}
+              alt={campaign.shelter.name}
+              className="h-10 w-10 rounded-full border border-border bg-muted"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-full border border-border bg-muted" />
+          )}
+        </Link>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-2">
             {campaign.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">{campaign.shelter.name}</p>
+          <Link
+            href={`/shelters/${campaign.shelter.id}`}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors mt-0.5 block"
+          >
+            {campaign.shelter.name}
+          </Link>
         </div>
       </div>
 

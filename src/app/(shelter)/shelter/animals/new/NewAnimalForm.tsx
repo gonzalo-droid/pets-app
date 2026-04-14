@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { CheckCircle2, Upload } from 'lucide-react'
+import { CheckCircle2, ImageOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -60,9 +60,11 @@ function ToggleGroup<T extends string>({
   )
 }
 
+const PLACEHOLDER_URL = 'https://placehold.co/600x400/e2e8f0/94a3b8?text=Sin+foto'
+
 export default function NewAnimalForm() {
   const [submitted, setSubmitted] = useState(false)
-  const [photos, setPhotos] = useState<File[]>([])
+  const [photoUrls, setPhotoUrls] = useState<string[]>(['', '', ''])
 
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema) as Resolver<FormData>,
@@ -76,7 +78,9 @@ export default function NewAnimalForm() {
 
   const onSubmit = async (data: FormData) => {
     await new Promise((r) => setTimeout(r, 800))
-    console.log('Animal publicado (mock):', { ...data, photos: photos.map((f) => f.name) })
+    const filledUrls = photoUrls.filter(Boolean)
+    const photos = filledUrls.length > 0 ? filledUrls : [PLACEHOLDER_URL]
+    console.log('Animal publicado (mock):', { ...data, photos })
     setSubmitted(true)
   }
 
@@ -192,22 +196,37 @@ export default function NewAnimalForm() {
       </div>
 
       {/* Fotos */}
-      <div className="flex flex-col gap-2">
-        <Label>Fotos</Label>
-        <label className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-border p-8 cursor-pointer hover:border-primary/40 transition-colors">
-          <Upload className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            {photos.length > 0 ? `${photos.length} foto${photos.length > 1 ? 's' : ''} seleccionada${photos.length > 1 ? 's' : ''}` : 'Subir fotos (JPG, PNG — máx 5 MB c/u)'}
-          </p>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => setPhotos(Array.from(e.target.files ?? []))}
-          />
-        </label>
-        <p className="text-xs text-muted-foreground">La primera foto será la portada del perfil del animal.</p>
+      <div className="flex flex-col gap-3">
+        <div>
+          <Label>Fotos (máx. 3)</Label>
+          <p className="text-xs text-muted-foreground mt-1">La primera URL será la foto de portada.</p>
+        </div>
+        {photoUrls.map((url, idx) => (
+          <div key={idx} className="flex gap-3 items-center">
+            <div className="h-14 w-14 shrink-0 rounded-lg border border-border bg-muted overflow-hidden flex items-center justify-center">
+              {url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={url}
+                  alt={`Preview ${idx + 1}`}
+                  className="h-full w-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              ) : (
+                <ImageOff className="h-5 w-5 text-muted-foreground" />
+              )}
+            </div>
+            <Input
+              placeholder={idx === 0 ? 'URL de la foto de portada' : `URL de la foto ${idx + 1} (opcional)`}
+              value={url}
+              onChange={(e) => {
+                const updated = [...photoUrls]
+                updated[idx] = e.target.value
+                setPhotoUrls(updated)
+              }}
+            />
+          </div>
+        ))}
       </div>
 
       <Button type="submit" size="lg" disabled={isSubmitting}>

@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+# user test
+    ───────────────┬───────────────────────┬────────────┬────────────────────┐
+  │      Rol       │         Email         │ Contraseña │     Redirige a     │
+  ├────────────────┼───────────────────────┼────────────┼────────────────────┤
+  │ Usuario normal │ usuario@pawrescue.pe  │ demo1234   │ Inicio             │
+  ├────────────────┼───────────────────────┼────────────┼────────────────────┤
+  │ Albergue       │ albergue@pawrescue.pe │ demo1234   │ /shelter/dashboard │
+
+
 ## Getting Started
 
 First, run the development server:

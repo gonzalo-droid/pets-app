@@ -29,8 +29,23 @@ export default function ShelterSidebar() {
 
   return (
     <aside className="hidden lg:flex flex-col w-60 shrink-0 border-r border-border bg-sidebar min-h-screen">
+      {/* Volver al sitio + toggle tema */}
+      <div className="px-3 pt-3 pb-2 border-b border-border flex items-center justify-between gap-1">
+        <Link
+          href="/"
+          className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Volver al sitio
+        </Link>
+        <div className="flex items-center gap-1.5 px-2 py-1">
+          <span className="text-xs text-muted-foreground">Tema</span>
+          <ThemeToggle />
+        </div>
+      </div>
+
       {/* Logo del panel */}
-      <div className="flex items-center gap-2 px-5 py-5 border-b border-border">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
         <PawPrint className="h-5 w-5 text-primary" />
         <span className="font-bold text-sm text-foreground">Panel Albergue</span>
       </div>
@@ -53,21 +68,6 @@ export default function ShelterSidebar() {
           </Link>
         ))}
       </nav>
-
-      {/* Volver al sitio + toggle tema */}
-      <div className="px-3 pb-4 border-t border-border pt-3 flex flex-col gap-1">
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-muted"
-        >
-          <ChevronLeft className="h-3.5 w-3.5" />
-          Volver al sitio
-        </Link>
-        <div className="flex items-center gap-2 px-3 py-1">
-          <span className="text-xs text-muted-foreground flex-1">Tema</span>
-          <ThemeToggle />
-        </div>
-      </div>
     </aside>
   )
 }

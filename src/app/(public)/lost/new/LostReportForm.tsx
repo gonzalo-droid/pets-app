@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, ImageOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,6 +38,7 @@ type LostReportFormData = z.infer<typeof lostReportSchema>
 
 export default function LostReportForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [photoUrls, setPhotoUrls] = useState<string[]>(['', '', ''])
 
   const {
     register,
@@ -61,10 +62,10 @@ export default function LostReportForm() {
   const selectedType = watch('type')
 
   const onSubmit = async (data: LostReportFormData) => {
-    // Fase mock — cuando conectemos Supabase: insertar en lost_found_reports
     const payload = {
       ...data,
       reward_amount: data.reward_amount ? Number(data.reward_amount) : null,
+      photo_urls: photoUrls.filter(Boolean),
     }
     await new Promise((r) => setTimeout(r, 700))
     console.log('Reporte enviado (mock):', payload)
@@ -233,6 +234,42 @@ export default function LostReportForm() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Fotos */}
+      <div className="flex flex-col gap-3">
+        <div>
+          <Label>Fotos del animal (opcional)</Label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Agrega hasta 3 URLs de fotos. Ayudan a identificarlo más rápido.
+          </p>
+        </div>
+        {photoUrls.map((url, idx) => (
+          <div key={idx} className="flex gap-3 items-center">
+            <div className="h-14 w-14 shrink-0 rounded-lg border border-border bg-muted overflow-hidden flex items-center justify-center">
+              {url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={url}
+                  alt={`Preview ${idx + 1}`}
+                  className="h-full w-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                />
+              ) : (
+                <ImageOff className="h-5 w-5 text-muted-foreground" />
+              )}
+            </div>
+            <Input
+              placeholder={`URL de la foto ${idx + 1}`}
+              value={url}
+              onChange={(e) => {
+                const updated = [...photoUrls]
+                updated[idx] = e.target.value
+                setPhotoUrls(updated)
+              }}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Submit */}

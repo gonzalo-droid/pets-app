@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { daysAgo } from '@/lib/utils'
@@ -27,13 +28,25 @@ export default function LostReportCard({ report }: LostReportCardProps) {
       href={`/lost/${report.slug}`}
       className="flex gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all"
     >
-      {/* Ícono / tipo */}
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-xl ${
-          isLost ? 'bg-destructive/10' : 'bg-primary/10'
-        }`}
-      >
-        {isLost ? '🔍' : '📍'}
+      {/* Foto o ícono */}
+      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+        {report.photo_urls && report.photo_urls.length > 0 ? (
+          <Image
+            src={report.photo_urls[0]}
+            alt="Foto del animal"
+            fill
+            className="object-cover"
+            sizes="80px"
+          />
+        ) : (
+          <div
+            className={`flex h-full w-full items-center justify-center text-2xl ${
+              isLost ? 'bg-destructive/10' : 'bg-primary/10'
+            }`}
+          >
+            {isLost ? '🔍' : '📍'}
+          </div>
+        )}
       </div>
 
       {/* Contenido */}

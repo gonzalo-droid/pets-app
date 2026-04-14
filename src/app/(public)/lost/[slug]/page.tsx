@@ -1,9 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ArrowLeft, Phone, MapPin, Clock, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Phone, MapPin, CheckCircle2, Calendar } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
 import SightingForm from '@/components/lost/SightingForm'
+import ReportPhotoGallery from '@/components/lost/ReportPhotoGallery'
 import { daysAgo } from '@/lib/utils'
 import { DISTRICT_LABEL } from '@/lib/ubigeo'
 import { getLostReportBySlug } from '@/lib/mock/lost-reports'
@@ -30,7 +33,7 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
   const district = DISTRICT_LABEL[report.ubigeo] ?? 'Lambayeque'
 
   return (
-    <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
       <Link
         href="/lost"
@@ -40,142 +43,153 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
         Volver a perdidos y encontrados
       </Link>
 
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-6">
-        <div
-          className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl ${
-            isLost ? 'bg-destructive/10' : 'bg-primary/10'
-          }`}
-        >
-          {isLost ? '🔍' : '📍'}
+      {/* Layout principal: galería + info */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Galería */}
+        <div>
+          <ReportPhotoGallery urls={report.photo_urls} />
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant={isLost ? 'destructive' : 'default'}>
-              {isLost ? 'Animal perdido' : 'Animal encontrado'}
-            </Badge>
-            {report.is_resolved && (
-              <Badge variant="secondary" className="gap-1">
-                <CheckCircle2 className="h-3 w-3" />
-                Reunificado
-              </Badge>
-            )}
+
+        {/* Info */}
+        <div className="flex flex-col gap-6">
+          {/* Badges + título */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant={isLost ? 'destructive' : 'default'}>
+                  {isLost ? 'Animal perdido' : 'Animal encontrado'}
+                </Badge>
+                {report.is_resolved && (
+                  <Badge variant="secondary" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Reunificado
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-2xl font-bold text-foreground leading-snug">
+                {isLost ? '¿Lo viste?' : '¿Es tuyo?'}
+              </h1>
+            </div>
           </div>
-          <h1 className="text-xl font-bold text-foreground mt-2 leading-snug">
-            {report.description}
-          </h1>
+
+          {/* Descripción */}
+          <div>
+            <h2 className="text-sm font-semibold text-foreground mb-2">Descripción</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">{report.description}</p>
+          </div>
+
+          {/* Grid de datos clave */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg bg-muted/40 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Distrito</p>
+              <p className="text-sm font-medium text-foreground mt-0.5">{district}</p>
+            </div>
+            <div className="rounded-lg bg-muted/40 px-4 py-3">
+              <p className="text-xs text-muted-foreground">
+                {isLost ? 'Visto por última vez' : 'Encontrado'}
+              </p>
+              <p className="text-sm font-medium text-foreground mt-0.5">
+                {new Date(report.last_seen_at).toLocaleDateString('es-PE', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
+            {report.reward_amount !== null && report.reward_amount > 0 && (
+              <div className="rounded-lg bg-muted/40 px-4 py-3">
+                <p className="text-xs text-muted-foreground">Recompensa</p>
+                <p className="text-sm font-medium text-foreground mt-0.5">S/ {report.reward_amount}</p>
+              </div>
+            )}
+            <div className="rounded-lg bg-muted/40 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Reporte activo</p>
+              <p className="text-sm font-medium text-foreground mt-0.5">
+                {days === 0 ? 'Hoy' : `Hace ${days} día${days === 1 ? '' : 's'}`}
+              </p>
+            </div>
+          </div>
+
+          {/* Dirección */}
+          {report.last_seen_address && (
+            <div className="flex items-start gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <span>{report.last_seen_address}</span>
+            </div>
+          )}
+
+          {/* Contacto CTA */}
+          <div className="flex flex-col gap-3 pt-2">
+            <a
+              href={`tel:${report.contact_phone}`}
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                'justify-center gap-2'
+              )}
+            >
+              <Phone className="h-4 w-4" />
+              Llamar al {report.contact_phone}
+            </a>
+            <Link
+              href="/lost"
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'lg' }),
+                'justify-center'
+              )}
+            >
+              Ver más reportes
+            </Link>
+          </div>
+
+          {/* Fecha publicación */}
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            Publicado el{' '}
+            {new Date(report.created_at).toLocaleDateString('es-PE', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {/* Columna principal */}
-        <div className="sm:col-span-2 flex flex-col gap-6">
-          {/* Detalles del avistamiento */}
-          <div className="rounded-xl border border-border p-5 flex flex-col gap-4">
-            <h2 className="text-sm font-semibold text-foreground">Detalles</h2>
+      {/* Avistamientos — ancho completo debajo */}
+      <div className="mt-10 flex flex-col gap-4">
+        <h2 className="text-sm font-semibold text-foreground">
+          Avistamientos ({report.sightings.length})
+        </h2>
 
-            <div className="flex items-start gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium text-foreground">{district}</p>
-                {report.last_seen_address && (
-                  <p className="text-muted-foreground text-xs mt-0.5">{report.last_seen_address}</p>
-                )}
+        {report.sightings.length > 0 ? (
+          <div className="flex flex-col gap-3">
+            {report.sightings.map((sighting) => (
+              <div
+                key={sighting.id}
+                className="rounded-lg border border-border bg-muted/20 px-4 py-3"
+              >
+                <p className="text-sm text-foreground">{sighting.message}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  {new Date(sighting.created_at).toLocaleDateString('es-PE', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4 text-primary shrink-0" />
-              <span>
-                {isLost ? 'Visto por última vez' : 'Encontrado'} el{' '}
-                {new Date(report.last_seen_at).toLocaleDateString('es-PE', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-                {' '}({days === 0 ? 'hoy' : `hace ${days} día${days === 1 ? '' : 's'}`})
-              </span>
-            </div>
-
-            {report.reward_amount !== null && report.reward_amount > 0 && (
-              <div className="flex items-center gap-2 text-sm">
-                <AlertCircle className="h-4 w-4 text-primary shrink-0" />
-                <span className="font-medium text-foreground">
-                  Recompensa: S/ {report.reward_amount}
-                </span>
-              </div>
-            )}
+            ))}
           </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Aún no hay avistamientos. Si ves a este animal, deja un mensaje abajo.
+          </p>
+        )}
 
-          {/* Avistamientos */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-sm font-semibold text-foreground">
-              Avistamientos ({report.sightings.length})
-            </h2>
-
-            {report.sightings.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {report.sightings.map((sighting) => (
-                  <div
-                    key={sighting.id}
-                    className="rounded-lg border border-border bg-muted/20 px-4 py-3"
-                  >
-                    <p className="text-sm text-foreground">{sighting.message}</p>
-                    <p className="mt-1.5 text-xs text-muted-foreground">
-                      {new Date(sighting.created_at).toLocaleDateString('es-PE', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Aún no hay avistamientos. Si ves a este animal, deja un mensaje abajo.
-              </p>
-            )}
-
-            {/* Formulario de avistamiento */}
-            {!report.is_resolved && (
-              <div className="mt-2 rounded-xl border border-border p-4">
-                <SightingForm reportId={report.id} />
-              </div>
-            )}
+        {!report.is_resolved && (
+          <div className="mt-2 rounded-xl border border-border p-4">
+            <SightingForm reportId={report.id} />
           </div>
-        </div>
-
-        {/* Columna de contacto */}
-        <div className="flex flex-col gap-4">
-          {/* Contacto */}
-          <div className="rounded-xl border border-border p-5 flex flex-col gap-3">
-            <h2 className="text-sm font-semibold text-foreground">Contacto</h2>
-            <p className="text-xs text-muted-foreground">
-              {isLost
-                ? 'Si encontraste este animal, contacta directamente al dueño.'
-                : 'Si este es tu animal, comunícate con quien lo encontró.'}
-            </p>
-            <a
-              href={`tel:${report.contact_phone}`}
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors justify-center"
-            >
-              <Phone className="h-4 w-4" />
-              {report.contact_phone}
-            </a>
-            <p className="text-[10px] text-muted-foreground text-center">
-              El contacto es directo fuera de la plataforma
-            </p>
-          </div>
-
-          {/* Compartir (texto plano MVP) */}
-          <div className="rounded-xl border border-dashed border-border p-4 text-center">
-            <p className="text-xs text-muted-foreground">
-              Comparte este reporte para aumentar las probabilidades de reunificación.
-            </p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

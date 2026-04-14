@@ -155,7 +155,10 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
           {shelter && (
             <div className="rounded-xl border border-border p-5 flex flex-col gap-3">
               <h2 className="text-sm font-semibold text-foreground">Albergue responsable</h2>
-              <div className="flex items-center gap-3">
+              <Link
+                href={`/shelters/${shelter.id}`}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
                 {shelter.avatar_url && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -175,7 +178,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                     <p className="text-xs text-muted-foreground mt-0.5">{shelter.address}</p>
                   )}
                 </div>
-              </div>
+              </Link>
 
               {/* Métodos de pago disponibles */}
               <div className="pt-3 border-t border-border flex flex-col gap-2">

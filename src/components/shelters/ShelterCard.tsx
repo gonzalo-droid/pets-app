@@ -18,7 +18,10 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
   const city = CITY_BY_UBIGEO[shelter.ubigeo] ?? 'Lambayeque'
 
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all">
+    <Link
+      href={`/shelters/${shelter.id}`}
+      className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+    >
       {/* Avatar */}
       <div className="relative shrink-0">
         {shelter.avatar_url ? (
@@ -48,6 +51,6 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
           <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{shelter.description}</p>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
