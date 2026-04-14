@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PawPrint, Menu, X, Heart } from 'lucide-react'
-import { useState } from 'react'
+import { PawPrint, Menu, X, Heart, LogOut, LayoutDashboard } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { getMockSession, clearMockSession, type MockUser } from '@/lib/mock/users'
 
 const NAV_LINKS = [
   { href: '/adopt', label: 'Adoptar' },
@@ -17,6 +18,17 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [session, setSession] = useState<MockUser | null>(null)
+
+  useEffect(() => {
+    setSession(getMockSession())
+  }, [])
+
+  function handleLogout() {
+    clearMockSession()
+    setSession(null)
+    window.location.href = '/'
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -51,19 +63,45 @@ export default function Navbar() {
         {/* Auth — escritorio */}
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <Link
-            href="/auth/login"
-            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
-          >
-            Iniciar sesión
-          </Link>
-          <Link
-            href="/auth/register"
-            className={cn(buttonVariants({ size: 'sm' }))}
-          >
-            <Heart className="h-4 w-4" />
-            Registrarse
-          </Link>
+          {session ? (
+            <>
+              <span className="text-sm text-muted-foreground">
+                {session.full_name}
+              </span>
+              {session.role === 'shelter' && (
+                <Link
+                  href="/shelter/dashboard"
+                  className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Panel
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+              >
+                <LogOut className="h-4 w-4" />
+                Salir
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                href="/auth/register"
+                className={cn(buttonVariants({ size: 'sm' }))}
+              >
+                <Heart className="h-4 w-4" />
+                Registrarse
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Controles móvil */}
@@ -99,21 +137,46 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-              <Link
-                href="/auth/login"
-                onClick={() => setMobileOpen(false)}
-                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'justify-center')}
-              >
-                Iniciar sesión
-              </Link>
-              <Link
-                href="/auth/register"
-                onClick={() => setMobileOpen(false)}
-                className={cn(buttonVariants({ size: 'sm' }), 'justify-center')}
-              >
-                <Heart className="h-4 w-4" />
-                Registrarse
-              </Link>
+              {session ? (
+                <>
+                  <span className="px-3 py-1 text-sm text-muted-foreground">{session.full_name}</span>
+                  {session.role === 'shelter' && (
+                    <Link
+                      href="/shelter/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'justify-center')}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Panel
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleLogout}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'justify-center')}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'justify-center')}
+                  >
+                    Iniciar sesión
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(buttonVariants({ size: 'sm' }), 'justify-center')}
+                  >
+                    <Heart className="h-4 w-4" />
+                    Registrarse
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

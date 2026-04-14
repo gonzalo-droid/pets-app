@@ -137,7 +137,9 @@ export default async function HomePage() {
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {shelters.map((shelter) => (
-              <ShelterCard key={shelter.id} shelter={shelter} />
+              <Link key={shelter.id} href={`/shelters/${shelter.id}`}>
+                <ShelterCard shelter={shelter} />
+              </Link>
             ))}
           </div>
         </div>

@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { findMockUser, setMockSession } from '@/lib/mock/users'
 // import { createBrowserClient } from '@/lib/supabase/client'
 
 const schema = z.object({
@@ -46,10 +47,17 @@ function LoginForm() {
       // window.location.href = redirectTo
       // ─────────────────────────────────────────────────────────────────
 
-      // Mock: simular delay y redirigir
-      await new Promise((r) => setTimeout(r, 800))
-      console.log('Login mock:', data.email, '→ redirect:', redirectTo)
-      window.location.href = redirectTo
+      // Mock: validar contra usuarios de prueba
+      await new Promise((r) => setTimeout(r, 600))
+      const mockUser = findMockUser(data.email, data.password)
+      if (!mockUser) {
+        setServerError('Correo o contraseña incorrectos.')
+        return
+      }
+      setMockSession(mockUser)
+      // Albergues van al panel; usuarios normales van a redirectTo o home
+      const destination = mockUser.role === 'shelter' ? mockUser.redirectTo : redirectTo
+      window.location.href = destination
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error al iniciar sesión'
       if (msg.includes('Invalid login credentials')) {
