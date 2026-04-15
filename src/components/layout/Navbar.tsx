@@ -40,7 +40,7 @@ export default function Navbar() {
           className="flex items-center gap-1.5 hover:opacity-90 transition-opacity"
           aria-label="PawRescue — inicio"
         >
-          <span className="text-2xl leading-none">🐾</span>
+          <span className="text-2xl leading-none" aria-hidden="true">🐾</span>
           <span className="font-display font-black text-xl leading-none">
             <span className="text-brand-400">Paw</span>
             <span className="text-foreground">Rescue</span>
