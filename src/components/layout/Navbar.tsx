@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { PawPrint, Menu, X, Heart, LogOut, LayoutDashboard, UserCircle } from 'lucide-react'
+import { Menu, X, Heart, LogOut, LayoutDashboard, UserCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -37,10 +37,14 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-xl text-primary hover:opacity-90 transition-opacity"
+          className="flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+          aria-label="PawRescue — inicio"
         >
-          <PawPrint className="h-6 w-6" />
-          <span>PawRescue</span>
+          <span className="text-2xl leading-none">🐾</span>
+          <span className="font-display font-black text-xl leading-none">
+            <span className="text-brand-400">Paw</span>
+            <span className="text-foreground">Rescue</span>
+          </span>
         </Link>
 
         {/* Links de escritorio */}
