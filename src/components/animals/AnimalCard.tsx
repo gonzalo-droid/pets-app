@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
 import { cn, formatAge, SPECIES_LABELS, SIZE_LABELS } from '@/lib/utils'
 import type { AnimalWithPhotos } from '@/types'
 
@@ -12,20 +11,27 @@ interface AnimalCardProps {
   shelterId?: string
 }
 
-const HEALTH_CHIPS = [
-  { key: 'is_vaccinated', label: 'Vacunado' },
-  { key: 'is_neutered', label: 'Castrado' },
-  { key: 'is_microchipped', label: 'Microchip' },
-] as const
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  available: {
+    label: 'Disponible',
+    className: 'bg-adopt text-white',
+  },
+  in_process: {
+    label: 'En proceso',
+    className: 'bg-donate text-white',
+  },
+  adopted: {
+    label: 'Adoptado',
+    className: 'bg-muted text-muted-foreground',
+  },
+}
 
 export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCardProps) {
   const coverPhoto = animal.animal_photos.find((p) => p.is_cover) ?? animal.animal_photos[0]
-  const activeChips = HEALTH_CHIPS.filter(({ key }) => animal[key])
+  const badge = STATUS_BADGE[animal.status]
 
   return (
-    // Patrón "stretched link": div relativo, el link al animal va absolute inset-0,
-    // el link del albergue queda encima con z-10 para ser clickeable independientemente.
-    <div className="group relative flex flex-col rounded-xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-md transition-all">
+    <div className="group relative flex flex-col rounded-2xl bg-card overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
       {/* Link principal — cubre toda la card */}
       <Link
         href={`/adopt/${animal.slug}`}
@@ -48,18 +54,24 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
             {animal.species === 'dog' ? '🐶' : animal.species === 'cat' ? '🐱' : '🐾'}
           </div>
         )}
-        {/* Badge de estado */}
-        {animal.status === 'in_process' && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge variant="secondary" className="text-xs">En proceso</Badge>
-          </div>
+
+        {/* Badge flotante sobre la foto */}
+        {badge && (
+          <span className={cn(
+            'absolute top-3 left-3 z-10 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide',
+            badge.className
+          )}>
+            {badge.label}
+          </span>
         )}
       </div>
 
       {/* Contenido */}
       <div className="relative z-10 flex flex-col gap-2 p-4 flex-1 pointer-events-none">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-foreground text-base leading-tight">{animal.name}</h3>
+          <h3 className="font-display font-bold text-foreground text-base leading-tight">
+            {animal.name}
+          </h3>
           <span className="text-xs text-muted-foreground shrink-0">
             {SPECIES_LABELS[animal.species]}
           </span>
@@ -77,27 +89,13 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
           )}
         </div>
 
-        {/* Chips de salud */}
-        {activeChips.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1">
-            {activeChips.map(({ label }) => (
-              <span
-                key={label}
-                className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Albergue — pointer-events-auto para contrarrestar el none del padre */}
+        {/* Albergue */}
         {shelterName && (
           <div className="mt-auto pt-2 border-t border-border pointer-events-auto">
             {shelterId ? (
               <Link
                 href={`/shelters/${shelterId}`}
-                className="text-xs text-primary hover:underline truncate block"
+                className="text-xs text-brand-400 hover:underline truncate block"
               >
                 {shelterName}
               </Link>
