@@ -1,0 +1,6 @@
+{"type":"server-started","port":51110,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:51110","screen_dir":"/Users/gonzalo/DocsNeko/webs/pets-app/.superpowers/brainstorm/20082-1776210064/content","state_dir":"/Users/gonzalo/DocsNeko/webs/pets-app/.superpowers/brainstorm/20082-1776210064/state"}
+{"type":"screen-added","file":"/Users/gonzalo/DocsNeko/webs/pets-app/.superpowers/brainstorm/20082-1776210064/content/scope.html"}
+{"source":"user-event","type":"click","text":"D\n    \n      Todo el sitio\n      Aplicar el sistema de diseño completo — paleta, tipografía, componentes — en todas las páginas existentes","choice":"all","id":null,"timestamp":1776210094188}
+{"source":"user-event","type":"click","text":"D\n    \n      Todo el sitio\n      Aplicar el sistema de diseño completo — paleta, tipografía, componentes — en todas las páginas existentes","choice":"all","id":null,"timestamp":1776210100954}
+{"type":"screen-added","file":"/Users/gonzalo/DocsNeko/webs/pets-app/.superpowers/brainstorm/20082-1776210064/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

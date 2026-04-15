@@ -188,7 +188,7 @@ export default async function HomePage() {
           <div className="mt-6 text-center">
             <Link
               href="/lost/new"
-              className={cn(buttonVariants({ variant: 'outline' }))}
+              className={cn(buttonVariants({ variant: 'outline' }), 'dark:border-rescue dark:text-rescue hover:dark:bg-rescue/10')}
             >
               Reportar animal perdido o encontrado
             </Link>

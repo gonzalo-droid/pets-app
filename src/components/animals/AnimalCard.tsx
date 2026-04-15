@@ -18,7 +18,7 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   },
   in_process: {
     label: 'En proceso',
-    className: 'bg-donate text-white',
+    className: 'bg-donate-light text-donate-dark',
   },
   adopted: {
     label: 'Adoptado',
