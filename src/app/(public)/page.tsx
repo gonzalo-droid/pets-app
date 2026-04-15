@@ -20,6 +20,7 @@ export default async function HomePage() {
   ])
 
   const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
+  const availableCount = animals.length // getAnimals pre-filters by status: 'available'
 
   return (
     <div className="flex flex-col">
@@ -59,7 +60,7 @@ export default async function HomePage() {
               </Link>
             </div>
             <p className="text-white/60 text-xs">
-              🐾 {animals.filter(a => a.status === 'available').length} en adopción
+              🐾 {availableCount} en adopción
               &nbsp;·&nbsp;
               🔍 {lostReports.length} reportes activos
               &nbsp;·&nbsp;
@@ -73,6 +74,7 @@ export default async function HomePage() {
             <img
               src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=900&q=80"
               alt="Animal esperando adopción"
+              fetchPriority="high"
               className="absolute inset-0 h-full w-full object-cover object-center dark:brightness-90"
             />
           </div>
@@ -89,7 +91,7 @@ export default async function HomePage() {
             <span className="text-3xl">🐾</span>
             <div>
               <p className="font-display font-bold text-foreground text-sm">Adoptar</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{animals.filter(a => a.status === 'available').length} disponibles</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{availableCount} disponibles</p>
             </div>
             <span className="text-xs font-semibold text-adopt-dark">Ver todos →</span>
           </Link>
