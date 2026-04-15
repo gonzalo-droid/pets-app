@@ -15,9 +15,10 @@ const FILTERS: { label: string; value: AnimalSpecies | 'all' }[] = [
 interface AnimalFeedFilterProps {
   animals: AnimalWithPhotos[]
   shelterNames: Record<string, string>
+  shelterIds: Record<string, string>
 }
 
-export default function AnimalFeedFilter({ animals, shelterNames }: AnimalFeedFilterProps) {
+export default function AnimalFeedFilter({ animals, shelterNames, shelterIds }: AnimalFeedFilterProps) {
   const [active, setActive] = useState<AnimalSpecies | 'all'>('all')
 
   const filtered = active === 'all' ? animals : animals.filter((a) => a.species === active)
@@ -50,6 +51,7 @@ export default function AnimalFeedFilter({ animals, shelterNames }: AnimalFeedFi
               key={animal.id}
               animal={animal}
               shelterName={shelterNames[animal.shelter_id]}
+              shelterId={shelterIds[animal.shelter_id]}
             />
           ))}
         </div>

@@ -20,6 +20,7 @@ export default async function HomePage() {
   ])
 
   const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
+  const shelterIds = Object.fromEntries(shelters.map((s) => [s.id, s.id]))
   const availableCount = animals.length // getAnimals pre-filters by status: 'available'
 
   return (
@@ -142,7 +143,7 @@ export default async function HomePage() {
             subtitle="Todos esperando un hogar responsable en Lambayeque"
             href="/adopt"
           />
-          <AnimalFeedFilter animals={animals} shelterNames={shelterNames} />
+          <AnimalFeedFilter animals={animals} shelterNames={shelterNames} shelterIds={shelterIds} />
         </div>
       </section>
 
