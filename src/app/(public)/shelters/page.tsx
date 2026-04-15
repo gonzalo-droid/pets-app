@@ -46,7 +46,7 @@ export default async function SheltersPage({ searchParams }: SheltersPageProps) 
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Albergues</h1>
+        <h1 className="font-display font-bold text-3xl tracking-tight text-foreground">Albergues</h1>
         <p className="mt-2 text-muted-foreground">
           {filtered.length === 0
             ? 'No hay albergues con ese nombre.'

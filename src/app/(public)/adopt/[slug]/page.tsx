@@ -51,7 +51,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
       {/* Breadcrumb */}
       <Link
         href="/adopt"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-adopt transition-colors mb-8"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a adopciones
@@ -68,7 +68,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
           {/* Nombre y estado */}
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">{animal.name}</h1>
+              <h1 className="font-display font-bold text-3xl text-foreground">{animal.name}</h1>
               <p className="text-muted-foreground mt-1">
                 {SPECIES_LABELS[animal.species]}
                 {animal.breed ? ` · ${animal.breed}` : ''}
@@ -114,7 +114,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
 
           {/* Ubicación */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 text-primary shrink-0" />
+            <MapPin className="h-4 w-4 text-adopt shrink-0" />
             <span>{district}, Lambayeque</span>
           </div>
 
@@ -130,7 +130,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
           {shelter && (
             <Link
               href={`/shelters/${shelter.id}`}
-              className="rounded-xl border border-border p-4 flex items-center gap-4 hover:border-primary/40 hover:shadow-sm transition-all"
+              className="rounded-xl border border-border p-4 flex items-center gap-4 hover:border-shelter/40 hover:shadow-sm transition-all"
             >
               {shelter.avatar_url && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -144,7 +144,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
                 <div className="flex items-center gap-1.5">
                   <p className="text-sm font-semibold text-foreground truncate">{shelter.name}</p>
                   {shelter.is_verified && (
-                    <BadgeCheck className="h-4 w-4 text-primary shrink-0" />
+                    <BadgeCheck className="h-4 w-4 text-shelter shrink-0" />
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">

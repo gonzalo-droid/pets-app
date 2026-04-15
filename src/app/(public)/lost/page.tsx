@@ -53,7 +53,7 @@ export default async function LostPage({ searchParams }: LostPageProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="font-display font-bold text-3xl tracking-tight text-foreground">
             Perdidos y Encontrados
           </h1>
           <p className="mt-2 text-muted-foreground">

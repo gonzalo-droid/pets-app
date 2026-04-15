@@ -34,8 +34,8 @@ export default function AnimalFeedFilter({ animals, shelterNames, shelterIds }: 
             className={cn(
               'rounded-full px-4 py-1.5 text-sm font-medium border transition-colors',
               active === value
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background'
+                ? 'bg-brand-400 text-white border-brand-400'
+                : 'border-border text-muted-foreground hover:border-brand-400/40 hover:text-foreground bg-background'
             )}
           >
             {label}

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { PawPrint } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 
@@ -10,9 +9,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Marca */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary">
-              <PawPrint className="h-5 w-5" />
-              <span>PawRescue</span>
+            <Link href="/" className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+              <span className="text-xl leading-none" aria-hidden="true">🐾</span>
+              <span className="font-display font-black text-lg leading-none">
+                <span className="text-brand-400">Paw</span>
+                <span className="text-foreground">Rescue</span>
+              </span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               La plataforma de adopción y rescate animal de Perú. Conectamos animales

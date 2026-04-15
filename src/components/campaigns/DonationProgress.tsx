@@ -24,7 +24,7 @@ export default function DonationProgress({
       {/* Barra de progreso */}
       <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
         <div
-          className="h-full rounded-full bg-primary transition-all"
+          className="h-full rounded-full bg-donate transition-all"
           style={{ width: `${pct}%` }}
           role="progressbar"
           aria-valuenow={pct}

@@ -46,7 +46,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
       {/* Breadcrumb */}
       <Link
         href="/donate"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-donate transition-colors mb-8"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a campañas
@@ -66,7 +66,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
               />
             )}
             <div>
-              <h1 className="text-2xl font-bold text-foreground leading-tight">
+              <h1 className="font-display font-bold text-2xl text-foreground leading-tight">
                 {campaign.title}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -107,7 +107,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
               </div>
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Completado</p>
-                <p className="font-bold text-primary mt-0.5">{pct}%</p>
+                <p className="font-bold text-donate mt-0.5">{pct}%</p>
               </div>
             </div>
 
@@ -171,7 +171,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                   <div className="flex items-center gap-1">
                     <p className="text-sm font-medium text-foreground">{shelter.name}</p>
                     {shelter.is_verified && (
-                      <BadgeCheck className="h-4 w-4 text-primary shrink-0" />
+                      <BadgeCheck className="h-4 w-4 text-shelter shrink-0" />
                     )}
                   </div>
                   {shelter.address && (
@@ -191,7 +191,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                 )}
                 {shelter.bank_account && (
                   <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="h-5 w-5 flex items-center justify-center rounded bg-primary/20 text-primary text-[10px] font-bold">B</span>
+                    <span className="h-5 w-5 flex items-center justify-center rounded bg-donate/20 text-donate-dark text-[10px] font-bold">B</span>
                     Transferencia bancaria
                   </span>
                 )}

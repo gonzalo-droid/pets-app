@@ -55,7 +55,7 @@ export default async function ShelterPublicPage({
       {/* ── Hero: banner + avatar + nombre ── */}
       <div className="rounded-2xl overflow-hidden border border-border">
         {/* Banner */}
-        <div className="relative h-48 sm:h-60 bg-gradient-to-r from-primary/30 to-primary/10">
+        <div className="relative h-48 sm:h-60 bg-gradient-to-r from-shelter/30 to-shelter/10">
           {shelter.banner_url && (
             <Image
               src={shelter.banner_url}
@@ -85,13 +85,13 @@ export default async function ShelterPublicPage({
                 </div>
               )}
               {shelter.is_verified && (
-                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-shelter text-white">
                   <BadgeCheck className="h-4 w-4" />
                 </span>
               )}
             </div>
             <div className="pt-12">
-              <h1 className="text-xl font-bold text-foreground leading-tight">{shelter.name}</h1>
+              <h1 className="font-display font-bold text-xl text-foreground leading-tight">{shelter.name}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">{city}, Lambayeque</p>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default async function ShelterPublicPage({
             <h2 className="text-base font-semibold text-foreground">Animales disponibles</h2>
             <Link
               href="/adopt"
-              className="flex items-center gap-1 text-xs text-primary hover:underline"
+              className="flex items-center gap-1 text-xs text-brand-400 hover:underline"
             >
               Ver todos <ArrowRight className="h-3 w-3" />
             </Link>
@@ -235,7 +235,7 @@ function ContactChip({
   label: string
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:border-primary/40 transition-colors cursor-pointer">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:border-shelter/40 transition-colors cursor-pointer">
       {icon}
       {label}
     </span>

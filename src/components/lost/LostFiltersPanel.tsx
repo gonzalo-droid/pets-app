@@ -87,8 +87,8 @@ export default function LostFiltersPanel() {
             className={cn(
               'rounded-full px-4 py-1.5 text-sm font-medium border transition-colors',
               activeType === value
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background'
+                ? 'bg-rescue text-white border-rescue'
+                : 'border-border text-muted-foreground hover:border-rescue/40 hover:text-foreground bg-background'
             )}
           >
             {label}

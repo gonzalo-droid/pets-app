@@ -37,7 +37,7 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
       {/* Breadcrumb */}
       <Link
         href="/lost"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-rescue transition-colors mb-8"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a perdidos y encontrados
@@ -66,7 +66,7 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
                   </Badge>
                 )}
               </div>
-              <h1 className="text-2xl font-bold text-foreground leading-snug">
+              <h1 className="font-display font-bold text-2xl text-foreground leading-snug">
                 {isLost ? '¿Lo viste?' : '¿Es tuyo?'}
               </h1>
             </div>
@@ -113,7 +113,7 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
           {/* Dirección */}
           {report.last_seen_address && (
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <MapPin className="h-4 w-4 text-rescue shrink-0 mt-0.5" />
               <span>{report.last_seen_address}</span>
             </div>
           )}

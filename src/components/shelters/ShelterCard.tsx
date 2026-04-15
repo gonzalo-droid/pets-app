@@ -20,7 +20,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
   return (
     <Link
       href={`/shelters/${shelter.id}`}
-      className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+      className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 hover:border-shelter/40 hover:shadow-sm transition-all"
     >
       {/* Avatar */}
       <div className="relative shrink-0">
@@ -37,7 +37,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
           </div>
         )}
         {shelter.is_verified && (
-          <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-shelter text-white">
             <BadgeCheck className="h-3.5 w-3.5" />
           </span>
         )}

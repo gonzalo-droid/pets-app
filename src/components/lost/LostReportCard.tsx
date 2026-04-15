@@ -26,7 +26,7 @@ export default function LostReportCard({ report }: LostReportCardProps) {
   return (
     <Link
       href={`/lost/${report.slug}`}
-      className="flex gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all"
+      className="flex gap-3 rounded-xl border border-border bg-card p-4 hover:border-rescue/40 hover:shadow-md transition-all"
     >
       {/* Foto o ícono */}
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
@@ -41,7 +41,7 @@ export default function LostReportCard({ report }: LostReportCardProps) {
         ) : (
           <div
             className={`flex h-full w-full items-center justify-center text-2xl ${
-              isLost ? 'bg-destructive/10' : 'bg-primary/10'
+              isLost ? 'bg-rescue/10' : 'bg-adopt/10'
             }`}
           >
             {isLost ? '🔍' : '📍'}
@@ -75,7 +75,7 @@ export default function LostReportCard({ report }: LostReportCardProps) {
             Lambayeque
           </span>
           {report.sightings.length > 0 && (
-            <span className="text-primary font-medium">
+            <span className="text-rescue font-medium">
               {report.sightings.length} avistamiento{report.sightings.length > 1 ? 's' : ''}
             </span>
           )}

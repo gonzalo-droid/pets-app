@@ -76,7 +76,7 @@ export default function ReportPhotoGallery({ urls }: ReportPhotoGalleryProps) {
               key={i}
               onClick={() => setActive(i)}
               className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
-                i === active ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'
+                i === active ? 'border-rescue' : 'border-transparent opacity-70 hover:opacity-100'
               }`}
             >
               <Image

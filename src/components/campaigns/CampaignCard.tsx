@@ -20,7 +20,7 @@ function daysUntil(isoDate: string | null): string {
 
 export default function CampaignCard({ campaign }: CampaignCardProps) {
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card p-5 gap-4 hover:border-primary/40 hover:shadow-md transition-all">
+    <div className="flex flex-col rounded-xl border border-border bg-card p-5 gap-4 hover:border-donate/40 hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-start gap-3">
         <Link
@@ -44,7 +44,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           </h3>
           <Link
             href={`/shelters/${campaign.shelter.id}`}
-            className="text-xs text-muted-foreground hover:text-primary transition-colors mt-0.5 block"
+            className="text-xs text-muted-foreground hover:text-brand-400 transition-colors mt-0.5 block"
           >
             {campaign.shelter.name}
           </Link>

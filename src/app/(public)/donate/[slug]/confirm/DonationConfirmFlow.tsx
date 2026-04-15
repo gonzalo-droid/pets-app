@@ -34,16 +34,16 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
             className={cn(
               'h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
               i < current
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-donate text-white'
                 : i === current
-                ? 'bg-primary/20 text-primary border-2 border-primary'
+                ? 'bg-donate/20 text-donate-dark border-2 border-donate'
                 : 'bg-muted text-muted-foreground'
             )}
           >
             {i < current ? <Check className="h-3.5 w-3.5" /> : i + 1}
           </div>
           {i < total - 1 && (
-            <div className={cn('h-0.5 w-8 rounded', i < current ? 'bg-primary' : 'bg-muted')} />
+            <div className={cn('h-0.5 w-8 rounded', i < current ? 'bg-donate' : 'bg-muted')} />
           )}
         </div>
       ))}
@@ -72,10 +72,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
       </div>
       <button
         onClick={copy}
-        className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+        className="shrink-0 flex items-center gap-1 text-xs text-muted-foreground hover:text-donate transition-colors"
         aria-label={`Copiar ${label}`}
       >
-        {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+        {copied ? <Check className="h-4 w-4 text-donate" /> : <Copy className="h-4 w-4" />}
         {copied ? 'Copiado' : 'Copiar'}
       </button>
     </div>
@@ -122,8 +122,8 @@ export default function DonationConfirmFlow({
               className={cn(
                 'rounded-xl border-2 py-3 text-sm font-bold transition-colors',
                 amount === preset && !customAmount
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-foreground hover:border-primary/50'
+                  ? 'border-donate bg-donate text-white'
+                  : 'border-border text-foreground hover:border-donate/50'
               )}
             >
               S/{preset}
@@ -194,8 +194,8 @@ export default function DonationConfirmFlow({
             className={cn(
               'flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-colors',
               method === 'yape'
-                ? 'border-primary bg-accent/40'
-                : 'border-border hover:border-primary/40'
+                ? 'border-donate bg-donate-light'
+                : 'border-border hover:border-donate/40'
             )}
           >
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#742483] text-white text-lg font-extrabold">
@@ -216,11 +216,11 @@ export default function DonationConfirmFlow({
             className={cn(
               'flex items-center gap-4 rounded-xl border-2 p-4 text-left transition-colors',
               method === 'bank'
-                ? 'border-primary bg-accent/40'
-                : 'border-border hover:border-primary/40'
+                ? 'border-donate bg-donate-light'
+                : 'border-border hover:border-donate/40'
             )}
           >
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary text-lg font-extrabold">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-donate/10 text-donate-dark text-lg font-extrabold">
               B
             </span>
             <div>
@@ -272,7 +272,7 @@ export default function DonationConfirmFlow({
         {method === 'bank' && bankAccount && (
           <>
             <div className="flex items-center gap-2 mb-1">
-              <span className="flex h-6 w-6 items-center justify-center rounded bg-primary/10 text-primary text-xs font-bold">B</span>
+              <span className="flex h-6 w-6 items-center justify-center rounded bg-donate/10 text-donate-dark text-xs font-bold">B</span>
               <span className="text-sm font-semibold text-foreground">{bankName}</span>
             </div>
             <CopyField label="CCI" value={bankAccount} />
@@ -282,7 +282,7 @@ export default function DonationConfirmFlow({
         )}
       </div>
 
-      <div className="rounded-lg bg-accent/60 border border-primary/20 px-4 py-3 text-sm text-accent-foreground">
+      <div className="rounded-lg bg-donate-light border border-donate/20 px-4 py-3 text-sm text-foreground">
         <strong>Importante:</strong> Después de realizar la transferencia, vuelve aquí y
         sube la captura del comprobante. El albergue lo verificará en 24–48 horas.
       </div>
@@ -333,13 +333,13 @@ export default function DonationConfirmFlow({
         className={cn(
           'flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 cursor-pointer transition-colors',
           receiptFile
-            ? 'border-primary bg-primary/5'
-            : 'border-border hover:border-primary/40 hover:bg-muted/30'
+            ? 'border-donate bg-donate/5'
+            : 'border-border hover:border-donate/40 hover:bg-muted/30'
         )}
       >
         {receiptFile ? (
           <>
-            <CheckCircle2 className="h-10 w-10 text-primary" />
+            <CheckCircle2 className="h-10 w-10 text-donate" />
             <p className="text-sm font-medium text-foreground">{receiptFile.name}</p>
             <p className="text-xs text-muted-foreground">
               {(receiptFile.size / 1024).toFixed(0)} KB · Toca para cambiar
@@ -403,8 +403,8 @@ export default function DonationConfirmFlow({
   if (submitted) {
     return (
       <div className="flex flex-col items-center gap-5 py-16 text-center">
-        <CheckCircle2 className="h-16 w-16 text-primary" />
-        <h2 className="text-xl font-bold text-foreground">¡Donación registrada!</h2>
+        <CheckCircle2 className="h-16 w-16 text-donate" />
+        <h2 className="font-display font-bold text-xl text-foreground">¡Donación registrada!</h2>
         <p className="text-sm text-muted-foreground max-w-sm">
           {shelterName} verificará tu comprobante en las próximas 24–48 horas y
           confirmará tu aporte. La barra de progreso se actualizará automáticamente.
@@ -412,7 +412,7 @@ export default function DonationConfirmFlow({
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
           <a
             href="/donate"
-            className="text-sm text-primary hover:underline"
+            className="text-sm text-donate hover:underline"
           >
             Ver otras campañas →
           </a>

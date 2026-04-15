@@ -44,7 +44,7 @@ export default function SightingForm({ reportId }: SightingFormProps) {
 
   if (submitted) {
     return (
-      <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-3 text-sm text-center text-foreground">
+      <div className="rounded-lg bg-rescue/5 border border-rescue/20 px-4 py-3 text-sm text-center text-foreground">
         ¡Gracias! Tu avistamiento fue registrado. El dueño verá tu mensaje.
       </div>
     )

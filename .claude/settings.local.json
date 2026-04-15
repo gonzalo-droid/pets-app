@@ -41,7 +41,18 @@
       "Bash(git merge:*)",
       "Bash(git branch:*)",
       "Bash(kill 4820 69791)",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(bash scripts/start-server.sh --project-dir /Users/gonzalo/DocsNeko/webs/pets-app)",
+      "Bash(git -C /Users/gonzalo/DocsNeko/webs/pets-app add src/components/animals/AnimalCard.tsx)",
+      "Bash(git -C /Users/gonzalo/DocsNeko/webs/pets-app commit -m \"feat: update AnimalCard with shadow, floating badge, hover lift\")",
+      "Bash(echo \"orange-500 not in globals.css - checking tailwind config\" ls /Users/gonzalo/DocsNeko/webs/pets-app/tailwind.config*)",
+      "Bash(echo \"no tailwind.config\" ls /Users/gonzalo/DocsNeko/webs/pets-app/*.css)",
+      "Bash(echo \"theme.css not found\" ls /Users/gonzalo/DocsNeko/webs/pets-app/node_modules/tailwindcss/*.css)",
+      "Bash(/Users/gonzalo/DocsNeko/webs/pets-app/node_modules/.bin/tsc --project /Users/gonzalo/DocsNeko/webs/pets-app/tsconfig.json --noEmit)",
+      "Bash(sh -c \"npx tsc --noEmit 2>&1\")",
+      "Bash(sh:*)",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(ls:*)"
     ]
   }
 }

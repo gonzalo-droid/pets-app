@@ -19,7 +19,7 @@ export default async function DonatePage() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="font-display font-bold text-3xl tracking-tight text-foreground">
           Campañas de donación
         </h1>
         <p className="mt-2 text-muted-foreground">
@@ -28,7 +28,7 @@ export default async function DonatePage() {
       </div>
 
       {/* Resumen global */}
-      <div className="mb-10 rounded-2xl bg-primary/5 border border-primary/20 px-6 py-5">
+      <div className="mb-10 rounded-2xl bg-donate-light border border-donate/20 px-6 py-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <p className="text-sm text-muted-foreground">Total recaudado entre todas las campañas</p>
@@ -72,7 +72,7 @@ export default async function DonatePage() {
             { n: '4', title: 'Sube el comprobante', desc: 'El albergue confirma y la barra se actualiza.' },
           ].map(({ n, title, desc }) => (
             <li key={n} className="flex gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-donate text-white text-xs font-bold">
                 {n}
               </span>
               <div>
