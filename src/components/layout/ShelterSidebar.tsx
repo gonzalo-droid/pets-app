@@ -8,7 +8,6 @@ import {
   ClipboardList,
   HeartHandshake,
   Wallet,
-  PawPrint,
   ChevronLeft,
   Settings,
 } from 'lucide-react'
@@ -46,8 +45,8 @@ export default function ShelterSidebar() {
 
       {/* Logo del panel */}
       <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
-        <PawPrint className="h-5 w-5 text-primary" />
-        <span className="font-bold text-sm text-foreground">Panel Albergue</span>
+        <span className="text-lg leading-none" aria-hidden="true">🐾</span>
+        <span className="font-display font-bold text-sm text-foreground">Panel Albergue</span>
       </div>
 
       {/* Links de navegación */}

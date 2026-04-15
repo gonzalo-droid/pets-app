@@ -4,7 +4,7 @@ import { Search } from 'lucide-react'
 import ShelterCard from '@/components/shelters/ShelterCard'
 import ShelterSearchInput from './ShelterSearchInput'
 import PaginationNav from '@/components/ui/pagination-nav'
-import { getShelters } from '@/lib/mock/shelters'
+import { getShelters } from '@/lib/data/shelters'
 
 export const metadata: Metadata = {
   title: 'Albergues — PawRescue',

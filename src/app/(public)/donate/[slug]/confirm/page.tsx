@@ -3,8 +3,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
 import DonationConfirmFlow from './DonationConfirmFlow'
-import { getCampaignBySlug } from '@/lib/mock/campaigns'
-import { getShelterById } from '@/lib/mock/shelters'
+import { getCampaignBySlug } from '@/lib/data/campaigns'
+import { getShelterById } from '@/lib/data/shelters'
 
 interface ConfirmPageProps {
   params: Promise<{ slug: string }>

@@ -47,8 +47,8 @@ function ToggleGroup<T extends string>({
             className={cn(
               'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors',
               value === opt.value
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border text-muted-foreground hover:border-primary/40'
+                ? 'border-brand-400 bg-brand-400 text-white'
+                : 'border-border text-muted-foreground hover:border-brand-400/40'
             )}
           >
             {opt.label}
@@ -87,13 +87,13 @@ export default function NewAnimalForm() {
   if (submitted) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <CheckCircle2 className="h-14 w-14 text-primary" />
-        <h2 className="text-xl font-bold">¡Animal publicado!</h2>
+        <CheckCircle2 className="h-14 w-14 text-adopt" />
+        <h2 className="font-display font-bold text-xl">¡Animal publicado!</h2>
         <p className="text-muted-foreground text-sm max-w-sm">
           Ya aparece en el feed público de adopciones.
         </p>
         <div className="flex gap-3 mt-2">
-          <a href="/shelter/animals" className="text-sm text-primary hover:underline">← Volver a mis animales</a>
+          <a href="/shelter/animals" className="text-sm text-brand-400 hover:underline">← Volver a mis animales</a>
         </div>
       </div>
     )

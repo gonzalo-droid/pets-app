@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 import { cn, formatAge, SPECIES_LABELS, STATUS_LABELS } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getAnimalsByShelter } from '@/lib/mock/animals'
+import { getAnimalsByShelter } from '@/lib/data/animals'
 
 export const metadata: Metadata = { title: 'Mis animales — Panel Albergue' }
 
@@ -94,7 +94,7 @@ export default async function ShelterAnimalsPage() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/adopt/${animal.slug}`}
-                          className="text-xs text-primary hover:underline"
+                          className="text-xs text-brand-400 hover:underline"
                           target="_blank"
                         >
                           Ver público →

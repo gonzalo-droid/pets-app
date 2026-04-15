@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import LostReportCard from '@/components/lost/LostReportCard'
 import LostFiltersPanel from '@/components/lost/LostFiltersPanel'
 import PaginationNav from '@/components/ui/pagination-nav'
-import { getLostReports } from '@/lib/mock/lost-reports'
+import { getLostReports } from '@/lib/data/lost-reports'
 import type { ReportType } from '@/types'
 
 export const metadata: Metadata = {

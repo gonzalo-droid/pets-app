@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { PawPrint } from 'lucide-react'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,10 +6,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Logo */}
       <Link
         href="/"
-        className="flex items-center gap-2 font-bold text-xl text-primary mb-8 hover:opacity-90 transition-opacity"
+        className="flex items-center gap-1.5 mb-8 hover:opacity-90 transition-opacity"
       >
-        <PawPrint className="h-6 w-6" />
-        PawRescue
+        <span className="text-2xl leading-none" aria-hidden="true">🐾</span>
+        <span className="font-display font-black text-xl leading-none">
+          <span className="text-brand-400">Paw</span>
+          <span className="text-foreground">Rescue</span>
+        </span>
       </Link>
 
       {/* Card centrada */}
@@ -21,7 +23,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Volver */}
       <Link
         href="/"
-        className="mt-6 text-xs text-muted-foreground hover:text-primary transition-colors"
+        className="mt-6 text-xs text-muted-foreground hover:text-brand-400 transition-colors"
       >
         ← Volver al inicio
       </Link>

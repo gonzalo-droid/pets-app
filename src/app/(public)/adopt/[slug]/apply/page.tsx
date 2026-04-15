@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
 import AdoptionForm from './AdoptionForm'
-import { getAnimalBySlug } from '@/lib/mock/animals'
+import { getAnimalBySlug } from '@/lib/data/animals'
 import { SPECIES_LABELS } from '@/lib/utils'
 
 interface ApplyPageProps {

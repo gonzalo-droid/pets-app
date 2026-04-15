@@ -106,16 +106,16 @@ export default function RegisterPage() {
   if (done) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-          <User className="h-8 w-8 text-primary" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-400/10">
+          <User className="h-8 w-8 text-brand-400" />
         </div>
-        <h2 className="text-xl font-bold">¡Cuenta creada!</h2>
+        <h2 className="font-display font-bold text-xl">¡Cuenta creada!</h2>
         <p className="text-sm text-muted-foreground max-w-xs">
           Revisa tu correo para confirmar tu cuenta y empieza a usar PawRescue.
         </p>
         <Link
           href="/auth/login"
-          className="mt-2 text-sm font-medium text-primary hover:underline"
+          className="mt-2 text-sm font-medium text-brand-400 hover:underline"
         >
           Ir a iniciar sesión →
         </Link>
@@ -127,7 +127,7 @@ export default function RegisterPage() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-foreground">Crear cuenta</h1>
+        <h1 className="font-display font-bold text-2xl text-foreground">Crear cuenta</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Únete a la comunidad PawRescue
         </p>
@@ -146,8 +146,8 @@ export default function RegisterPage() {
                 className={cn(
                   'flex flex-col items-center gap-1.5 rounded-xl border p-4 text-center transition-colors',
                   selectedRole === value
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border text-muted-foreground hover:border-primary/40'
+                    ? 'border-brand-400 bg-brand-400/5 text-brand-400'
+                    : 'border-border text-muted-foreground hover:border-brand-400/40'
                 )}
               >
                 <Icon className="h-5 w-5" />
@@ -272,7 +272,7 @@ export default function RegisterPage() {
       {/* Login link */}
       <p className="text-center text-sm text-muted-foreground">
         ¿Ya tienes cuenta?{' '}
-        <Link href="/auth/login" className="font-medium text-primary hover:underline">
+        <Link href="/auth/login" className="font-medium text-brand-400 hover:underline">
           Inicia sesión
         </Link>
       </p>

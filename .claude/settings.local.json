@@ -52,7 +52,11 @@
       "Bash(sh -c \"npx tsc --noEmit 2>&1\")",
       "Bash(sh:*)",
       "Bash(echo \"EXIT_CODE=$?\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(cat /Users/gonzalo/DocsNeko/webs/pets-app/.env*)",
+      "Bash(echo \"exit:$?\")"
     ]
   }
 }

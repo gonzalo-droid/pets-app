@@ -72,7 +72,7 @@ function LoginForm() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-foreground">Iniciar sesión</h1>
+        <h1 className="font-display font-bold text-2xl text-foreground">Iniciar sesión</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Bienvenido de vuelta a PawRescue
         </p>
@@ -102,7 +102,7 @@ function LoginForm() {
             <Label htmlFor="password">Contraseña</Label>
             <Link
               href="/auth/forgot-password"
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              className="text-xs text-muted-foreground hover:text-brand-400 transition-colors"
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -156,7 +156,7 @@ function LoginForm() {
       {/* Register link */}
       <p className="text-center text-sm text-muted-foreground">
         ¿No tienes cuenta?{' '}
-        <Link href="/auth/register" className="font-medium text-primary hover:underline">
+        <Link href="/auth/register" className="font-medium text-brand-400 hover:underline">
           Regístrate gratis
         </Link>
       </p>

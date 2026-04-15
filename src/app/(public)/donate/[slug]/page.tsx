@@ -5,8 +5,8 @@ import { ArrowLeft, BadgeCheck, CalendarDays, Target } from 'lucide-react'
 import DonationProgress from '@/components/campaigns/DonationProgress'
 import { cn, formatPEN, campaignProgress } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { getCampaignBySlug } from '@/lib/mock/campaigns'
-import { getShelterById } from '@/lib/mock/shelters'
+import { getCampaignBySlug } from '@/lib/data/campaigns'
+import { getShelterById } from '@/lib/data/shelters'
 
 interface CampaignDetailPageProps {
   params: Promise<{ slug: string }>

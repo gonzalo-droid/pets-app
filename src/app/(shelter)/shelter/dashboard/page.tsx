@@ -4,9 +4,9 @@ import { PawPrint, ClipboardList, HeartHandshake, Plus, ArrowRight, Wallet } fro
 import { cn, formatPEN } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getAnimalsByShelter } from '@/lib/mock/animals'
+import { getAnimalsByShelter } from '@/lib/data/animals'
 import { getRequestsByShelter, MOCK_REQUESTER_NAMES, MOCK_ANIMAL_NAMES } from '@/lib/mock/requests'
-import { getCampaigns } from '@/lib/mock/campaigns'
+import { getCampaigns } from '@/lib/data/campaigns'
 import { getDonationsByCampaigns } from '@/lib/mock/donations'
 
 export const metadata: Metadata = { title: 'Dashboard — Panel Albergue' }
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="font-display font-bold text-2xl text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{MOCK_SHELTER_NAME}</p>
         </div>
         <Link href="/shelter/animals/new" className={cn(buttonVariants({ size: 'sm' }))}>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: PawPrint, label: 'Animales activos', value: activeAnimals, href: '/shelter/animals', color: 'text-primary' },
+          { icon: PawPrint, label: 'Animales activos', value: activeAnimals, href: '/shelter/animals', color: 'text-adopt' },
           { icon: ClipboardList, label: 'Solicitudes pendientes', value: pendingRequests, href: '/shelter/requests', color: 'text-yellow-600 dark:text-yellow-400' },
           { icon: HeartHandshake, label: 'Total recaudado', value: formatPEN(totalRaised), href: '/shelter/donations', color: 'text-green-600 dark:text-green-400' },
           { icon: Wallet, label: 'Pagos por verificar', value: pendingDonations, href: '/shelter/donations', color: 'text-blue-600 dark:text-blue-400' },
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           <Link
             key={label}
             href={href}
-            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 hover:border-primary/40 hover:shadow-sm transition-all"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 hover:border-brand-400/40 hover:shadow-sm transition-all"
           >
             <Icon className={cn('h-5 w-5', color)} />
             <div>
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-foreground">Solicitudes recientes</h2>
-          <Link href="/shelter/requests" className="flex items-center gap-1 text-xs text-primary hover:underline">
+          <Link href="/shelter/requests" className="flex items-center gap-1 text-xs text-brand-400 hover:underline">
             Ver todas <ArrowRight className="h-3 w-3" />
           </Link>
         </div>

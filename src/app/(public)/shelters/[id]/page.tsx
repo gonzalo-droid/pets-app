@@ -5,8 +5,8 @@ import { notFound } from 'next/navigation'
 import { BadgeCheck, Phone, Mail, MapPin, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { getShelterWithPhotos } from '@/lib/mock/shelters'
-import { getAnimalsByShelter } from '@/lib/mock/animals'
+import { getShelterWithPhotos } from '@/lib/data/shelters'
+import { getAnimalsByShelter } from '@/lib/data/animals'
 import AnimalCard from '@/components/animals/AnimalCard'
 
 const CITY_BY_UBIGEO: Record<string, string> = {

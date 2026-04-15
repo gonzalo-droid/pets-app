@@ -6,8 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import PhotoGallery from '@/components/animals/PhotoGallery'
 import { cn, formatAge, SPECIES_LABELS, SIZE_LABELS, GENDER_LABELS, STATUS_LABELS } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { getAnimalBySlug } from '@/lib/mock/animals'
-import { getShelterById } from '@/lib/mock/shelters'
+import { getAnimalBySlug } from '@/lib/data/animals'
+import { getShelterById } from '@/lib/data/shelters'
 
 interface AnimalDetailPageProps {
   params: Promise<{ slug: string }>

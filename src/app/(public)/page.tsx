@@ -6,10 +6,10 @@ import AnimalFeedFilter from '@/components/animals/AnimalFeedFilter'
 import CampaignCard from '@/components/campaigns/CampaignCard'
 import LostReportCard from '@/components/lost/LostReportCard'
 import ShelterCard from '@/components/shelters/ShelterCard'
-import { getAnimals } from '@/lib/mock/animals'
-import { getCampaigns } from '@/lib/mock/campaigns'
-import { getLostReports } from '@/lib/mock/lost-reports'
-import { getShelters } from '@/lib/mock/shelters'
+import { getAnimals } from '@/lib/data/animals'
+import { getCampaigns } from '@/lib/data/campaigns'
+import { getLostReports } from '@/lib/data/lost-reports'
+import { getShelters } from '@/lib/data/shelters'
 
 export default async function HomePage() {
   const [animals, campaigns, lostReports, shelters] = await Promise.all([

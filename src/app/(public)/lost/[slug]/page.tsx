@@ -9,7 +9,7 @@ import SightingForm from '@/components/lost/SightingForm'
 import ReportPhotoGallery from '@/components/lost/ReportPhotoGallery'
 import { daysAgo } from '@/lib/utils'
 import { DISTRICT_LABEL } from '@/lib/ubigeo'
-import { getLostReportBySlug } from '@/lib/mock/lost-reports'
+import { getLostReportBySlug } from '@/lib/data/lost-reports'
 
 interface LostDetailPageProps {
   params: Promise<{ slug: string }>

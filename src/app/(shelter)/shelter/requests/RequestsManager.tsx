@@ -62,8 +62,8 @@ export default function RequestsManager({ requests, requesterNames, animalNames 
               className={cn(
                 'rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors',
                 activeTab === value
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
+                  ? 'bg-brand-400 text-white border-brand-400'
+                  : 'border-border text-muted-foreground hover:border-brand-400/40'
               )}
             >
               {label} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
@@ -113,14 +113,14 @@ export default function RequestsManager({ requests, requesterNames, animalNames 
 
                 {/* Mensaje */}
                 {req.message && (
-                  <blockquote className="border-l-2 border-primary/30 pl-3 text-sm text-muted-foreground italic">
+                  <blockquote className="border-l-2 border-brand-400/30 pl-3 text-sm text-muted-foreground italic">
                     {req.message}
                   </blockquote>
                 )}
 
                 {/* Footer: teléfono + acciones */}
                 <div className="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-border">
-                  <a href={`tel:${req.phone}`} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                  <a href={`tel:${req.phone}`} className="flex items-center gap-1.5 text-sm font-medium text-brand-400 hover:underline">
                     <Phone className="h-4 w-4" /> {req.phone}
                   </a>
                   {canAct && (

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { cn, formatPEN, campaignProgress } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import DonationProgress from '@/components/campaigns/DonationProgress'
-import { getCampaigns } from '@/lib/mock/campaigns'
+import { getCampaigns } from '@/lib/data/campaigns'
 
 export const metadata: Metadata = { title: 'Campañas — Panel Albergue' }
 
@@ -75,7 +75,7 @@ export default async function ShelterCampaignsPage() {
                     <p className="text-xs text-muted-foreground">Meta</p>
                   </div>
                   <div>
-                    <p className="font-bold text-primary">{pct}%</p>
+                    <p className="font-bold text-donate">{pct}%</p>
                     <p className="text-xs text-muted-foreground">Completado</p>
                   </div>
                 </div>

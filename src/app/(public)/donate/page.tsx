@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import CampaignCard from '@/components/campaigns/CampaignCard'
 import DonationProgress from '@/components/campaigns/DonationProgress'
-import { getCampaigns } from '@/lib/mock/campaigns'
+import { getCampaigns } from '@/lib/data/campaigns'
 import { formatPEN } from '@/lib/utils'
 
 export const metadata: Metadata = {

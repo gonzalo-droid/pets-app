@@ -81,8 +81,8 @@ export default function DonationsManager({ donations, donorNames, campaignTitles
               className={cn(
                 'rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors',
                 activeTab === value
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
+                  ? 'bg-donate text-white border-donate'
+                  : 'border-border text-muted-foreground hover:border-donate/40'
               )}
             >
               {label} {count > 0 && <span className="ml-1 opacity-70">({count})</span>}
@@ -147,7 +147,7 @@ export default function DonationsManager({ donations, donorNames, campaignTitles
                   {don.receipt_url ? (
                     <button
                       onClick={() => setPreviewUrl(don.receipt_url!)}
-                      className="flex items-center gap-1 text-xs text-primary hover:underline"
+                      className="flex items-center gap-1 text-xs text-donate hover:underline"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
                       Ver comprobante

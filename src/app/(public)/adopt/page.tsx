@@ -4,8 +4,8 @@ import AnimalCard from '@/components/animals/AnimalCard'
 import AnimalFiltersPanel from '@/components/animals/AnimalFiltersPanel'
 import PaginationNav from '@/components/ui/pagination-nav'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getAnimals } from '@/lib/mock/animals'
-import { getShelters } from '@/lib/mock/shelters'
+import { getAnimals } from '@/lib/data/animals'
+import { getShelters } from '@/lib/data/shelters'
 import type { AnimalSpecies, AnimalSize } from '@/types'
 
 export const metadata: Metadata = {
