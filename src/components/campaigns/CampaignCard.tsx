@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { CalendarDays } from 'lucide-react'
 import DonationProgress from './DonationProgress'
@@ -28,11 +29,13 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           className="shrink-0 hover:opacity-80 transition-opacity"
         >
           {campaign.shelter.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={campaign.shelter.avatar_url}
               alt={campaign.shelter.name}
-              className="h-10 w-10 rounded-full border border-border bg-muted"
+              width={40}
+              height={40}
+              sizes="40px"
+              className="h-10 w-10 rounded-full border border-border bg-muted object-cover"
             />
           ) : (
             <div className="h-10 w-10 rounded-full border border-border bg-muted" />

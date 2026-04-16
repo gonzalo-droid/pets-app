@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -71,12 +72,13 @@ export default async function HomePage() {
 
           {/* Columna derecha — foto del animal */}
           <div className="relative h-64 lg:h-auto">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=900&q=80"
               alt="Animal esperando adopción"
-              fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover object-center dark:brightness-90"
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-cover object-center dark:brightness-90"
             />
           </div>
         </div>

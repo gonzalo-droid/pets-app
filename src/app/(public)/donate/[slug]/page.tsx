@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -58,11 +59,13 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
           {/* Header campaña */}
           <div className="flex items-start gap-4">
             {campaign.shelter.avatar_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={campaign.shelter.avatar_url}
                 alt={campaign.shelter.name}
-                className="h-14 w-14 rounded-full border border-border bg-muted shrink-0"
+                width={56}
+                height={56}
+                sizes="56px"
+                className="h-14 w-14 rounded-full border border-border bg-muted object-cover shrink-0"
               />
             )}
             <div>
@@ -160,11 +163,13 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 {shelter.avatar_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={shelter.avatar_url}
                     alt={shelter.name}
-                    className="h-10 w-10 rounded-full border border-border"
+                    width={40}
+                    height={40}
+                    sizes="40px"
+                    className="h-10 w-10 rounded-full border border-border object-cover"
                   />
                 )}
                 <div>

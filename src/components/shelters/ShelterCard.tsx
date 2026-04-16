@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { BadgeCheck } from 'lucide-react'
 import type { Shelter } from '@/types'
@@ -25,10 +26,12 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
       {/* Avatar */}
       <div className="relative shrink-0">
         {shelter.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={shelter.avatar_url}
             alt={shelter.name}
+            width={56}
+            height={56}
+            sizes="56px"
             className="h-14 w-14 rounded-full border-2 border-border bg-muted object-cover"
           />
         ) : (

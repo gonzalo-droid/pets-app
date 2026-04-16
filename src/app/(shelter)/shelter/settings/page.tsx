@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { Save, Plus, X } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -87,10 +88,12 @@ export default function ShelterSettingsPage() {
             {/* Avatar preview */}
             <div className="flex items-center gap-4">
               {info.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={info.avatar_url}
                   alt="Avatar"
+                  width={64}
+                  height={64}
+                  sizes="64px"
                   className="h-16 w-16 rounded-full border-2 border-border object-cover bg-muted"
                 />
               ) : (
@@ -114,12 +117,15 @@ export default function ShelterSettingsPage() {
             <div>
               <Label htmlFor="banner_url">URL del banner</Label>
               {info.banner_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={info.banner_url}
-                  alt="Banner"
-                  className="mt-2 w-full h-28 object-cover rounded-lg border border-border bg-muted mb-2"
-                />
+                <div className="relative mt-2 w-full h-28 rounded-lg border border-border bg-muted mb-2 overflow-hidden">
+                  <Image
+                    src={info.banner_url}
+                    alt="Banner"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
               )}
               <Input
                 id="banner_url"
@@ -294,11 +300,12 @@ export default function ShelterSettingsPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {photos.map((photo) => (
                   <div key={photo.id} className="relative group rounded-lg overflow-hidden border border-border aspect-video bg-muted">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={photo.url}
                       alt="Foto del albergue"
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(min-width: 768px) 33vw, 50vw"
+                      className="object-cover"
                     />
                     <button
                       onClick={() => removePhoto(photo.id)}

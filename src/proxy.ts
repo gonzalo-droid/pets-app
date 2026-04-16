@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Saltar auth si está desactivado explícitamente o si Supabase aún no está configurado
   const supabaseConfigured =
     process.env.NEXT_PUBLIC_SUPABASE_URL &&

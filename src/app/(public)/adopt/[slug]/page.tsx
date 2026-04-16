@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
@@ -133,11 +134,13 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
               className="rounded-xl border border-border p-4 flex items-center gap-4 hover:border-shelter/40 hover:shadow-sm transition-all"
             >
               {shelter.avatar_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={shelter.avatar_url}
                   alt={shelter.name}
-                  className="h-12 w-12 rounded-full border border-border bg-muted"
+                  width={48}
+                  height={48}
+                  sizes="48px"
+                  className="h-12 w-12 rounded-full border border-border bg-muted object-cover"
                 />
               )}
               <div className="flex-1 min-w-0">

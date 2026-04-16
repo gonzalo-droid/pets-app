@@ -1,6 +1,10 @@
+import path from 'node:path'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.join(__dirname),
+  },
   images: {
     remotePatterns: [
       // Fotos de animales (mock) — en producción serán URLs de Supabase Storage

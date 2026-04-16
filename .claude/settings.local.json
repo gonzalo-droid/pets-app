@@ -56,7 +56,9 @@
       "Bash(tsc --noEmit)",
       "Bash(./node_modules/.bin/tsc --noEmit)",
       "Bash(cat /Users/gonzalo/DocsNeko/webs/pets-app/.env*)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Bash(git mv *)",
+      "Bash(npx next *)"
     ]
   }
 }
