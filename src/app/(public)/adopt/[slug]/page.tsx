@@ -2,8 +2,15 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { BadgeCheck, MapPin, Calendar, ArrowLeft } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Calendar,
+  Check,
+  Heart,
+  Info,
+  MapPin,
+} from "lucide-react";
 import PhotoGallery from "@/components/animals/PhotoGallery";
 import {
   cn,
@@ -11,9 +18,8 @@ import {
   SPECIES_LABELS,
   SIZE_LABELS,
   GENDER_LABELS,
-  STATUS_LABELS,
 } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { DISTRICT_LABEL } from "@/lib/ubigeo";
 import { getAnimalBySlug } from "@/lib/data/animals";
 import { getShelterById } from "@/lib/data/shelters";
 
@@ -35,36 +41,19 @@ export async function generateMetadata({
   };
 }
 
-const HEALTH_CHIPS = [
-  {
-    key: "is_vaccinated",
-    label: "💉 Vacunado",
-    active:
-      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    inactive: "bg-muted text-muted-foreground opacity-50",
-  },
-  {
-    key: "is_neutered",
-    label: "✂️ Castrado/a",
-    active: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-    inactive: "bg-muted text-muted-foreground opacity-50",
-  },
-  {
-    key: "is_microchipped",
-    label: "📡 Microchip",
-    active:
-      "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
-    inactive: "bg-muted text-muted-foreground opacity-50",
-  },
+// Solo se muestran los datos de salud confirmados: la ausencia de un dato
+// no significa que el animal no lo tenga.
+const HEALTH = [
+  { key: "is_vaccinated", label: "Vacunado" },
+  { key: "is_neutered", label: "Esterilizado" },
+  { key: "is_microchipped", label: "Con microchip" },
 ] as const;
 
-const DISTRICT_NAMES: Record<string, string> = {
-  "140101": "Chiclayo",
-  "140108": "José L. Ortiz",
-  "140110": "La Victoria",
-  "140201": "Ferreñafe",
-  "140301": "Lambayeque ciudad",
-};
+const STATUS_CHIP = {
+  available: { label: "Busca un hogar", className: "bg-success-bg text-success-fg" },
+  in_process: { label: "Adopción en proceso", className: "bg-warning-bg text-warning-fg" },
+  adopted: { label: "Adoptado", className: "bg-muted text-muted-foreground" },
+} as const;
 
 export default async function AnimalDetailPage({
   params,
@@ -74,147 +63,148 @@ export default async function AnimalDetailPage({
   if (!animal) notFound();
 
   const shelter = await getShelterById(animal.shelter_id);
-  const district = DISTRICT_NAMES[animal.ubigeo] ?? "Lambayeque";
-  const isAvailable = animal.status === "available";
+  const place = DISTRICT_LABEL[animal.ubigeo] ?? "Lambayeque";
+  const canAdopt = animal.status === "available";
+  // Un animal adoptado no recibe nuevos apadrinamientos.
+  const canSponsor = animal.status !== "adopted";
+  const chip =
+    STATUS_CHIP[animal.status as keyof typeof STATUS_CHIP] ?? STATUS_CHIP.adopted;
+  const health = HEALTH.filter(({ key }) => animal[key]);
+  const facts = [
+    { label: "Especie", value: SPECIES_LABELS[animal.species] + (animal.breed ? ` · ${animal.breed}` : "") },
+    { label: "Edad aproximada", value: formatAge(animal.age_months) },
+    { label: "Tamaño", value: SIZE_LABELS[animal.size] },
+    { label: "Sexo", value: GENDER_LABELS[animal.gender] },
+    ...(animal.color ? [{ label: "Color", value: animal.color }] : []),
+  ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
-      <div className="rounded-2xl border bg-card p-5 mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <strong>También puedes acompañar su historia.</strong>
-          <p className="text-sm text-muted-foreground">
-            Un compromiso mensual ayuda a planificar sus cuidados.
-          </p>
-        </div>
-        <Link className="huellas-button huellas-button--accent" href={`/sponsor/${slug}`}>
-          Apadrinar a {animal.name} ♡
-        </Link>
-      </div>
-      {/* Breadcrumb */}
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <Link
         href="/adopt"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-adopt transition-colors mb-8"
+        className="mb-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Volver a adopciones
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Volver a los animales
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Galería */}
-        <div>
-          <PhotoGallery
-            photos={animal.animal_photos}
-            animalName={animal.name}
-          />
-        </div>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+        <PhotoGallery photos={animal.animal_photos} animalName={animal.name} />
 
-        {/* Info */}
         <div className="flex flex-col gap-6">
-          {/* Nombre y estado */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h1 className="font-display font-bold text-3xl text-foreground">
-                {animal.name}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {SPECIES_LABELS[animal.species]}
-                {animal.breed ? ` · ${animal.breed}` : ""}
-              </p>
-            </div>
-            <Badge
-              variant={isAvailable ? "default" : "secondary"}
-              className="shrink-0 mt-1"
+          <div>
+            <span
+              className={cn(
+                "inline-flex rounded-full px-3 py-1 text-sm font-semibold",
+                chip.className,
+              )}
             >
-              {STATUS_LABELS[animal.status]}
-            </Badge>
+              {chip.label}
+            </span>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
+              {animal.name}
+            </h1>
+            {shelter && (
+              <p className="mt-2 flex items-center gap-1.5 text-muted-foreground">
+                <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                {shelter.name} · {place}
+              </p>
+            )}
           </div>
 
-          {/* Chips de salud */}
-          <div className="flex flex-wrap gap-2">
-            {HEALTH_CHIPS.map(({ key, label, active, inactive }) => (
-              <span
-                key={key}
-                className={cn(
-                  "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
-                  animal[key] ? active : inactive,
-                )}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          {/* Características */}
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Edad", value: formatAge(animal.age_months) },
-              { label: "Tamaño", value: SIZE_LABELS[animal.size] },
-              { label: "Género", value: GENDER_LABELS[animal.gender] },
-              { label: "Color", value: animal.color ?? "—" },
-            ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg bg-muted/40 px-4 py-3">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-medium text-foreground mt-0.5">
-                  {value}
-                </p>
+          <dl className="grid grid-cols-2 gap-3">
+            {facts.map(({ label, value }) => (
+              <div key={label} className="rounded-xl bg-secondary px-4 py-3">
+                <dt className="text-xs text-muted-foreground">{label}</dt>
+                <dd className="mt-0.5 text-sm font-semibold text-foreground">{value}</dd>
               </div>
             ))}
-          </div>
+          </dl>
 
-          {/* Ubicación */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 text-adopt shrink-0" />
-            <span>{district}, Lambayeque</span>
-          </div>
-
-          {/* Descripción */}
-          {animal.description && (
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">
-                Sobre {animal.name}
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {animal.description}
-              </p>
-            </div>
+          {health.length > 0 && (
+            <ul className="flex flex-wrap gap-2" aria-label="Salud informada por el albergue">
+              {health.map(({ key, label }) => (
+                <li
+                  key={key}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-sm font-medium text-foreground"
+                >
+                  <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                  {label}
+                </li>
+              ))}
+            </ul>
           )}
 
-          {/* Albergue */}
+          {/* Acciones según el estado del animal */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
+            {canAdopt ? (
+              <Link
+                href={`/adopt/${animal.slug}/apply`}
+                className="huellas-button w-full"
+              >
+                Solicitar adopción
+              </Link>
+            ) : (
+              <p className="flex items-start gap-2 rounded-xl bg-muted px-4 py-3 text-sm text-muted-foreground">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                {animal.status === "adopted"
+                  ? `${animal.name} ya encontró un hogar.`
+                  : `${animal.name} tiene una adopción en proceso. No recibe nuevas solicitudes por ahora.`}
+              </p>
+            )}
+            {canSponsor && (
+              <>
+                <Link
+                  href={`/sponsor/${animal.slug}`}
+                  className="huellas-button huellas-button--secondary w-full"
+                >
+                  <Heart className="h-5 w-5" aria-hidden="true" />
+                  Apadrinar a {animal.name}
+                </Link>
+                <p className="text-center text-xs text-muted-foreground">
+                  Apadrinar es un compromiso mensual sin cobro y no reemplaza la
+                  adopción.
+                </p>
+              </>
+            )}
+          </div>
+
           {shelter && (
             <Link
               href={`/shelters/${shelter.id}`}
-              className="rounded-xl border border-border p-4 flex items-center gap-4 hover:border-shelter/40 hover:shadow-sm transition-all"
+              className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-[box-shadow,border-color] hover:border-primary/40 hover:shadow-sm"
             >
               {shelter.avatar_url && (
                 <Image
                   src={shelter.avatar_url}
                   unoptimized={shelter.avatar_url.includes("api.dicebear.com")}
-                  alt={shelter.name}
+                  alt=""
                   width={48}
                   height={48}
                   sizes="48px"
-                  className="h-12 w-12 rounded-full border border-border bg-muted object-cover"
+                  className="h-12 w-12 rounded-xl border border-border bg-secondary object-cover"
                 />
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-semibold text-foreground truncate">
-                    {shelter.name}
-                  </p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-muted-foreground">Albergue responsable</p>
+                <p className="flex items-center gap-1.5 truncate font-semibold text-foreground">
+                  {shelter.name}
                   {shelter.is_verified && (
-                    <BadgeCheck className="h-4 w-4 text-shelter shrink-0" />
+                    <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="Verificado" />
                   )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {district}, Lambayeque
                 </p>
               </div>
             </Link>
           )}
+        </div>
+      </div>
 
-          {/* Fecha */}
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5" />
+      {animal.description && (
+        <section className="mt-10 max-w-3xl">
+          <h2 className="text-2xl font-bold text-foreground">Su historia</h2>
+          <p className="mt-3 leading-relaxed text-muted-foreground">{animal.description}</p>
+          <p className="mt-6 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
             Publicado el{" "}
             {new Date(animal.created_at).toLocaleDateString("es-PE", {
               year: "numeric",
@@ -222,36 +212,8 @@ export default async function AnimalDetailPage({
               day: "numeric",
             })}
           </p>
-
-          {/* CTA */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            {isAvailable ? (
-              <Link
-                href={`/adopt/${animal.slug}/apply`}
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "flex-1 justify-center",
-                )}
-              >
-                Solicitar adopción
-              </Link>
-            ) : (
-              <div className="flex-1 rounded-lg bg-muted px-4 py-3 text-sm text-center text-muted-foreground">
-                Este animal ya tiene un proceso de adopción en curso.
-              </div>
-            )}
-            <Link
-              href="/adopt"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "flex-1 justify-center",
-              )}
-            >
-              Ver más animales
-            </Link>
-          </div>
-        </div>
-      </div>
+        </section>
+      )}
     </div>
   );
 }
