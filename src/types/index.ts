@@ -9,6 +9,7 @@ export interface AnimalFilters {
   status?: import('./database').AnimalStatus
   department?: string // nombre del departamento
   ubigeo?: string
+  q?: string // busca en nombre, raza y descripción
 }
 
 export interface LostReportFilters {
@@ -17,6 +18,7 @@ export interface LostReportFilters {
   department?: string
   ubigeo?: string
   is_resolved?: boolean
+  q?: string // busca en descripción y dirección
 }
 
 export interface CampaignFilters {

@@ -4,7 +4,8 @@ import { Search } from "lucide-react";
 import ShelterCard from "@/components/shelters/ShelterCard";
 import ShelterSearchInput from "./ShelterSearchInput";
 import PaginationNav from "@/components/ui/pagination-nav";
-import { getShelters } from "@/lib/data/shelters";
+import { getSheltersPage } from "@/lib/data/shelters";
+import { parsePage, queryWithoutPage } from "@/lib/pagination";
 
 export const metadata: Metadata = {
   title: "Albergues — HUELLAS",
@@ -22,30 +23,13 @@ export default async function SheltersPage({
   searchParams,
 }: SheltersPageProps) {
   const params = await searchParams;
-  const q = params.q?.toLowerCase().trim();
-  const currentPage = Math.max(1, Number(params.page ?? 1));
-
-  const allShelters = await getShelters();
-
-  const filtered = q
-    ? allShelters.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          (s.description?.toLowerCase().includes(q) ?? false) ||
-          (s.address?.toLowerCase().includes(q) ?? false),
-      )
-    : allShelters;
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const page = Math.min(currentPage, Math.max(1, totalPages));
-  const shelters = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const { page: _page, ...restParams } = params;
-  const paramString = new URLSearchParams(
-    Object.fromEntries(
-      Object.entries(restParams).filter(([, v]) => v !== undefined),
-    ) as Record<string, string>,
-  ).toString();
+  const {
+    items: shelters,
+    page,
+    totalPages,
+    total,
+  } = await getSheltersPage(params.q, parsePage(params.page), PAGE_SIZE);
+  const paramString = queryWithoutPage(params);
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
@@ -55,9 +39,9 @@ export default async function SheltersPage({
           Albergues
         </h1>
         <p className="mt-2 text-muted-foreground">
-          {filtered.length === 0
+          {total === 0
             ? "No hay albergues con ese nombre."
-            : `${filtered.length} albergue${filtered.length === 1 ? "" : "s"} en Lambayeque`}
+            : `${total} albergue${total === 1 ? "" : "s"} en Lambayeque`}
         </p>
       </div>
 

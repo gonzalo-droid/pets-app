@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import CampaignCard from '@/components/campaigns/CampaignCard'
 import DonationProgress from '@/components/campaigns/DonationProgress'
-import { getCampaigns } from '@/lib/data/campaigns'
+import PaginationNav from '@/components/ui/pagination-nav'
+import { getCampaignTotals, getCampaignsPage } from '@/lib/data/campaigns'
+import { parsePage, queryWithoutPage } from '@/lib/pagination'
 import { formatPEN } from '@/lib/utils'
 
 export const metadata: Metadata = {
@@ -9,11 +11,20 @@ export const metadata: Metadata = {
   description: 'Apoya a los albergues de Lambayeque con donaciones directas vía Yape o transferencia bancaria.',
 }
 
-export default async function DonatePage() {
-  const campaigns = await getCampaigns({ is_active: true })
+const PAGE_SIZE = 9
 
-  const totalGoal = campaigns.reduce((s, c) => s + c.goal_amount, 0)
-  const totalRaised = campaigns.reduce((s, c) => s + c.current_amount, 0)
+export default async function DonatePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams
+  const [{ items: campaigns, page, totalPages, total }, totals] = await Promise.all([
+    getCampaignsPage({ is_active: true }, parsePage(params.page), PAGE_SIZE),
+    getCampaignTotals({ is_active: true }),
+  ])
+  const totalGoal = totals.goal
+  const totalRaised = totals.raised
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -40,7 +51,7 @@ export default async function DonatePage() {
             </p>
           </div>
           <div className="text-sm text-muted-foreground">
-            {campaigns.length} campaña{campaigns.length !== 1 ? 's' : ''} activa{campaigns.length !== 1 ? 's' : ''}
+            {total} campaña{total !== 1 ? 's' : ''} activa{total !== 1 ? 's' : ''}
           </div>
         </div>
         <DonationProgress current={totalRaised} goal={totalGoal} showNumbers={false} />
@@ -48,11 +59,19 @@ export default async function DonatePage() {
 
       {/* Grid de campañas */}
       {campaigns.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {campaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {campaigns.map((campaign) => (
+              <CampaignCard key={campaign.id} campaign={campaign} />
+            ))}
+          </div>
+          <PaginationNav
+            currentPage={page}
+            totalPages={totalPages}
+            paramString={queryWithoutPage(params)}
+            pathname="/donate"
+          />
+        </>
       ) : (
         <div className="flex flex-col items-center py-20 text-center gap-3">
           <span className="text-5xl">💛</span>

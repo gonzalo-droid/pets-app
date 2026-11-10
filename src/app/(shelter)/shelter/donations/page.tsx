@@ -1,8 +1,22 @@
 import { shelterContext } from "@/lib/huellas/auth";
-import { records } from "@/lib/huellas/records";
+import { recordsPage } from "@/lib/huellas/records";
+import PaginationNav from "@/components/ui/pagination-nav";
+import { parsePage } from "@/lib/pagination";
+
+const PAGE_SIZE = 20;
 import { formatPEN } from "@/lib/utils";
-export default async function Page() {
-  const rows = await records("support_intents", await shelterContext());
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: rawPage } = await searchParams;
+  const { items: rows, page, totalPages } = await recordsPage(
+    "support_intents",
+    { shelterId: await shelterContext() },
+    parsePage(rawPage),
+    PAGE_SIZE,
+  );
   return (
     <div className="max-w-5xl space-y-6">
       <h1 className="text-3xl font-bold">Compromisos de apoyo</h1>
@@ -41,6 +55,12 @@ export default async function Page() {
           Los nuevos compromisos aparecerán aquí.
         </p>
       )}
+      <PaginationNav
+        currentPage={page}
+        totalPages={totalPages}
+        paramString=""
+        pathname="/shelter/donations"
+      />
     </div>
   );
 }

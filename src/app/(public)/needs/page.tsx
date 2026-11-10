@@ -1,14 +1,21 @@
 import Link from "next/link";
-import { records } from "@/lib/huellas/records";
+import PaginationNav from "@/components/ui/pagination-nav";
+import { recordsPage } from "@/lib/huellas/records";
 import { getShelters } from "@/lib/data/shelters";
-export default async function Page() {
-  const [needs, shelters] = await Promise.all([
-    records("needs"),
+import { parsePage, queryWithoutPage } from "@/lib/pagination";
+
+const PAGE_SIZE = 9;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const [{ items: visible, page, totalPages }, shelters] = await Promise.all([
+    recordsPage("needs", { openNeeds: true }, parsePage(params.page), PAGE_SIZE),
     getShelters(),
   ]);
-  const visible = needs.filter(
-    (n) => !n.fulfilled && shelters.some((s) => s.id === n.shelter_id),
-  );
   return (
     <div className="max-w-6xl mx-auto px-5 py-12 space-y-8">
       <div className="max-w-2xl">
@@ -48,6 +55,12 @@ export default async function Page() {
         ))}
       </div>
       {!visible.length && <p>No hay necesidades abiertas en este momento.</p>}
+      <PaginationNav
+        currentPage={page}
+        totalPages={totalPages}
+        paramString={queryWithoutPage(params)}
+        pathname="/needs"
+      />
     </div>
   );
 }

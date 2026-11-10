@@ -3,12 +3,48 @@ import { isDemo } from "@/lib/huellas/config";
 import { readDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
 import { ActionButton } from "@/components/huellas/Forms";
+import PaginationNav from "@/components/ui/pagination-nav";
+import { fetchPage, parsePage, slicePage } from "@/lib/pagination";
 import type { Shelter } from "@/types";
-export default async function Page() {
+
+const PAGE_SIZE = 20;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireActor(["admin"]);
-  const shelters: Shelter[] = isDemo()
-    ? (await readDemo()).shelters
-    : ((await (await createClient()).from("shelters").select("*")).data ?? []);
+  const requested = parsePage((await searchParams).page);
+  // Primero los pendientes de verificación, luego los más recientes.
+  const {
+    items: shelters,
+    page,
+    totalPages,
+  } = isDemo()
+    ? slicePage(
+        [...(await readDemo()).shelters].sort(
+          (a, b) => Number(a.is_verified) - Number(b.is_verified),
+        ),
+        requested,
+        PAGE_SIZE,
+      )
+    : await (async () => {
+        const db = await createClient();
+        return fetchPage<Shelter>(
+          (from, to) =>
+            db
+              .from("shelters")
+              .select("*", { count: "exact" })
+              .order("is_verified")
+              .order("created_at", { ascending: false })
+              .order("id")
+              .range(from, to),
+          requested,
+          PAGE_SIZE,
+          "admin:shelters",
+        );
+      })();
   return (
     <div className="max-w-5xl mx-auto px-5 py-12 space-y-6">
       <p className="uppercase tracking-widest text-xs text-primary">
@@ -41,6 +77,12 @@ export default async function Page() {
           </ActionButton>
         </article>
       ))}
+      <PaginationNav
+        currentPage={page}
+        totalPages={totalPages}
+        paramString=""
+        pathname="/admin"
+      />
     </div>
   );
 }

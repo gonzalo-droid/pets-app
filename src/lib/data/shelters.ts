@@ -2,6 +2,14 @@ import { isDemo } from "@/lib/huellas/config";
 import { readDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
 import type { Shelter, ShelterWithPhotos } from "@/types";
+import {
+  cleanSearch,
+  fetchPage,
+  ilikeAny,
+  includesAny,
+  slicePage,
+  type Paged,
+} from "@/lib/pagination";
 
 export async function getShelters(): Promise<Shelter[]> {
   if (isDemo()) return (await readDemo()).shelters.filter((s) => s.is_verified);
@@ -76,4 +84,35 @@ export async function getShelterWithPhotos(
   );
 
   return shelter;
+}
+
+/** Una página de albergues verificados, con búsqueda por nombre, descripción o dirección. */
+export async function getSheltersPage(
+  search: string | undefined,
+  page: number,
+  pageSize: number,
+): Promise<Paged<Shelter>> {
+  const q = cleanSearch(search);
+  if (isDemo()) {
+    const rows = (await readDemo()).shelters.filter(
+      (s) => s.is_verified && (!q || includesAny(q, s.name, s.description, s.address)),
+    );
+    return slicePage(rows, page, pageSize);
+  }
+  const supabase = await createClient();
+  return fetchPage<Shelter>(
+    (from, to) => {
+      let query = supabase
+        .from("shelters")
+        .select("*", { count: "exact" })
+        .eq("is_verified", true)
+        .order("created_at", { ascending: false })
+        .order("id");
+      if (q) query = query.or(ilikeAny(["name", "description", "address"], q));
+      return query.range(from, to);
+    },
+    page,
+    pageSize,
+    "getSheltersPage",
+  );
 }

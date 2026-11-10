@@ -6,17 +6,20 @@ import {
   HeartHandshake,
   PawPrint,
 } from "lucide-react";
-import { getAnimals } from "@/lib/data/animals";
+import { getAnimalsPage } from "@/lib/data/animals";
 import { getShelters } from "@/lib/data/shelters";
-import { getCampaigns } from "@/lib/data/campaigns";
+import { getCampaignsPage } from "@/lib/data/campaigns";
 import AnimalCard from "@/components/animals/AnimalCard";
 import CampaignCard from "@/components/campaigns/CampaignCard";
 export default async function Page() {
-  const [animals, shelters, campaigns] = await Promise.all([
-    getAnimals({ status: "available" }),
+  // Solo se piden las tarjetas visibles; el total sale del conteo de la consulta.
+  const [animalsPage, shelters, campaignsPage] = await Promise.all([
+    getAnimalsPage({ status: "available" }, 1, 4),
     getShelters(),
-    getCampaigns({ is_active: true }),
+    getCampaignsPage({ is_active: true }, 1, 3),
   ]);
+  const animals = animalsPage.items;
+  const campaigns = campaignsPage.items;
   return (
     <div>
       <section className="mx-auto max-w-7xl px-5 py-8 md:py-12">
@@ -79,8 +82,8 @@ export default async function Page() {
       <section className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-3 gap-4 text-center border-b pb-10">
         {[
           [shelters.length, "albergues en la comunidad"],
-          [animals.length, "vidas listas para un hogar"],
-          [campaigns.length, "campañas que puedes apoyar"],
+          [animalsPage.total, "vidas listas para un hogar"],
+          [campaignsPage.total, "campañas que puedes apoyar"],
         ].map(([n, t]) => (
           <div key={t}>
             <p className="text-3xl font-bold">{n}</p>
@@ -106,7 +109,7 @@ export default async function Page() {
           </Link>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {animals.slice(0, 4).map((a) => (
+          {animals.map((a) => (
             <div key={a.id}>
               <AnimalCard
                 animal={a}
@@ -139,7 +142,7 @@ export default async function Page() {
             </Link>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
-            {campaigns.slice(0, 3).map((c) => (
+            {campaigns.map((c) => (
               <CampaignCard key={c.id} campaign={c} />
             ))}
           </div>

@@ -7,7 +7,11 @@ import { Plus } from "lucide-react";
 import { cn, formatAge, SPECIES_LABELS, STATUS_LABELS } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getAnimalsByShelter } from "@/lib/data/animals";
+import { getAnimalsByShelterPage } from "@/lib/data/animals";
+import PaginationNav from "@/components/ui/pagination-nav";
+import { parsePage } from "@/lib/pagination";
+
+const PAGE_SIZE = 20;
 
 export const metadata: Metadata = { title: "Mis animales — Panel Albergue" };
 
@@ -21,8 +25,22 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> =
     reunited: "secondary",
   };
 
-export default async function ShelterAnimalsPage() {
-  const animals = await getAnimalsByShelter(await shelterContext());
+export default async function ShelterAnimalsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: rawPage } = await searchParams;
+  const {
+    items: animals,
+    page,
+    totalPages,
+    total,
+  } = await getAnimalsByShelterPage(
+    await shelterContext(),
+    parsePage(rawPage),
+    PAGE_SIZE,
+  );
 
   return (
     <div className="flex flex-col gap-6 max-w-5xl">
@@ -31,7 +49,7 @@ export default async function ShelterAnimalsPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Mis animales</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {animals.length} publicados
+            {total} publicados
           </p>
         </div>
         <Link
@@ -182,6 +200,12 @@ export default async function ShelterAnimalsPage() {
           </div>
         </div>
       )}
+      <PaginationNav
+        currentPage={page}
+        totalPages={totalPages}
+        paramString=""
+        pathname="/shelter/animals"
+      />
     </div>
   );
 }

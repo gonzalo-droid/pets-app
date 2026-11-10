@@ -3,7 +3,8 @@ import type { Metadata } from 'next'
 import AnimalCard from '@/components/animals/AnimalCard'
 import AnimalFiltersPanel from '@/components/animals/AnimalFiltersPanel'
 import PaginationNav from '@/components/ui/pagination-nav'
-import { getAnimals } from '@/lib/data/animals'
+import { getAnimalsPage } from '@/lib/data/animals'
+import { parsePage, queryWithoutPage } from '@/lib/pagination'
 import { getShelters } from '@/lib/data/shelters'
 import type { AnimalSpecies, AnimalSize } from '@/types'
 
@@ -22,35 +23,22 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
   const params = await searchParams
   const species = params.species as AnimalSpecies | undefined
   const size = params.size as AnimalSize | undefined
-  const q = params.q?.toLowerCase().trim()
-  const currentPage = Math.max(1, Number(params.page ?? 1))
 
-  const [allAnimals, shelters] = await Promise.all([
-    getAnimals({ species, size, status: 'available' }),
+  const [result, shelters] = await Promise.all([
+    getAnimalsPage(
+      { species, size, status: 'available', q: params.q },
+      parsePage(params.page),
+      PAGE_SIZE,
+    ),
     getShelters(),
   ])
-
-  const filtered = q
-    ? allAnimals.filter(
-        (a) =>
-          a.name.toLowerCase().includes(q) ||
-          (a.breed?.toLowerCase().includes(q) ?? false) ||
-          (a.description?.toLowerCase().includes(q) ?? false)
-      )
-    : allAnimals
-
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
-  const page = Math.min(currentPage, Math.max(1, totalPages))
-  const animals = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const { items: animals, page, totalPages, total } = result
 
   const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
   const shelterIds = Object.fromEntries(shelters.map((s) => [s.id, s.id]))
 
   // Params sin 'page' para que PaginationNav construya los hrefs correctamente
-  const { page: _page, ...restParams } = params
-  const paramString = new URLSearchParams(
-    Object.fromEntries(Object.entries(restParams).filter(([, v]) => v !== undefined)) as Record<string, string>
-  ).toString()
+  const paramString = queryWithoutPage(params)
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -60,9 +48,9 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
           Animales en adopción
         </h1>
         <p className="mt-2 text-muted-foreground">
-          {filtered.length === 0
+          {total === 0
             ? 'No hay animales disponibles con estos filtros.'
-            : `${filtered.length} animal${filtered.length === 1 ? '' : 'es'} esperando un hogar`}
+            : `${total} animal${total === 1 ? '' : 'es'} esperando un hogar`}
         </p>
       </div>
 

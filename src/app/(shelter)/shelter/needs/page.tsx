@@ -1,9 +1,23 @@
 import { shelterContext } from "@/lib/huellas/auth";
-import { records } from "@/lib/huellas/records";
+import { recordsPage } from "@/lib/huellas/records";
+import PaginationNav from "@/components/ui/pagination-nav";
+import { parsePage } from "@/lib/pagination";
+
+const PAGE_SIZE = 10;
 import { ManageForm, ActionButton } from "@/components/huellas/Forms";
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const id = await shelterContext();
-  const needs = await records("needs", id);
+  const { page: rawPage } = await searchParams;
+  const { items: needs, page, totalPages } = await recordsPage(
+    "needs",
+    { shelterId: id },
+    parsePage(rawPage),
+    PAGE_SIZE,
+  );
   return (
     <div className="max-w-5xl space-y-7">
       <h1 className="text-3xl font-bold">Lo que necesitamos</h1>
@@ -43,6 +57,12 @@ export default async function Page() {
               </ActionButton>
             </article>
           ))}
+          <PaginationNav
+            currentPage={page}
+            totalPages={totalPages}
+            paramString=""
+            pathname="/shelter/needs"
+          />
         </div>
       </div>
     </div>
