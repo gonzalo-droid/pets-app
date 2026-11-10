@@ -187,7 +187,7 @@ export default async function LostDetailPage({ params }: LostDetailPageProps) {
 
         {!report.is_resolved && (
           <div className="mt-2 rounded-xl border border-border p-4">
-            <SightingForm reportId={report.id} />
+            <SightingForm />
           </div>
         )}
       </div>

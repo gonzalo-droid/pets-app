@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle2 } from "lucide-react";
@@ -83,7 +84,7 @@ export default function AdoptionForm({
     register,
     setError,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<AdoptionFormData>({
@@ -95,6 +96,11 @@ export default function AdoptionForm({
       phone: "",
       message: "",
     },
+  });
+  // useWatch es compatible con el React Compiler (watch() no lo es).
+  const [hasHome, hasOtherPets, hasChildren, message] = useWatch({
+    control,
+    name: ["has_home", "has_other_pets", "has_children", "message"],
   });
 
   const onSubmit = async (data: AdoptionFormData) => {
@@ -123,9 +129,9 @@ export default function AdoptionForm({
           teléfono en los próximos días. ¡Gracias por querer darle un hogar a{" "}
           {animalName}!
         </p>
-        <a href="/adopt" className="mt-2 text-sm text-primary hover:underline">
+        <Link href="/adopt" className="mt-2 text-sm text-primary hover:underline">
           Ver más animales en adopción →
-        </a>
+        </Link>
       </div>
     );
   }
@@ -142,21 +148,21 @@ export default function AdoptionForm({
           id="has_home"
           label="Tengo patio o espacio exterior"
           description="Jardín, terraza o zona donde el animal pueda moverse libremente."
-          checked={watch("has_home")}
+          checked={hasHome}
           onChange={(v) => setValue("has_home", v)}
         />
         <CheckField
           id="has_other_pets"
           label="Ya tengo otras mascotas"
           description="Perros, gatos u otras mascotas que conviven en casa."
-          checked={watch("has_other_pets")}
+          checked={hasOtherPets}
           onChange={(v) => setValue("has_other_pets", v)}
         />
         <CheckField
           id="has_children"
           label="Hay niños en casa"
           description="Menores de 12 años que vivirán con el animal."
-          checked={watch("has_children")}
+          checked={hasChildren}
           onChange={(v) => setValue("has_children", v)}
         />
       </section>
@@ -203,7 +209,7 @@ export default function AdoptionForm({
             <span />
           )}
           <p className="text-xs text-muted-foreground">
-            {watch("message").length}/1000
+            {message.length}/1000
           </p>
         </div>
       </section>

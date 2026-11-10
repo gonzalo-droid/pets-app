@@ -1,4 +1,4 @@
-export default function LegacyForm(_props: Record<string, unknown>) {
+export default function LegacyForm() {
   return (
     <p className="rounded-xl border bg-muted p-5 text-sm">
       Esta función del proyecto anterior está pendiente de integración. Por

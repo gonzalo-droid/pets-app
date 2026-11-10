@@ -1,7 +1,7 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -9,12 +9,16 @@ interface ThemeToggleProps {
   className?: string
 }
 
+const noopSubscribe = () => () => {}
+
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  // Evitar hydration mismatch
-  useEffect(() => setMounted(true), [])
+  // false en el servidor y true en el cliente: evita el hydration mismatch.
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  )
 
   if (!mounted) {
     return <div className={cn('h-9 w-9 rounded-md', className)} />

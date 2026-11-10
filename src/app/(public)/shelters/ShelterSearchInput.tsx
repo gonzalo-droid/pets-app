@@ -12,7 +12,12 @@ export default function ShelterSearchInput() {
   const [query, setQuery] = useState(activeQ)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => { setQuery(activeQ) }, [activeQ])
+  // Si la URL cambia (atrás/adelante, limpiar filtros), sincroniza el campo.
+  const [syncedQ, setSyncedQ] = useState(activeQ)
+  if (activeQ !== syncedQ) {
+    setSyncedQ(activeQ)
+    setQuery(activeQ)
+  }
 
   const applySearch = useCallback(
     (value: string) => {

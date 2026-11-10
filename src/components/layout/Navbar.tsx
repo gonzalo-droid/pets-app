@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Actor } from "@/lib/huellas/domain";
@@ -10,6 +10,7 @@ export default function Navbar() {
   const [actor, setActor] = useState<Actor | null>(null),
     [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   useEffect(() => {
     fetch("/api/session")
       .then((r) => r.json())
@@ -81,7 +82,9 @@ export default function Navbar() {
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "logout" }),
                   });
-                  window.location.assign("/");
+                  setActor(null);
+                  router.push("/");
+                  router.refresh();
                 }}
               >
                 Salir

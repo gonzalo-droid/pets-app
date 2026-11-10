@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireActor } from "@/lib/huellas/auth";
 import { records } from "@/lib/huellas/records";
 import { ActionButton } from "@/components/huellas/Forms";
@@ -55,9 +56,9 @@ export default async function Page() {
         {!support.length && (
           <div className="rounded-2xl bg-muted p-7">
             <p>Todavía no tienes compromisos de apoyo.</p>
-            <a className="huellas-button mt-4" href="/adopt">
+            <Link className="huellas-button mt-4" href="/adopt">
               Conocer a quienes puedes apadrinar ↗
-            </a>
+            </Link>
           </div>
         )}
       </section>

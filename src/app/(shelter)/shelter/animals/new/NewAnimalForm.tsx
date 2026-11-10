@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle2, ImageOff } from "lucide-react";
@@ -80,8 +80,6 @@ function ToggleGroup<T extends string>({
   );
 }
 
-const PLACEHOLDER_URL =
-  "https://placehold.co/600x400/e2e8f0/94a3b8?text=Sin+foto";
 
 export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
   const [submitted, setSubmitted] = useState(false);
@@ -91,7 +89,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
     register,
     setError,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
@@ -110,6 +108,11 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
       is_microchipped: false,
       ubigeo: "140101",
     },
+  });
+  // useWatch es compatible con el React Compiler (watch() no lo es).
+  const [species, size, gender, description] = useWatch({
+    control,
+    name: ["species", "size", "gender", "description"],
   });
 
   const onSubmit = async (data: FormData) => {
@@ -178,7 +181,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
         </Label>
         <ToggleGroup
           options={SPECIES_OPTIONS}
-          value={watch("species")}
+          value={species}
           onChange={(v) => setValue("species", v as FormData["species"])}
           error={errors.species?.message}
         />
@@ -192,7 +195,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
           </Label>
           <ToggleGroup
             options={SIZE_OPTIONS}
-            value={watch("size")}
+            value={size}
             onChange={(v) => setValue("size", v as FormData["size"])}
           />
         </div>
@@ -202,7 +205,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
           </Label>
           <ToggleGroup
             options={GENDER_OPTIONS}
-            value={watch("gender")}
+            value={gender}
             onChange={(v) => setValue("gender", v as FormData["gender"])}
           />
         </div>
@@ -295,7 +298,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
             <span />
           )}
           <span className="text-xs text-muted-foreground">
-            {watch("description").length}/1000
+            {description.length}/1000
           </span>
         </div>
       </div>
