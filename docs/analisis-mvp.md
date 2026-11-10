@@ -8,7 +8,7 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 |---|---|---|
 | E1 | La web en Vercel mostraba "No pudimos cargar esta información". Causa comprobada en los logs: el proyecto de Supabase estaba pausado y faltaba la migración HUELLAS. | Resuelto |
 | E2 | Al tocar la foto de una mascota no se abría su ficha (la foto tapaba el enlace). | Resuelto |
-| E3 | Las campañas vencidas seguían mostrando "Donar ahora" y contaban como activas. | Resuelto (pendiente de publicar) |
+| E3 | Las campañas vencidas seguían mostrando "Donar ahora" y contaban como activas. | Resuelto |
 | E4 | La página de campañas prometía "Yape o transferencia, 100% al albergue" y pasos con comprobante, aunque no hay pagos. | Resuelto |
 | E5 | La ficha del animal ofrecía "Apadrinar" aunque estuviera adoptado. | Resuelto |
 | E6 | La ficha mostraba atenuados "Vacunado/Castrado/Microchip" cuando no había dato, como si fuera un "no". | Resuelto: solo se muestran los datos confirmados |
