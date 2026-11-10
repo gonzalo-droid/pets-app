@@ -21,6 +21,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       "202611090001_legacy_baseline.sql",
       "202611090002_huellas.sql",
       "202611100001_huellas_fixes.sql",
+      "202611100002_anon_sightings_read.sql",
     ])
       await db.exec(
         await readFile(

@@ -33,8 +33,12 @@ export function slicePage<T>(rows: T[], page: number, pageSize: number): Paged<T
 type RangeResult<T> = {
   data: T[] | null;
   count: number | null;
-  error: { message: string } | null;
+  error: { message: string; code?: string } | null;
 };
+
+// PostgREST responde 416 ("Requested range not satisfiable") si la página
+// pedida empieza después de la última fila.
+const RANGE_NOT_SATISFIABLE = "PGRST103";
 
 /**
  * Ejecuta una consulta paginada de Supabase. `run(from, to)` debe construir la
@@ -46,8 +50,14 @@ export async function fetchPage<T>(
   pageSize: number,
   label: string,
 ): Promise<Paged<T>> {
-  const query = async (p: number) => {
+  const query = async (p: number): Promise<{ items: T[]; total: number }> => {
     const { data, count, error } = await run((p - 1) * pageSize, p * pageSize - 1);
+    // Página fuera de rango: la primera página trae el total para recalcular.
+    if (error?.code === RANGE_NOT_SATISFIABLE && p > 1) {
+      const first = await query(1);
+      const last = totalPagesFor(first.total, pageSize);
+      return last === 1 ? first : query(last);
+    }
     if (error) {
       console.error(`[pagination] ${label}:`, error.message);
       throw new Error(

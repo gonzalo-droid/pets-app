@@ -54,6 +54,14 @@ test("consulta paginada pide solo el rango y corrige páginas fuera de rango", a
   await assert.rejects(
     fetchPage(async () => ({ data: null, count: null, error: { message: "x" } }), 1, 3, "t"),
   );
+  // Supabase real: una página fuera de rango responde error 416 (PGRST103).
+  const strict = async (from, to) =>
+    from >= rows.length
+      ? { data: null, count: null, error: { message: "range", code: "PGRST103" } }
+      : { data: rows.slice(from, to + 1), count: rows.length, error: null };
+  const clamped = await fetchPage(strict, 99, 3, "t");
+  assert.equal(clamped.page, 3);
+  assert.deepEqual(clamped.items, [6]);
 });
 
 test("la búsqueda no puede inyectar filtros de PostgREST", () => {

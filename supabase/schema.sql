@@ -463,3 +463,6 @@ BEGIN
  IF NOT FOUND THEN RAISE EXCEPTION 'Not found'; END IF;
 END $$;
 COMMIT;
+
+-- ── 202611100002_anon_sightings_read.sql ──
+GRANT SELECT ON public.lost_found_sightings TO anon;
