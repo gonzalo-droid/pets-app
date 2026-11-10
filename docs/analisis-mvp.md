@@ -14,7 +14,7 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 | E6 | La ficha mostraba atenuados "Vacunado/Castrado/Microchip" cuando no había dato, como si fuera un "no". | Resuelto: solo se muestran los datos confirmados |
 | E7 | Perdidos fallaba para visitantes sin sesión (permiso faltante). | Resuelto |
 | E8 | El menú no tenía "Inicio". | Resuelto |
-| E9 | La "recaudación" de las campañas (p. ej. S/ 3,060) viene de datos de ejemplo heredados, no de pagos confirmados. La definición pide no mostrar cifras inventadas. | **Decisión pendiente** |
+| E9 | La "recaudación" de las campañas (p. ej. S/ 3,060) viene de datos de ejemplo heredados, no de pagos confirmados. | **Decidido (10/11/2026): se mantiene como dato de ejemplo por ahora.** Revisar antes de producción o al integrar pagos. |
 | E10 | Las solicitudes de adopción permiten cualquier cambio de estado (p. ej. de "Completada" a "Pendiente"). La definición pide transiciones definidas. | Pendiente |
 
 ## 2. Funciones incompletas del MVP
@@ -31,7 +31,7 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 
 ## 3. Ampliaciones (fase posterior)
 
-Pagos y suscripciones reales, notificaciones, subida de imágenes, onboarding y equipos de albergue, actualizaciones para padrinos, informes de transparencia, voluntariado, fichas veterinarias privadas, gastos e inventario, participación empresarial, auditoría y moderación, varios países. El módulo heredado de perdidos sigue fuera del alcance.
+Votación comunitaria de campañas (ver sección 6), pagos y suscripciones reales, notificaciones, subida de imágenes, onboarding y equipos de albergue, actualizaciones para padrinos, informes de transparencia, voluntariado, fichas veterinarias privadas, gastos e inventario, participación empresarial, auditoría y moderación, varios países. El módulo heredado de perdidos sigue fuera del alcance.
 
 ## 4. Hecho en esta iteración (diseño)
 
@@ -42,7 +42,33 @@ Pagos y suscripciones reales, notificaciones, subida de imágenes, onboarding y 
 - Tarjetas nuevas de animales, albergues y campañas.
 - Ficha del animal reordenada: foto, estado, nombre, albergue, datos, acciones según el estado, historia.
 
-## 5. Preguntas abiertas
+## 5. Decisiones tomadas
 
-1. "Votar por campañas": se interpretó como **apoyar** (registrar un compromiso). Si se quiere una votación comunitaria, es una función nueva que hay que definir.
-2. Recaudación de ejemplo (E9): ¿ocultarla hasta que existan pagos confirmados, o etiquetarla como "dato de ejemplo"?
+1. "Votar por campañas": en el MVP, apoyar una campaña significa **registrar un compromiso de apoyo**. La votación comunitaria queda mapeada como función futura (sección 6), pendiente de definir.
+2. Recaudación de ejemplo (E9): se mantiene visible por ahora.
+
+## 6. Función futura: votación comunitaria de campañas
+
+**Estado: por definir.** Esta ficha es un mapa inicial con preguntas abiertas. No forma parte del MVP.
+
+| Aspecto | Propuesta inicial |
+|---|---|
+| Objetivo | Que la comunidad muestre qué campañas considera prioritarias y ayude a darles visibilidad, sin confundirlo con dinero. |
+| Usuario | Miembro de la comunidad con sesión iniciada. Los visitantes ven los resultados, pero no votan. |
+| Punto de entrada | Tarjeta y detalle de campaña: acción "Apoyar con mi voto" junto a "Apoyar campaña". |
+| Flujo principal | 1. La persona abre una campaña abierta. 2. Toca votar (si no tiene sesión, inicia sesión y vuelve a la campaña). 3. El voto queda registrado y el botón cambia a "Votaste". 4. Puede retirar su voto. |
+| Información necesaria | Campaña, persona, fecha. Sin importe. |
+| Reglas de negocio | Un voto por persona y campaña. Solo campañas abiertas de albergues verificados. Un voto no es una donación ni un compromiso, y no suma a la recaudación. El albergue no puede votar sus propias campañas. Al cerrarse la campaña, los votos quedan congelados. |
+| Permisos | Votar o retirar el voto: persona con sesión. Ver el total: público. Ver quién votó: nadie; solo se muestra el total. |
+| Estados | Sin voto, votada y voto retirado. Campaña: abierta (acepta votos) o cerrada (no acepta). |
+| Estados vacíos | "Sé la primera persona en apoyar esta campaña con tu voto." |
+| Errores posibles | Sin sesión: llevar al login y volver. Campaña cerrada mientras votaba: avisar y no registrar. Doble clic: no duplicar el voto. |
+| Criterios de aceptación | Un voto por persona y campaña, garantizado también en la base de datos. El total coincide con los votos activos. Una campaña cerrada no acepta votos. El voto nunca aparece como dinero. Funciona con teclado y en móvil. |
+| Fase | Posterior al MVP. |
+
+**Preguntas por responder antes de construirla:**
+- ¿Para qué se usan los votos? ¿Solo para ordenar las campañas, para destacar una "campaña del mes" o para repartir fondos de un patrocinador?
+- ¿Se vota por campañas, por necesidades o por ambas?
+- ¿Hay periodos de votación (mensuales) o es continua?
+- ¿Se muestra el número de votos o solo un orden de prioridad?
+- ¿Qué medidas se toman contra cuentas falsas? Por ejemplo, exigir el correo verificado.
