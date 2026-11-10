@@ -5,7 +5,7 @@ import { BadgeCheck, Search } from "lucide-react";
 import ShelterCard from "@/components/shelters/ShelterCard";
 import ShelterSearchInput from "./ShelterSearchInput";
 import PaginationNav from "@/components/ui/pagination-nav";
-import { getSheltersPage } from "@/lib/data/shelters";
+import { getShelterStats, getSheltersPage } from "@/lib/data/shelters";
 import { parsePage, queryWithoutPage } from "@/lib/pagination";
 
 export const metadata: Metadata = {
@@ -31,48 +31,39 @@ export default async function SheltersPage({
     total,
   } = await getSheltersPage(params.q, parsePage(params.page), PAGE_SIZE);
   const paramString = queryWithoutPage(params);
+  const stats = await getShelterStats(shelters.map((s) => s.id));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-      {/* Header */}
-      <div className="mb-8 max-w-2xl">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-          Albergues
-        </h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          Conoce a quienes rescatan y cuidan animales en tu región.{" "}
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* Cabecera salvia con buscador */}
+      <section className="rounded-[32px] bg-secondary p-6 sm:p-10">
+        <h1 className="text-4xl text-foreground sm:text-5xl">Quienes los cuidan</h1>
+        <p className="mt-3 max-w-2xl text-lg text-foreground/80">
+          Conoce a los albergues de tu región, sus rescatados y sus campañas.{" "}
           {total > 0 && `${total} albergue${total === 1 ? "" : "s"} verificado${total === 1 ? "" : "s"}.`}
         </p>
-        <p className="mt-3 flex items-start gap-2 rounded-xl bg-secondary px-4 py-3 text-sm text-secondary-foreground">
-          <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-          <span>
-            <strong className="font-semibold">Verificado</strong> significa que
-            HUELLAS revisó la identidad del albergue. No garantiza cada una de
-            sus actuaciones.
-          </span>
-        </p>
-      </div>
-
-      {/* Búsqueda */}
-      <div className="mb-8 max-w-2xl">
-        <Suspense
-          fallback={
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <div className="w-full h-9 rounded-lg border border-input bg-background pl-9" />
-            </div>
-          }
-        >
-          <ShelterSearchInput />
-        </Suspense>
-      </div>
+        <div className="mt-6 max-w-xl">
+          <Suspense
+            fallback={<div className="h-12 w-full animate-pulse rounded-full bg-card" />}
+          >
+            <ShelterSearchInput />
+          </Suspense>
+        </div>
+      </section>
+      <p className="mb-8 mt-4 flex max-w-2xl items-start gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm">
+        <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+        <span>
+          <strong className="font-extrabold">Verificado</strong> significa que HUELLAS revisó la
+          identidad del albergue. No garantiza cada una de sus actuaciones.
+        </span>
+      </p>
 
       {/* Lista */}
       {shelters.length > 0 ? (
         <>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {shelters.map((shelter) => (
-              <ShelterCard key={shelter.id} shelter={shelter} />
+              <ShelterCard key={shelter.id} shelter={shelter} stats={stats[shelter.id]} />
             ))}
           </div>
           <PaginationNav

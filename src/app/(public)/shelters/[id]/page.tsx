@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BadgeCheck, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { ArrowLeft, AtSign, Heart, Mail, MapPin, MessageCircle, Package, Phone } from "lucide-react";
 import { getShelterWithPhotos } from "@/lib/data/shelters";
 import { getAnimalsByShelter } from "@/lib/data/animals";
+import { getCampaigns } from "@/lib/data/campaigns";
+import { records } from "@/lib/huellas/records";
+import { isCampaignOpen } from "@/lib/huellas/domain";
+import { DISTRICT_LABEL } from "@/lib/ubigeo";
 import AnimalCard from "@/components/animals/AnimalCard";
-
-const CITY_BY_UBIGEO: Record<string, string> = {
-  "140101": "Chiclayo",
-  "140108": "José L. Ortiz",
-  "140110": "La Victoria",
-  "140201": "Ferreñafe",
-  "140301": "Lambayeque",
-};
+import CampaignCard from "@/components/campaigns/CampaignCard";
+import { PawIcon } from "@/components/campaigns/PawProgress";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -24,247 +23,239 @@ export async function generateMetadata({
   const shelter = await getShelterWithPhotos(id);
   if (!shelter) return { title: "Albergue no encontrado" };
   return {
-    title: `${shelter.name} — HUELLAS`,
+    title: shelter.name,
     description: shelter.description ?? undefined,
   };
 }
 
+const TABS = [
+  { id: "campanas", label: "Campañas" },
+  { id: "animales", label: "Animales" },
+  { id: "necesidades", label: "Necesidades" },
+] as const;
+
 export default async function ShelterPublicPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { id } = await params;
-  const [shelter, animals] = await Promise.all([
+  const { tab: rawTab } = await searchParams;
+  const tab = TABS.some((t) => t.id === rawTab) ? rawTab! : "campanas";
+  const [shelter, animals, campaigns, needs] = await Promise.all([
     getShelterWithPhotos(id),
     getAnimalsByShelter(id),
+    getCampaigns({ shelter_id: id }),
+    records("needs", id),
   ]);
-
   if (!shelter) notFound();
 
-  const city = CITY_BY_UBIGEO[shelter.ubigeo] ?? "Lambayeque";
-  const availableAnimals = animals
-    .filter((a) => a.status === "available" || a.status === "in_process")
-    .slice(0, 4);
+  const place = DISTRICT_LABEL[shelter.ubigeo] ?? "Lambayeque";
+  const openCampaigns = campaigns.filter((c) => isCampaignOpen(c));
+  const shownCampaigns = [...openCampaigns, ...campaigns.filter((c) => !isCampaignOpen(c))];
+  const available = animals.filter((a) => a.status === "available" || a.status === "in_process");
+  const openNeeds = needs.filter((n) => !n.fulfilled);
+  const counts: Record<string, number> = {
+    campanas: openCampaigns.length,
+    animales: available.length,
+    necesidades: openNeeds.length,
+  };
+
+  // Solo los medios que el albergue publicó en su perfil.
+  const contacts = [
+    shelter.whatsapp && { href: `https://wa.me/51${shelter.whatsapp}`, icon: MessageCircle, label: "WhatsApp" },
+    shelter.phone && { href: `tel:${shelter.phone}`, icon: Phone, label: shelter.phone },
+    shelter.email && { href: `mailto:${shelter.email}`, icon: Mail, label: shelter.email },
+    shelter.instagram && { href: `https://instagram.com/${shelter.instagram}`, icon: AtSign, label: `@${shelter.instagram}` },
+    shelter.facebook && { href: `https://facebook.com/${shelter.facebook}`, icon: AtSign, label: shelter.facebook },
+  ].filter(Boolean) as { href: string; icon: typeof Phone; label: string }[];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
-      {/* ── Hero: banner + avatar + nombre ── */}
-      <div className="rounded-2xl overflow-hidden border border-border">
-        {/* Banner */}
-        <div className="relative h-48 sm:h-60 bg-gradient-to-r from-shelter/30 to-shelter/10">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <Link
+        href="/shelters"
+        className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-muted-foreground hover:text-primary"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Volver a albergues
+      </Link>
+
+      {/* Portada + identidad */}
+      <section className="overflow-hidden rounded-[32px] border border-border bg-card">
+        <div className="relative h-40 bg-support-soft sm:h-56">
           {shelter.banner_url && (
-            <Image
-              src={shelter.banner_url}
-              alt={`Banner de ${shelter.name}`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 896px) 100vw, 896px"
-            />
+            <Image src={shelter.banner_url} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 1024px" />
           )}
         </div>
-
-        {/* Avatar + info */}
-        <div className="px-6 pb-6 bg-card">
-          <div className="flex items-end gap-4 -mt-10">
-            <div className="relative shrink-0">
-              {shelter.avatar_url ? (
-                <Image
-                  src={shelter.avatar_url}
-                  unoptimized={shelter.avatar_url.includes("api.dicebear.com")}
-                  alt={shelter.name}
-                  width={80}
-                  height={80}
-                  className="rounded-full border-4 border-background bg-muted object-cover"
-                />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-background bg-accent text-3xl">
-                  🏠
-                </div>
-              )}
-              {shelter.is_verified && (
-                <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-shelter text-white">
-                  <BadgeCheck className="h-4 w-4" />
-                </span>
-              )}
-            </div>
-            <div className="pt-12">
-              <h1 className="font-display font-bold text-xl text-foreground leading-tight">
-                {shelter.name}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {city}, Lambayeque
-              </p>
-            </div>
+        <div className="px-5 pb-6 sm:px-8">
+          <div className="-mt-11 flex items-end justify-between gap-3">
+            {shelter.avatar_url ? (
+              <Image
+                src={shelter.avatar_url}
+                unoptimized={shelter.avatar_url.includes("api.dicebear.com")}
+                alt=""
+                width={88}
+                height={88}
+                className="h-[88px] w-[88px] rounded-[26px] border-[5px] border-card bg-secondary object-cover"
+              />
+            ) : (
+              <span className="flex h-[88px] w-[88px] items-center justify-center rounded-[26px] border-[5px] border-card bg-secondary text-primary">
+                <PawIcon className="h-10 w-10" />
+              </span>
+            )}
+            {shelter.is_verified && (
+              <span
+                className="mb-1 -rotate-2 rounded-full bg-highlight px-3 py-1 text-sm font-extrabold"
+                title="HUELLAS revisó la identidad del albergue. No garantiza cada una de sus actuaciones."
+              >
+                Verificado
+              </span>
+            )}
           </div>
+          <h1 className="mt-4 text-4xl leading-tight text-foreground">{shelter.name}</h1>
+          <p className="mt-1 flex items-center gap-1.5 font-bold text-muted-foreground">
+            <MapPin className="h-4 w-4 text-primary" aria-hidden="true" />
+            {place}
+          </p>
+          {(shelter.long_description || shelter.description) && (
+            <p className="mt-4 max-w-3xl leading-relaxed text-foreground/80">
+              {shelter.long_description ?? shelter.description}
+            </p>
+          )}
+          {openCampaigns.length > 0 && (
+            <Link href="?tab=campanas#contenido" className="huellas-button huellas-button--support mt-6">
+              <Heart className="h-5 w-5" aria-hidden="true" />
+              Apoyar a este albergue
+            </Link>
+          )}
         </div>
+      </section>
+
+      {/* Pestañas */}
+      <nav
+        id="contenido"
+        aria-label="Contenido del albergue"
+        className="mt-8 flex gap-1 rounded-full bg-muted p-1.5"
+      >
+        {TABS.map((t) => (
+          <Link
+            key={t.id}
+            href={`?tab=${t.id}#contenido`}
+            scroll={false}
+            aria-current={tab === t.id ? "page" : undefined}
+            className={cn(
+              "flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full px-2 text-sm font-extrabold transition-colors",
+              tab === t.id ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-card",
+            )}
+          >
+            {t.label}
+            <span className={cn("rounded-full px-1.5 text-xs", tab === t.id ? "bg-white/20" : "bg-card")}>
+              {counts[t.id]}
+            </span>
+          </Link>
+        ))}
+      </nav>
+
+      <div className="mt-6">
+        {tab === "campanas" &&
+          (shownCampaigns.length ? (
+            <div className="grid gap-5 md:grid-cols-2">
+              {shownCampaigns.map((c) => (
+                <CampaignCard key={c.id} campaign={c} />
+              ))}
+            </div>
+          ) : (
+            <Empty text="Este albergue aún no publicó campañas." />
+          ))}
+
+        {tab === "animales" &&
+          (available.length ? (
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+              {available.map((a) => (
+                <AnimalCard key={a.id} animal={a} shelterName={shelter.name} />
+              ))}
+            </div>
+          ) : (
+            <Empty text="Por ahora no hay animales publicados." />
+          ))}
+
+        {tab === "necesidades" &&
+          (openNeeds.length ? (
+            <ul className="grid gap-4 md:grid-cols-2">
+              {openNeeds.map((n) => (
+                <li key={n.id} className="flex gap-4 rounded-[24px] bg-warning-bg p-5">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card text-foreground">
+                    <Package className="h-6 w-6" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <span className="rounded-full bg-card px-3 py-1 text-xs font-extrabold">{n.quantity}</span>
+                    <h3 className="mt-2 text-xl">{n.title}</h3>
+                    <p className="mt-1 text-sm text-foreground/80">{n.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="Este albergue no tiene necesidades abiertas." />
+          ))}
       </div>
 
-      {/* ── Historia / descripción ── */}
-      {(shelter.long_description || shelter.description) && (
-        <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">
-            Sobre nosotros
-          </h2>
-          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-            {shelter.long_description ?? shelter.description}
-          </div>
-        </section>
-      )}
-
-      {/* ── Galería ── */}
+      {/* Galería */}
       {shelter.shelter_photos.length > 0 && (
-        <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">
-            Galería
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <section className="mt-10">
+          <h2 className="text-2xl">Así es el albergue</h2>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {shelter.shelter_photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="relative aspect-video rounded-xl overflow-hidden border border-border bg-muted"
-              >
-                <Image
-                  src={photo.url}
-                  alt="Foto del albergue"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, 33vw"
-                />
+              <div key={photo.id} className="relative aspect-[4/3] overflow-hidden rounded-[20px] bg-muted">
+                <Image src={photo.url} alt={`Foto de ${shelter.name}`} fill className="object-cover" sizes="(max-width: 640px) 50vw, 33vw" />
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── Contacto ── */}
-      <section>
-        <h2 className="text-base font-semibold text-foreground mb-3">
-          Contacto
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          {shelter.address && (
-            <ContactChip
-              icon={<MapPin className="h-3.5 w-3.5" />}
-              label={shelter.address}
-            />
-          )}
-          {shelter.phone && (
-            <a href={`tel:${shelter.phone}`}>
-              <ContactChip
-                icon={<Phone className="h-3.5 w-3.5" />}
-                label={shelter.phone}
-              />
-            </a>
-          )}
-          {shelter.whatsapp && (
-            <a
-              href={`https://wa.me/51${shelter.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ContactChip
-                icon={
-                  <span className="text-[11px] font-bold leading-none">WA</span>
-                }
-                label={`WhatsApp ${shelter.whatsapp}`}
-              />
-            </a>
-          )}
-          {shelter.email && (
-            <a href={`mailto:${shelter.email}`}>
-              <ContactChip
-                icon={<Mail className="h-3.5 w-3.5" />}
-                label={shelter.email}
-              />
-            </a>
-          )}
-          {shelter.instagram && (
-            <a
-              href={`https://instagram.com/${shelter.instagram}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ContactChip
-                icon={
-                  <span className="text-[11px] font-bold leading-none">IG</span>
-                }
-                label={`@${shelter.instagram}`}
-              />
-            </a>
-          )}
-          {shelter.facebook && (
-            <a
-              href={`https://facebook.com/${shelter.facebook}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ContactChip
-                icon={
-                  <span className="text-[11px] font-bold leading-none">FB</span>
-                }
-                label={shelter.facebook}
-              />
-            </a>
-          )}
-          {shelter.tiktok && (
-            <a
-              href={`https://tiktok.com/@${shelter.tiktok}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ContactChip
-                icon={
-                  <span className="text-[11px] font-bold leading-none">TT</span>
-                }
-                label={`@${shelter.tiktok}`}
-              />
-            </a>
-          )}
-        </div>
-      </section>
-
-      {/* ── Animales disponibles ── */}
-      {availableAnimals.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground">
-              Animales disponibles
-            </h2>
-            <Link
-              href="/adopt"
-              className="flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              Ver todos <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {availableAnimals.map((animal) => (
-              <AnimalCard
-                key={animal.id}
-                animal={animal}
-                shelterName={shelter.name}
-                shelterId={shelter.id}
-              />
+      {/* Contacto autorizado */}
+      <section className="mt-10 rounded-[28px] border border-border bg-card p-6">
+        <h2 className="text-2xl">Contacto</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Medios que el albergue publicó. Escríbeles para coordinar entregas o visitas.
+        </p>
+        {contacts.length ? (
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {contacts.map(({ href, icon: Icon, label }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-primary px-4 text-sm font-extrabold text-primary hover:bg-secondary"
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {label}
+                </a>
+              </li>
             ))}
-          </div>
-        </section>
-      )}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm">Este albergue aún no publicó medios de contacto.</p>
+        )}
+        {shelter.address && (
+          <p className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4" aria-hidden="true" />
+            {shelter.address}
+          </p>
+        )}
+      </section>
     </div>
   );
 }
 
-function ContactChip({
-  icon,
-  label,
-}: {
-  icon: React.ReactNode;
-  label: string;
-}) {
+function Empty({ text }: { text: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:border-shelter/40 transition-colors cursor-pointer">
-      {icon}
-      {label}
-    </span>
+    <p className="rounded-[24px] border-2 border-dashed border-border bg-card p-8 text-center text-muted-foreground">
+      {text}
+    </p>
   );
 }

@@ -3,12 +3,16 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, MapPin, PawPrint } from "lucide-react";
 import { DISTRICT_LABEL } from "@/lib/ubigeo";
 import type { Shelter } from "@/types";
+import type { ShelterStats } from "@/lib/data/shelters";
 
 interface ShelterCardProps {
   shelter: Shelter;
+  stats?: ShelterStats;
 }
 
-export default function ShelterCard({ shelter }: ShelterCardProps) {
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+export default function ShelterCard({ shelter, stats }: ShelterCardProps) {
   const place = DISTRICT_LABEL[shelter.ubigeo] ?? "Lambayeque";
 
   return (
@@ -76,6 +80,24 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
           <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {shelter.description}
           </p>
+        )}
+
+        {stats && (
+          <ul className="flex flex-wrap gap-1.5" aria-label="Actividad del albergue">
+            {stats.openCampaigns > 0 && (
+              <li className="rounded-full bg-support-soft px-2.5 py-1 text-xs font-extrabold">
+                {plural(stats.openCampaigns, "campaña abierta", "campañas abiertas")}
+              </li>
+            )}
+            <li className="rounded-full bg-secondary px-2.5 py-1 text-xs font-extrabold">
+              {plural(stats.animals, "animal", "animales")}
+            </li>
+            {stats.openNeeds > 0 && (
+              <li className="rounded-full bg-warning-bg px-2.5 py-1 text-xs font-extrabold text-warning-fg">
+                {plural(stats.openNeeds, "necesidad", "necesidades")}
+              </li>
+            )}
+          </ul>
         )}
 
         <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-extrabold text-primary">

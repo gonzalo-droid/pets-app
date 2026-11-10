@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import AnimalCard from '@/components/animals/AnimalCard'
@@ -35,42 +36,40 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
   const { items: animals, page, totalPages, total } = result
 
   const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
-  const shelterIds = Object.fromEntries(shelters.map((s) => [s.id, s.id]))
 
   // Params sin 'page' para que PaginationNav construya los hrefs correctamente
   const paramString = queryWithoutPage(params)
 
+  const filtered = Boolean(params.species || params.size || params.q)
+
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display font-bold text-3xl tracking-tight text-foreground">
-          Animales en adopción
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          {total === 0
-            ? 'No hay animales disponibles con estos filtros.'
-            : `${total} animal${total === 1 ? '' : 'es'} esperando un hogar`}
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mb-6 max-w-2xl">
+        <h1 className="text-4xl text-foreground sm:text-5xl">Te están esperando</h1>
+        <p className="mt-3 text-lg text-muted-foreground">
+          Solicita su adopción o apadrínalos para acompañar su cuidado mientras encuentran hogar.
         </p>
       </div>
 
-      {/* Filtros */}
-      <div className="mb-8 p-4 rounded-xl border border-border bg-muted/20">
-        <Suspense fallback={<div className="h-10 animate-pulse bg-muted rounded-full w-64" />}>
+      <div className="mb-6 rounded-[28px] border border-border bg-card p-4 sm:p-6">
+        <Suspense fallback={<div className="h-12 w-full animate-pulse rounded-full bg-muted" />}>
           <AnimalFiltersPanel />
         </Suspense>
       </div>
 
-      {/* Grid */}
+      <p className="mb-4 text-sm font-extrabold text-muted-foreground" aria-live="polite">
+        {total} animal{total === 1 ? '' : 'es'}
+        {filtered ? ' con estos filtros' : ' buscan hogar'}
+      </p>
+
       {animals.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {animals.map((animal) => (
               <AnimalCard
                 key={animal.id}
                 animal={animal}
                 shelterName={shelterNames[animal.shelter_id]}
-                shelterId={shelterIds[animal.shelter_id]}
               />
             ))}
           </div>
@@ -82,12 +81,14 @@ export default async function AdoptPage({ searchParams }: AdoptPageProps) {
           />
         </>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-          <span className="text-5xl">🐾</span>
-          <p className="text-lg font-medium text-foreground">Sin resultados</p>
-          <p className="text-muted-foreground text-sm max-w-xs">
-            Prueba quitando algún filtro para ver más animales disponibles.
+        <div className="rounded-[28px] border-2 border-dashed border-border bg-card p-10 text-center">
+          <p className="text-lg font-bold text-foreground">No hay animales con estos filtros</p>
+          <p className="mx-auto mt-1 max-w-sm text-muted-foreground">
+            Prueba con otra especie o tamaño, o revisa la búsqueda.
           </p>
+          <Link href="/adopt" className="huellas-button huellas-button--secondary mt-5">
+            Quitar filtros
+          </Link>
         </div>
       )}
     </div>

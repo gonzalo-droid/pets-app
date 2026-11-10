@@ -280,6 +280,16 @@
   background: var(--support-hover);
   border-color: var(--support-hover);
 }
+/* Apadrinar: borde y texto coral, secundaria frente a "Solicitar adopción". */
+.huellas-button--support-outline {
+  background: var(--card);
+  border-color: var(--support);
+  color: var(--support);
+}
+.huellas-button--support-outline:hover {
+  background: var(--support-soft);
+  border-color: var(--support);
+}
 .huellas-button:disabled {
   opacity: 0.5;
   cursor: wait;

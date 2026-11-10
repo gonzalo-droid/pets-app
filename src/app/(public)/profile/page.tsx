@@ -14,6 +14,9 @@ const REQUEST_STATUS: Record<string, { label: string; className: string }> = {
   completed: { label: "Adopción completada", className: "bg-success-bg text-success-fg" },
 };
 
+// Pasos de una solicitud para la barra de avance (rechazada no se muestra).
+const STEPS = ["pending", "reviewing", "approved", "completed"];
+
 const date = (iso: string) =>
   new Date(iso).toLocaleDateString("es-PE", {
     day: "numeric",
@@ -42,32 +45,40 @@ export default async function Page({
 
   const tabs = [
     { id: "apoyos", label: "Mis apoyos", count: support.length },
-    { id: "solicitudes", label: "Mis solicitudes de adopción", count: requests.length },
+    { id: "solicitudes", label: "Mis solicitudes", count: requests.length },
   ];
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
-      <div>
-        <p className="text-sm font-bold text-primary">Mi espacio</p>
-        <h1 className="mt-1 text-3xl sm:text-4xl">Hola, {a.full_name}</h1>
-        <p className="mt-2 text-muted-foreground">
-          {pending.length > 0
-            ? `Tienes ${pending.length} compromiso${pending.length === 1 ? "" : "s"} de apoyo pendiente${pending.length === 1 ? "" : "s"}.`
-            : "Aquí verás tus apoyos y tus solicitudes de adopción."}
-        </p>
-      </div>
+      <section className="flex items-center gap-4 rounded-[32px] bg-secondary p-6 sm:p-8">
+        <span
+          aria-hidden="true"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-support-soft font-display text-3xl font-semibold text-support"
+        >
+          {a.full_name.trim().charAt(0).toUpperCase() || "H"}
+        </span>
+        <div>
+          <p className="text-sm font-extrabold text-accent-foreground">Mi espacio</p>
+          <h1 className="text-3xl leading-tight sm:text-4xl">Hola, {a.full_name}</h1>
+          <p className="mt-1 text-foreground/80">
+            {pending.length > 0
+              ? `Acompañas ${pending.length} historia${pending.length === 1 ? "" : "s"} con compromisos pendientes.`
+              : "Aquí verás tus apoyos y tus solicitudes de adopción."}
+          </p>
+        </div>
+      </section>
 
-      <nav aria-label="Secciones de Mi espacio" className="flex flex-wrap gap-2">
+      <nav aria-label="Secciones de Mi espacio" className="flex gap-1 rounded-full bg-muted p-1.5">
         {tabs.map((t) => (
           <Link
             key={t.id}
             href={t.id === "apoyos" ? "/profile" : "/profile?tab=solicitudes"}
             aria-current={active === t.id ? "page" : undefined}
             className={cn(
-              "inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-extrabold transition-colors",
+              "flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-3 text-sm font-extrabold transition-colors",
               active === t.id
                 ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+                : "text-foreground hover:bg-card",
             )}
           >
             {t.label}
@@ -196,6 +207,27 @@ export default async function Page({
                     </span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">Enviada el {date(r.created_at)}</p>
+                  {r.status !== "rejected" && (
+                    <div className="mt-3">
+                      <ol
+                        className="flex gap-1"
+                        aria-label={`Avance de la solicitud: paso ${STEPS.indexOf(r.status) + 1} de 4`}
+                      >
+                        {STEPS.map((step, i) => (
+                          <li
+                            key={step}
+                            className={cn(
+                              "h-1.5 flex-1 rounded-full",
+                              i <= STEPS.indexOf(r.status) ? "bg-primary" : "bg-secondary",
+                            )}
+                          />
+                        ))}
+                      </ol>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Enviada · En revisión · Aprobada · Completada
+                      </p>
+                    </div>
+                  )}
                   <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{r.message}</p>
                 </div>
               </article>

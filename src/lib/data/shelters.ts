@@ -116,3 +116,47 @@ export async function getSheltersPage(
     "getSheltersPage",
   );
 }
+
+export type ShelterStats = { openCampaigns: number; animals: number; openNeeds: number };
+
+/**
+ * Actividad visible de varios albergues: campañas abiertas, animales que
+ * buscan hogar y necesidades abiertas. Tres consultas en total, no una por albergue.
+ */
+export async function getShelterStats(ids: string[]): Promise<Record<string, ShelterStats>> {
+  const stats: Record<string, ShelterStats> = Object.fromEntries(
+    ids.map((id) => [id, { openCampaigns: 0, animals: 0, openNeeds: 0 }]),
+  );
+  if (!ids.length) return stats;
+  const now = new Date();
+  let campaigns: { shelter_id: string }[] = [];
+  let animals: { shelter_id: string }[] = [];
+  let needs: { shelter_id: string }[] = [];
+  if (isDemo()) {
+    const d = await readDemo();
+    campaigns = d.campaigns.filter(
+      (c) => c.is_active && (!c.ends_at || new Date(c.ends_at) >= now),
+    );
+    animals = d.animals.filter((a) => a.status === "available");
+    needs = d.needs.filter((n) => !n.fulfilled);
+  } else {
+    const db = await createClient();
+    const [c, a, n] = await Promise.all([
+      db
+        .from("donation_campaigns")
+        .select("shelter_id")
+        .in("shelter_id", ids)
+        .eq("is_active", true)
+        .or(`ends_at.is.null,ends_at.gte.${now.toISOString()}`),
+      db.from("animals").select("shelter_id").in("shelter_id", ids).eq("status", "available"),
+      db.from("needs").select("shelter_id").in("shelter_id", ids).eq("fulfilled", false),
+    ]);
+    campaigns = c.data ?? [];
+    animals = a.data ?? [];
+    needs = n.data ?? [];
+  }
+  for (const r of campaigns) if (stats[r.shelter_id]) stats[r.shelter_id].openCampaigns++;
+  for (const r of animals) if (stats[r.shelter_id]) stats[r.shelter_id].animals++;
+  for (const r of needs) if (stats[r.shelter_id]) stats[r.shelter_id].openNeeds++;
+  return stats;
+}

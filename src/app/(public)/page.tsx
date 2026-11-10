@@ -202,7 +202,7 @@ export default async function Page() {
             linkLabel="Ver todos los animales"
           />
           {animals.length > 0 ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
               {animals.map((a) => (
                 <AnimalCard key={a.id} animal={a} shelterName={shelterName(a.shelter_id)} />
               ))}

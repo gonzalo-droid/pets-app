@@ -123,6 +123,7 @@ export async function getCampaignsPage(
     // Mismo orden que en Supabase: sin fecha límite y fechas más lejanas primero.
     const rows = (await getCampaigns(filters))
       .filter((c) => !filters?.open_only || isCampaignOpen(c))
+      .filter((c) => !filters?.closed_only || !isCampaignOpen(c))
       .sort(
         (a, b) =>
           Number(b.is_active) - Number(a.is_active) ||
@@ -153,6 +154,8 @@ export async function getCampaignsPage(
         query = query
           .eq("is_active", true)
           .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`);
+      if (filters?.closed_only)
+        query = query.or(`is_active.eq.false,ends_at.lt.${new Date().toISOString()}`);
       return query.range(from, to);
     },
     page,

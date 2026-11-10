@@ -185,17 +185,46 @@ export function SupportForm({
   slug: string;
   title: string;
 }) {
+  const monthly = kind === "sponsorship";
   const [amount, setAmount] = useState(30),
-    [message, setMessage] = useState(""),
+    [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [done, setDone] = useState(false),
+    [ref, setRef] = useState(""),
     [key] = useState(() => crypto.randomUUID());
+
+  // Confirmación: solo tras guardar correctamente, y sin parecer un pago.
+  if (ref)
+    return (
+      <div role="status" className="space-y-4 rounded-[28px] bg-support-soft p-6">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-success-bg text-success-fg">
+          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12l5 5 9-10" />
+          </svg>
+        </span>
+        <h2 className="text-2xl">Compromiso guardado</h2>
+        <dl className="grid gap-2 rounded-2xl bg-card p-4 text-sm">
+          <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Destino</dt><dd className="text-right font-bold">{title}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Importe</dt><dd className="font-bold">S/ {amount}{monthly ? " / mes" : ""}</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Estado</dt><dd className="font-bold">Pendiente</dd></div>
+          <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Referencia</dt><dd className="font-bold">{ref.slice(0, 8).toUpperCase()}</dd></div>
+        </dl>
+        <p className="text-sm font-bold">
+          No se realizó ningún cobro.{monthly ? " No tiene débito automático." : ""} El compromiso no
+          equivale a una donación recibida.
+        </p>
+        <a className="huellas-button w-full" href="/profile">
+          Ver mis apoyos
+        </a>
+      </div>
+    );
+
   return (
     <form
-      className="space-y-5 rounded-2xl border bg-card p-6"
+      className="space-y-5 rounded-[28px] bg-support-soft p-6"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
+        setError("");
         try {
           const r = await fetch("/api/support", {
             method: "POST",
@@ -204,72 +233,64 @@ export function SupportForm({
           });
           const d = await r.json();
           if (!r.ok) throw new Error(d.error);
-          setMessage(d.message);
-          setDone(true);
+          setRef(d.id ?? key);
         } catch (e) {
-          setMessage((e as Error).message);
+          setError((e as Error).message);
         } finally {
           setBusy(false);
         }
       }}
     >
-      <h2 className="text-xl font-bold">{title}</h2>
-      <p className="text-sm text-muted-foreground">
-        {kind === "sponsorship"
-          ? "Expresa tu intención de apoyar cada mes."
-          : "Registra tu intención de aportar."}{" "}
-        Los cobros están deshabilitados. No ingreses datos de tarjetas ni
-        realices transferencias.
-      </p>
-      {!done && (
-        <>
-          <div className="flex flex-wrap gap-2">
-            {[10, 30, 50, 100].map((n) => (
-              <button
-                key={n}
-                type="button"
-                aria-pressed={amount === n}
-                className={`rounded-xl border px-5 py-3 ${amount === n ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-                onClick={() => setAmount(n)}
-              >
-                S/ {n}
-              </button>
-            ))}
-          </div>
-          <label className="block text-sm">
-            Monto en soles{kind === "sponsorship" ? " por mes" : ""}
-            <input
-              className="huellas-field"
-              type="number"
-              min="1"
-              max="100000"
-              step="0.01"
-              required
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-            />
-          </label>
-          <button disabled={busy} className="huellas-button huellas-button--support w-full">
-            {busy ? "Guardando…" : "Registrar compromiso sin cobro"}
+      <div>
+        <p className="text-sm font-bold text-muted-foreground">{title}</p>
+        <h2 className="mt-1 text-2xl">
+          {monthly ? "¿Cuánto quieres aportar cada mes?" : "¿Cuánto quieres aportar?"}
+        </h2>
+      </div>
+      <div role="group" aria-label="Importes sugeridos" className="grid grid-cols-4 gap-2">
+        {[10, 30, 50, 100].map((n) => (
+          <button
+            key={n}
+            type="button"
+            aria-pressed={amount === n}
+            className={`min-h-12 rounded-2xl border-2 text-base font-extrabold transition-colors ${
+              amount === n
+                ? "border-support bg-support text-support-foreground"
+                : "border-card bg-card text-foreground hover:border-support/40"
+            }`}
+            onClick={() => setAmount(n)}
+          >
+            S/ {n}
           </button>
-        </>
-      )}
-      {message && (
-        <p
-          role="status"
-          className={`rounded-2xl p-4 text-sm ${done ? "bg-success-bg text-success-fg" : "bg-error-bg text-error-fg"}`}
-        >
-          {message}{" "}
-          {done && (
-            <a className="font-extrabold underline" href="/profile">
-              Ver mis apoyos
-            </a>
-          )}
+        ))}
+      </div>
+      <label className="block text-sm font-bold">
+        Otro importe en soles{monthly ? " por mes" : ""}
+        <input
+          className="huellas-field"
+          type="number"
+          min="1"
+          max="100000"
+          step="0.01"
+          required
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+        />
+      </label>
+      <p className="rounded-2xl bg-warning-bg p-3 text-sm text-warning-fg">
+        No se realizará ningún cobro{monthly ? " ni débito automático" : ""}. No ingreses datos de
+        tarjetas ni hagas transferencias.
+      </p>
+      {error && (
+        <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
+          {error}
         </p>
       )}
+      <button disabled={busy} className="huellas-button huellas-button--support w-full min-h-13 text-base">
+        {busy ? "Guardando…" : `Registrar compromiso de S/ ${amount || 0}`}
+      </button>
       <p className="text-xs text-muted-foreground">
-        Los compromisos pendientes no incrementan la recaudación. Puedes
-        cancelarlos desde tu perfil.
+        Los compromisos pendientes no incrementan la recaudación. Puedes cancelarlos desde Mi espacio.
       </p>
     </form>
   );

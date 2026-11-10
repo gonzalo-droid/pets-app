@@ -79,7 +79,7 @@ export default async function AnimalDetailPage({
   ];
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 pb-32 pt-6 sm:px-6 sm:pt-10 lg:px-8 lg:pb-12">
       <Link
         href="/adopt"
         className="mb-6 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
@@ -95,13 +95,13 @@ export default async function AnimalDetailPage({
           <div>
             <span
               className={cn(
-                "inline-flex rounded-full px-3 py-1 text-sm font-semibold",
+                "inline-flex -rotate-2 rounded-full px-3 py-1 text-sm font-extrabold",
                 chip.className,
               )}
             >
               {chip.label}
             </span>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground">
+            <h1 className="mt-3 text-5xl leading-none text-foreground">
               {animal.name}
             </h1>
             {shelter && (
@@ -114,7 +114,7 @@ export default async function AnimalDetailPage({
 
           <dl className="grid grid-cols-2 gap-3">
             {facts.map(({ label, value }) => (
-              <div key={label} className="rounded-xl bg-secondary px-4 py-3">
+              <div key={label} className="rounded-2xl bg-secondary px-4 py-3">
                 <dt className="text-xs text-muted-foreground">{label}</dt>
                 <dd className="mt-0.5 text-sm font-semibold text-foreground">{value}</dd>
               </div>
@@ -135,8 +135,8 @@ export default async function AnimalDetailPage({
             </ul>
           )}
 
-          {/* Acciones según el estado del animal */}
-          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
+          {/* Acciones según el estado del animal (en móvil, también en la barra fija) */}
+          <div className="flex flex-col gap-3 rounded-[28px] border border-border bg-card p-5">
             {canAdopt ? (
               <Link
                 href={`/adopt/${animal.slug}/apply`}
@@ -156,7 +156,7 @@ export default async function AnimalDetailPage({
               <>
                 <Link
                   href={`/sponsor/${animal.slug}`}
-                  className="huellas-button huellas-button--secondary w-full"
+                  className="huellas-button huellas-button--support-outline w-full"
                 >
                   <Heart className="h-5 w-5" aria-hidden="true" />
                   Apadrinar a {animal.name}
@@ -172,7 +172,7 @@ export default async function AnimalDetailPage({
           {shelter && (
             <Link
               href={`/shelters/${shelter.id}`}
-              className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-[box-shadow,border-color] hover:border-primary/40 hover:shadow-sm"
+              className="flex items-center gap-4 rounded-[24px] border border-border bg-card p-4 transition-transform hover:-translate-y-0.5"
             >
               {shelter.avatar_url && (
                 <Image
@@ -201,7 +201,7 @@ export default async function AnimalDetailPage({
 
       {animal.description && (
         <section className="mt-10 max-w-3xl">
-          <h2 className="text-2xl font-bold text-foreground">Su historia</h2>
+          <h2 className="text-3xl text-foreground">Su historia</h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">{animal.description}</p>
           <p className="mt-6 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
@@ -213,6 +213,26 @@ export default async function AnimalDetailPage({
             })}
           </p>
         </section>
+      )}
+
+      {/* Barra fija en móvil con las acciones disponibles */}
+      {(canAdopt || canSponsor) && (
+        <div className="fixed inset-x-0 bottom-0 z-40 flex gap-3 rounded-t-[28px] border-t border-border bg-card px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
+          {canSponsor && (
+            <Link
+              href={`/sponsor/${animal.slug}`}
+              className="huellas-button huellas-button--support-outline flex-1 px-3"
+            >
+              <Heart className="h-5 w-5" aria-hidden="true" />
+              Apadrinar
+            </Link>
+          )}
+          {canAdopt && (
+            <Link href={`/adopt/${animal.slug}/apply`} className="huellas-button flex-[1.3] px-3">
+              Solicitar adopción
+            </Link>
+          )}
+        </div>
       )}
     </div>
   );

@@ -6,14 +6,14 @@ import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const SPECIES_OPTIONS = [
-  { value: '', label: 'Todas las especies' },
-  { value: 'dog', label: '🐶 Perros' },
-  { value: 'cat', label: '🐱 Gatos' },
-  { value: 'other', label: '🐾 Otros' },
+  { value: '', label: 'Todos' },
+  { value: 'dog', label: 'Perros' },
+  { value: 'cat', label: 'Gatos' },
+  { value: 'other', label: 'Otros' },
 ]
 
 const SIZE_OPTIONS = [
-  { value: '', label: 'Cualquier tamaño' },
+  { value: '', label: 'Cualquiera' },
   { value: 'small', label: 'Pequeño' },
   { value: 'medium', label: 'Mediano' },
   { value: 'large', label: 'Grande' },
@@ -69,23 +69,32 @@ export default function AnimalFiltersPanel() {
 
   useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current) }, [])
 
+  const chip = (on: boolean) =>
+    cn(
+      'inline-flex min-h-11 items-center rounded-full border-2 px-4 text-sm font-extrabold transition-colors',
+      on
+        ? 'border-primary bg-primary text-primary-foreground'
+        : 'border-border bg-card text-foreground hover:border-primary/50',
+    )
+
   return (
     <div className="flex flex-col gap-4">
       {/* Búsqueda por texto */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <input
-          type="text"
-          placeholder="Buscar por nombre, raza o descripción..."
+          type="search"
+          aria-label="Buscar por nombre, raza o descripción"
+          placeholder="Nombre, raza o descripción"
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { if (debounceRef.current) clearTimeout(debounceRef.current); applySearch(query) } }}
-          className="w-full rounded-lg border border-input bg-background pl-9 pr-9 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="min-h-12 w-full rounded-full border border-input bg-background pl-10 pr-11 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
         {query && (
           <button
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label="Limpiar búsqueda"
           >
             <X className="h-4 w-4" />
@@ -93,43 +102,36 @@ export default function AnimalFiltersPanel() {
         )}
       </div>
 
-      <div className="flex flex-wrap gap-3 items-center">
-        {/* Filtro especie */}
-        <div className="flex gap-1.5 flex-wrap">
-          {SPECIES_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value || 'all-species'}
-              onClick={() => updateParam('species', value)}
-              className={cn(
-                'rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors',
-                activeSpecies === value
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background'
-              )}
-            >
-              {label}
-            </button>
-          ))}
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-8">
+        <div role="group" aria-labelledby="f-especie">
+          <p id="f-especie" className="mb-2 text-sm font-extrabold">Especie</p>
+          <div className="flex flex-wrap gap-2">
+            {SPECIES_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value || 'all-species'}
+                aria-pressed={activeSpecies === value}
+                onClick={() => updateParam('species', value)}
+                className={chip(activeSpecies === value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-
-        <div className="h-5 w-px bg-border hidden sm:block" />
-
-        {/* Filtro tamaño */}
-        <div className="flex gap-1.5 flex-wrap">
-          {SIZE_OPTIONS.map(({ value, label }) => (
-            <button
-              key={value || 'all-sizes'}
-              onClick={() => updateParam('size', value)}
-              className={cn(
-                'rounded-full px-3.5 py-1.5 text-sm font-medium border transition-colors',
-                activeSize === value
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background'
-              )}
-            >
-              {label}
-            </button>
-          ))}
+        <div role="group" aria-labelledby="f-tamano">
+          <p id="f-tamano" className="mb-2 text-sm font-extrabold">Tamaño</p>
+          <div className="flex flex-wrap gap-2">
+            {SIZE_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value || 'all-sizes'}
+                aria-pressed={activeSize === value}
+                onClick={() => updateParam('size', value)}
+                className={chip(activeSize === value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

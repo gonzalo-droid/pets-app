@@ -1,12 +1,11 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { isCampaignOpen } from "@/lib/huellas/domain";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft, BadgeCheck, CalendarDays, Target } from "lucide-react";
-import DonationProgress from "@/components/campaigns/DonationProgress";
-import { cn, formatPEN, campaignProgress } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { ArrowLeft, BadgeCheck, CalendarDays, Heart } from "lucide-react";
+import { isCampaignOpen } from "@/lib/huellas/domain";
+import PawProgress, { PawIcon } from "@/components/campaigns/PawProgress";
+import { cn, formatPEN } from "@/lib/utils";
 import { getCampaignBySlug } from "@/lib/data/campaigns";
 import { getShelterById } from "@/lib/data/shelters";
 
@@ -26,10 +25,9 @@ export async function generateMetadata({
   };
 }
 
-function daysUntil(isoDate: string | null): string | null {
-  if (!isoDate) return null;
-  const diff = new Date(isoDate).getTime() - Date.now();
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+function deadlineLabel(isoDate: string | null): string {
+  if (!isoDate) return "Sin fecha límite";
+  const days = Math.ceil((new Date(isoDate).getTime() - Date.now()) / 86_400_000);
   if (days < 0) return "Cerrada";
   if (days === 0) return "Último día";
   return `${days} día${days === 1 ? "" : "s"} restantes`;
@@ -42,226 +40,142 @@ export default async function CampaignDetailPage({
   const campaign = await getCampaignBySlug(slug);
   if (!campaign) notFound();
 
-  // Shelter completo para mostrar datos de pago en el flujo de confirmación
   const shelter = await getShelterById(campaign.shelter_id);
-  const pct = campaignProgress(campaign.current_amount, campaign.goal_amount);
   const open = isCampaignOpen(campaign);
-  const deadline = open ? daysUntil(campaign.ends_at) : "Cerrada";
+  const remaining = Math.max(0, campaign.goal_amount - campaign.current_amount);
+
+  const cta = open ? (
+    <div className="flex flex-col gap-3">
+      <Link href={`/donate/${slug}/confirm`} className="huellas-button huellas-button--support min-h-13 w-full text-base">
+        <Heart className="h-5 w-5" aria-hidden="true" />
+        Apoyar esta campaña
+      </Link>
+      <p className="text-center text-xs text-muted-foreground">
+        Compromiso sin cobro. Los pagos aún no están habilitados.
+      </p>
+    </div>
+  ) : (
+    <div className="rounded-[24px] bg-muted p-5 text-sm">
+      <p className="font-display text-lg font-semibold text-foreground">Campaña cerrada</p>
+      <p className="mt-1 text-muted-foreground">
+        Ya no recibe aportes. Gracias a quienes la apoyaron.
+      </p>
+      <Link href="/donate" className="mt-3 inline-block font-extrabold text-primary hover:underline">
+        Ver campañas abiertas →
+      </Link>
+    </div>
+  );
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-      {/* Breadcrumb */}
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
       <Link
         href="/donate"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+        className="mb-6 inline-flex min-h-11 items-center gap-1.5 rounded-full text-sm font-bold text-muted-foreground transition-colors hover:text-primary"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Volver a campañas
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Columna principal */}
-        <div className="lg:col-span-2 flex flex-col gap-7">
-          {/* Header campaña */}
-          <div className="flex items-start gap-4">
-            {campaign.shelter.avatar_url && (
-              <Image
-                src={campaign.shelter.avatar_url}
-                unoptimized={campaign.shelter.avatar_url.includes(
-                  "api.dicebear.com",
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1.4fr_1fr]">
+        <div className="flex flex-col gap-8">
+          {/* Tarjeta principal */}
+          <section className="huellas-card-pop rounded-[32px] bg-card p-6 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                {campaign.shelter.avatar_url ? (
+                  <Image
+                    src={campaign.shelter.avatar_url}
+                    unoptimized={campaign.shelter.avatar_url.includes("api.dicebear.com")}
+                    alt=""
+                    width={48}
+                    height={48}
+                    sizes="48px"
+                    className="h-12 w-12 rounded-full border-2 border-secondary bg-secondary object-cover"
+                  />
+                ) : (
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-primary">
+                    <PawIcon className="h-6 w-6" />
+                  </span>
                 )}
-                alt={campaign.shelter.name}
-                width={56}
-                height={56}
-                sizes="56px"
-                className="h-14 w-14 rounded-full border border-border bg-muted object-cover shrink-0"
-              />
-            )}
-            <div>
-              <h1 className="font-display font-bold text-2xl text-foreground leading-tight">
-                {campaign.title}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                por{" "}
-                <span className="font-medium text-foreground">
-                  {campaign.shelter.name}
-                </span>
-              </p>
-              {campaign.animal && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Campaña para {campaign.animal.name} (
-                  {campaign.animal.species === "dog"
-                    ? "perro"
-                    : campaign.animal.species === "cat"
-                      ? "gato"
-                      : "animal"}
-                  )
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Descripción */}
-          {campaign.description && (
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">
-                Sobre esta campaña
-              </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {campaign.description}
-              </p>
-            </div>
-          )}
-
-          {/* Progreso detallado */}
-          <div className="rounded-xl border border-border p-5 flex flex-col gap-4">
-            <DonationProgress
-              current={campaign.current_amount}
-              goal={campaign.goal_amount}
-            />
-
-            <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground">Recaudado</p>
-                <p className="font-bold text-foreground mt-0.5">
-                  {formatPEN(campaign.current_amount)}
-                </p>
+                <p className="font-bold text-muted-foreground">{campaign.shelter.name}</p>
               </div>
-              <div className="text-center border-x border-border">
-                <p className="text-xs text-muted-foreground">Meta</p>
-                <p className="font-bold text-foreground mt-0.5">
-                  {formatPEN(campaign.goal_amount)}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground">Completado</p>
-                <p className="font-bold text-primary mt-0.5">{pct}%</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-              {deadline && (
-                <span className="flex items-center gap-1">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {deadline}
-                </span>
-              )}
-              <span className="flex items-center gap-1">
-                <Target className="h-3.5 w-3.5" />
-                Meta:{" "}
-                {formatPEN(campaign.goal_amount - campaign.current_amount)}{" "}
-                restantes
+              <span
+                className={cn(
+                  "-rotate-2 rounded-full px-3 py-1 text-sm font-extrabold",
+                  open ? "bg-highlight text-foreground" : "bg-muted text-muted-foreground",
+                )}
+              >
+                {open ? `Abierta · ${deadlineLabel(campaign.ends_at)}` : "Cerrada"}
               </span>
             </div>
-          </div>
-
-          {/* CTA móvil */}
-          <div className="lg:hidden">
-            {open ? (
-              <Link
-                href={`/donate/${slug}/confirm`}
-                className={cn(
-                  buttonVariants({ variant: "support", size: "lg" }),
-                  "w-full justify-center",
-                )}
-              >
-                Apoyar esta campaña
-              </Link>
-            ) : (
-              <div className="rounded-xl border border-border bg-muted p-5 text-sm">
-              <p className="font-semibold text-foreground">Campaña cerrada</p>
-              <p className="mt-1 text-muted-foreground">
-                Esta campaña ya no recibe aportes. Gracias a quienes la apoyaron.
+            <h1 className="mt-5 text-3xl leading-tight text-foreground sm:text-4xl">
+              {campaign.title}
+            </h1>
+            {campaign.animal && (
+              <p className="mt-2 text-sm font-bold text-muted-foreground">
+                Campaña para {campaign.animal.name}
               </p>
-              <Link href="/donate" className="mt-3 inline-block text-primary hover:underline">
-                Ver campañas abiertas →
-              </Link>
-            </div>
             )}
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="flex flex-col gap-5">
-          {/* CTA escritorio */}
-          <div className="hidden lg:flex flex-col gap-3">
-            {open ? (
-              <>
-                <Link
-                  href={`/donate/${slug}/confirm`}
-                  className={cn(
-                    buttonVariants({ variant: "support", size: "lg" }),
-                    "w-full justify-center",
-                  )}
-                >
-                  Apoyar esta campaña
-                </Link>
-                <p className="text-xs text-muted-foreground text-center">
-                  Compromiso sin cobro. Pagos aún no habilitados.
-                </p>
-              </>
-            ) : (
-              <div className="rounded-xl border border-border bg-muted p-5 text-sm">
-              <p className="font-semibold text-foreground">Campaña cerrada</p>
-              <p className="mt-1 text-muted-foreground">
-                Esta campaña ya no recibe aportes. Gracias a quienes la apoyaron.
-              </p>
-              <Link href="/donate" className="mt-3 inline-block text-primary hover:underline">
-                Ver campañas abiertas →
-              </Link>
+            <div className="mt-6">
+              <PawProgress current={campaign.current_amount} goal={campaign.goal_amount} size="lg" />
             </div>
-            )}
-          </div>
-
-          {/* Albergue */}
-          {shelter && (
-            <div className="rounded-xl border border-border p-5 flex flex-col gap-3">
-              <h2 className="text-sm font-semibold text-foreground">
-                Albergue responsable
-              </h2>
-              <Link
-                href={`/shelters/${shelter.id}`}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-              >
-                {shelter.avatar_url && (
-                  <Image
-                    src={shelter.avatar_url}
-                    unoptimized={shelter.avatar_url.includes(
-                      "api.dicebear.com",
-                    )}
-                    alt={shelter.name}
-                    width={40}
-                    height={40}
-                    sizes="40px"
-                    className="h-10 w-10 rounded-full border border-border object-cover"
-                  />
-                )}
-                <div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-sm font-medium text-foreground">
-                      {shelter.name}
-                    </p>
-                    {shelter.is_verified && (
-                      <BadgeCheck className="h-4 w-4 text-shelter shrink-0" />
-                    )}
-                  </div>
-                  {shelter.address && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {shelter.address}
-                    </p>
-                  )}
+            <dl className="mt-5 grid grid-cols-3 gap-2 text-center">
+              {[
+                ["Registrado", formatPEN(campaign.current_amount)],
+                ["Meta", formatPEN(campaign.goal_amount)],
+                ["Falta", formatPEN(remaining)],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl bg-support-soft px-2 py-3">
+                  <dt className="text-xs font-bold text-muted-foreground">{label}</dt>
+                  <dd className="font-display text-lg font-semibold text-foreground">{value}</dd>
                 </div>
-              </Link>
+              ))}
+            </dl>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Montos de ejemplo. Los compromisos pendientes no suman a lo registrado.
+            </p>
+          </section>
 
-            </div>
+          {/* Acción en móvil, justo después del avance */}
+          <div className="lg:hidden">{cta}</div>
+
+          {campaign.description && (
+            <section>
+              <h2 className="text-2xl text-foreground">Sobre esta campaña</h2>
+              <p className="mt-3 leading-relaxed text-foreground/80">{campaign.description}</p>
+            </section>
           )}
-
-          {/* Aviso manual */}
-          <div className="rounded-xl bg-muted/30 border border-border px-4 py-3 text-xs text-muted-foreground">
-            Registra tu intención de apoyo sin transferir dinero. Los
-            compromisos pendientes no actualizan la recaudación.
-          </div>
         </div>
+
+        {/* Lateral */}
+        <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
+          <div className="hidden lg:block">{cta}</div>
+          {shelter && (
+            <Link
+              href={`/shelters/${shelter.id}`}
+              className="flex items-center gap-4 rounded-[24px] border border-border bg-card p-4 transition-transform hover:-translate-y-0.5"
+            >
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary text-primary">
+                <PawIcon className="h-6 w-6" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs font-bold text-muted-foreground">Albergue responsable</span>
+                <span className="flex items-center gap-1.5 truncate font-display text-lg font-semibold">
+                  {shelter.name}
+                  {shelter.is_verified && (
+                    <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="Verificado" />
+                  )}
+                </span>
+              </span>
+            </Link>
+          )}
+          {open && campaign.ends_at && (
+            <p className="flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3 text-sm font-bold">
+              <CalendarDays className="h-4 w-4 text-primary" aria-hidden="true" />
+              {deadlineLabel(campaign.ends_at)}
+            </p>
+          )}
+        </aside>
       </div>
     </div>
   );

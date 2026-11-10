@@ -44,19 +44,20 @@ export default function ShelterSearchInput() {
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <input
-        type="text"
-        placeholder="Buscar por nombre, descripción o dirección..."
+        type="search"
+        aria-label="Buscar albergue por nombre, descripción o dirección"
+        placeholder="Nombre o ciudad"
         value={query}
         onChange={(e) => handleQueryChange(e.target.value)}
         onKeyDown={(e) => { if (e.key === 'Enter') { if (debounceRef.current) clearTimeout(debounceRef.current); applySearch(query) } }}
-        className="w-full rounded-lg border border-input bg-background pl-9 pr-9 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="min-h-12 w-full rounded-full border border-input bg-card pl-10 pr-11 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       />
       {query && (
         <button
           onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
           aria-label="Limpiar búsqueda"
         >
           <X className="h-4 w-4" />

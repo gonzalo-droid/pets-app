@@ -1,6 +1,6 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import CampaignCard from '@/components/campaigns/CampaignCard'
-import DonationProgress from '@/components/campaigns/DonationProgress'
 import PaginationNav from '@/components/ui/pagination-nav'
 import { getCampaignTotals, getCampaignsPage } from '@/lib/data/campaigns'
 import { parsePage, queryWithoutPage } from '@/lib/pagination'
@@ -13,57 +13,82 @@ export const metadata: Metadata = {
 
 const PAGE_SIZE = 9
 
+const FILTERS = [
+  { id: 'abiertas', label: 'Abiertas' },
+  { id: 'cerradas', label: 'Cerradas' },
+  { id: 'todas', label: 'Todas' },
+] as const
+
 export default async function DonatePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; estado?: string }>
 }) {
   const params = await searchParams
+  const estado = FILTERS.some((f) => f.id === params.estado) ? params.estado! : 'abiertas'
+  const filters =
+    estado === 'abiertas' ? { open_only: true } : estado === 'cerradas' ? { closed_only: true } : {}
   const [{ items: campaigns, page, totalPages }, totals] = await Promise.all([
-    // Todas: las cerradas siguen visibles (marcadas) para mostrar su resultado.
-    getCampaignsPage({}, parsePage(params.page), PAGE_SIZE),
+    getCampaignsPage(filters, parsePage(params.page), PAGE_SIZE),
     getCampaignTotals({}),
   ])
-  const totalGoal = totals.goal
-  const totalRaised = totals.raised
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-4xl sm:text-5xl text-foreground">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      {/* Cabecera */}
+      <section className="rounded-[32px] bg-support-soft p-6 sm:p-10">
+        <span className="inline-block -rotate-2 rounded-full bg-highlight px-4 py-1.5 text-sm font-extrabold">
           Campañas de los albergues
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Cada campaña tiene un objetivo concreto de un albergue. Por ahora registras un
-          compromiso de apoyo: no se realiza ningún cobro.
+        </span>
+        <h1 className="mt-4 text-4xl sm:text-5xl text-foreground">Elige a quién apoyar hoy</h1>
+        <p className="mt-3 max-w-2xl text-lg text-foreground/80">
+          Cada campaña tiene un objetivo concreto. Registras un compromiso de apoyo: no se
+          realiza ningún cobro.
         </p>
-      </div>
+        <ul className="mt-6 flex flex-wrap gap-3">
+          <li className="rounded-2xl bg-card px-5 py-3">
+            <strong className="font-display text-2xl font-semibold">{totals.open}</strong>{' '}
+            <span className="text-sm font-bold text-muted-foreground">
+              abierta{totals.open === 1 ? '' : 's'}
+            </span>
+          </li>
+          <li className="rounded-2xl bg-card px-5 py-3">
+            <strong className="font-display text-2xl font-semibold">{totals.closed}</strong>{' '}
+            <span className="text-sm font-bold text-muted-foreground">
+              cerrada{totals.closed === 1 ? '' : 's'}
+            </span>
+          </li>
+          <li className="rounded-2xl bg-card px-5 py-3 text-sm text-muted-foreground">
+            <strong className="font-display text-2xl font-semibold text-foreground">
+              {formatPEN(totals.raised)}
+            </strong>{' '}
+            registrados de {formatPEN(totals.goal)} · dato de ejemplo
+          </li>
+        </ul>
+      </section>
 
-      {/* Resumen global */}
-      <div className="mb-10 rounded-[28px] bg-support-soft px-6 py-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div>
-            <p className="text-sm text-muted-foreground">Recaudado registrado en las campañas</p>
-            <p className="text-2xl font-bold text-foreground mt-0.5">
-              {formatPEN(totalRaised)}{' '}
-              <span className="text-base font-normal text-muted-foreground">
-                de {formatPEN(totalGoal)}
-              </span>
-            </p>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {totals.open} campaña{totals.open !== 1 ? 's' : ''} abierta{totals.open !== 1 ? 's' : ''}
-            {totals.closed > 0 && ` · ${totals.closed} cerrada${totals.closed !== 1 ? 's' : ''}`}
-          </div>
-        </div>
-        <DonationProgress current={totalRaised} goal={totalGoal} showNumbers={false} />
-      </div>
+      {/* Filtro por estado */}
+      <nav aria-label="Filtrar campañas" className="mt-8 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <Link
+            key={f.id}
+            href={f.id === 'abiertas' ? '/donate' : `/donate?estado=${f.id}`}
+            aria-current={estado === f.id ? 'page' : undefined}
+            className={`inline-flex min-h-11 items-center rounded-full border-2 px-5 text-sm font-extrabold transition-colors ${
+              estado === f.id
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-card text-foreground hover:border-primary/50'
+            }`}
+          >
+            {f.label}
+          </Link>
+        ))}
+      </nav>
 
-      {/* Grid de campañas */}
+      {/* Campañas */}
       {campaigns.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {campaigns.map((campaign) => (
               <CampaignCard key={campaign.id} campaign={campaign} />
             ))}
@@ -76,10 +101,16 @@ export default async function DonatePage({
           />
         </>
       ) : (
-        <div className="flex flex-col items-center py-20 text-center gap-3">
-          
-          <p className="text-lg font-medium text-foreground">No hay campañas activas</p>
-          <p className="text-sm text-muted-foreground">Vuelve pronto.</p>
+        <div className="mt-6 rounded-[28px] border-2 border-dashed border-border bg-card p-10 text-center">
+          <p className="text-lg font-bold text-foreground">
+            {estado === 'cerradas' ? 'Todavía no hay campañas cerradas' : 'No hay campañas abiertas ahora'}
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            Mientras tanto, puedes ver lo que necesitan los albergues.
+          </p>
+          <Link className="huellas-button mt-5" href="/needs">
+            Ver necesidades
+          </Link>
         </div>
       )}
 
