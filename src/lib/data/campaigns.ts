@@ -2,6 +2,7 @@ import { isDemo } from "@/lib/huellas/config";
 import { readDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
 import type { CampaignWithShelter, CampaignFilters } from "@/types";
+import { isCampaignOpen } from "@/lib/huellas/domain";
 import {
   fetchPage,
   slicePage,
@@ -118,7 +119,15 @@ export async function getCampaignsPage(
   page: number,
   pageSize: number,
 ): Promise<Paged<CampaignWithShelter>> {
-  if (isDemo()) return slicePage(await getCampaigns(filters), page, pageSize);
+  if (isDemo()) {
+    // Mismo orden que en Supabase: sin fecha límite y fechas más lejanas primero.
+    const rows = [...(await getCampaigns(filters))].sort(
+      (a, b) =>
+        (b.ends_at ? Date.parse(b.ends_at) : Infinity) -
+        (a.ends_at ? Date.parse(a.ends_at) : Infinity),
+    );
+    return slicePage(rows, page, pageSize);
+  }
   const supabase = await createClient();
   const result = await fetchPage<RawCampaign>(
     (from, to) => {
@@ -128,6 +137,8 @@ export async function getCampaignsPage(
           "*, shelter:shelters ( id, name, avatar_url ), animal:animals ( id, name, species )",
           { count: "exact" },
         )
+        // Las abiertas primero: sin fecha límite o con la fecha más lejana.
+        .order("ends_at", { ascending: false, nullsFirst: true })
         .order("created_at", { ascending: false })
         .order("id");
       if (filters?.is_active !== undefined)
@@ -143,15 +154,20 @@ export async function getCampaignsPage(
   return { ...result, items: result.items.map(mapCampaign) };
 }
 
-/** Meta y recaudado sumados de todas las campañas que cumplen el filtro. */
+/** Meta, recaudado y campañas abiertas, sumando todas las que cumplen el filtro. */
 export async function getCampaignTotals(filters?: CampaignFilters) {
-  let rows: { goal_amount: number; current_amount: number }[];
+  let rows: {
+    goal_amount: number;
+    current_amount: number;
+    is_active: boolean;
+    ends_at: string | null;
+  }[];
   if (isDemo()) rows = await getCampaigns(filters);
   else {
     const supabase = await createClient();
     let query = supabase
       .from("donation_campaigns")
-      .select("goal_amount, current_amount");
+      .select("goal_amount, current_amount, is_active, ends_at");
     if (filters?.is_active !== undefined)
       query = query.eq("is_active", filters.is_active);
     if (filters?.shelter_id) query = query.eq("shelter_id", filters.shelter_id);
@@ -167,5 +183,7 @@ export async function getCampaignTotals(filters?: CampaignFilters) {
   return {
     goal: rows.reduce((s, c) => s + Number(c.goal_amount), 0),
     raised: rows.reduce((s, c) => s + Number(c.current_amount), 0),
+    open: rows.filter((c) => isCampaignOpen(c)).length,
+    closed: rows.filter((c) => !isCampaignOpen(c)).length,
   };
 }

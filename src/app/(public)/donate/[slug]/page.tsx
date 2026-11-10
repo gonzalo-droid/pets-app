@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { isCampaignOpen } from "@/lib/huellas/domain";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, BadgeCheck, CalendarDays, Target } from "lucide-react";
@@ -29,7 +30,7 @@ function daysUntil(isoDate: string | null): string | null {
   if (!isoDate) return null;
   const diff = new Date(isoDate).getTime() - Date.now();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return "Finalizada";
+  if (days < 0) return "Cerrada";
   if (days === 0) return "Último día";
   return `${days} día${days === 1 ? "" : "s"} restantes`;
 }
@@ -44,7 +45,8 @@ export default async function CampaignDetailPage({
   // Shelter completo para mostrar datos de pago en el flujo de confirmación
   const shelter = await getShelterById(campaign.shelter_id);
   const pct = campaignProgress(campaign.current_amount, campaign.goal_amount);
-  const deadline = daysUntil(campaign.ends_at);
+  const open = isCampaignOpen(campaign);
+  const deadline = open ? daysUntil(campaign.ends_at) : "Cerrada";
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
@@ -155,15 +157,27 @@ export default async function CampaignDetailPage({
 
           {/* CTA móvil */}
           <div className="lg:hidden">
-            <Link
-              href={`/donate/${slug}/confirm`}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "w-full justify-center",
-              )}
-            >
-              💛 Donar ahora
-            </Link>
+            {open ? (
+              <Link
+                href={`/donate/${slug}/confirm`}
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "w-full justify-center",
+                )}
+              >
+                💛 Donar ahora
+              </Link>
+            ) : (
+              <div className="rounded-xl border border-border bg-muted p-5 text-sm">
+              <p className="font-semibold text-foreground">Campaña cerrada</p>
+              <p className="mt-1 text-muted-foreground">
+                Esta campaña ya no recibe aportes. Gracias a quienes la apoyaron.
+              </p>
+              <Link href="/donate" className="mt-3 inline-block text-primary hover:underline">
+                Ver campañas abiertas →
+              </Link>
+            </div>
+            )}
           </div>
         </div>
 
@@ -171,18 +185,32 @@ export default async function CampaignDetailPage({
         <div className="flex flex-col gap-5">
           {/* CTA escritorio */}
           <div className="hidden lg:flex flex-col gap-3">
-            <Link
-              href={`/donate/${slug}/confirm`}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "w-full justify-center",
-              )}
-            >
-              💛 Donar ahora
-            </Link>
-            <p className="text-xs text-muted-foreground text-center">
-              Compromiso sin cobro. Pagos aún no habilitados.
-            </p>
+            {open ? (
+              <>
+                <Link
+                  href={`/donate/${slug}/confirm`}
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "w-full justify-center",
+                  )}
+                >
+                  💛 Donar ahora
+                </Link>
+                <p className="text-xs text-muted-foreground text-center">
+                  Compromiso sin cobro. Pagos aún no habilitados.
+                </p>
+              </>
+            ) : (
+              <div className="rounded-xl border border-border bg-muted p-5 text-sm">
+              <p className="font-semibold text-foreground">Campaña cerrada</p>
+              <p className="mt-1 text-muted-foreground">
+                Esta campaña ya no recibe aportes. Gracias a quienes la apoyaron.
+              </p>
+              <Link href="/donate" className="mt-3 inline-block text-primary hover:underline">
+                Ver campañas abiertas →
+              </Link>
+            </div>
+            )}
           </div>
 
           {/* Albergue */}

@@ -1,4 +1,5 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { isCampaignOpen } from '@/lib/huellas/domain'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
 export default async function DonationConfirmPage({ params }: ConfirmPageProps) {
   const { slug } = await params
   const campaign = await getCampaignBySlug(slug)
-  if (!campaign || !campaign.is_active) notFound()
+  if (!campaign) notFound()
+  // Una campaña cerrada no acepta aportes: vuelve a su ficha, que lo explica.
+  if (!isCampaignOpen(campaign)) redirect(`/donate/${slug}`)
 
   const shelter = await getShelterById(campaign.shelter_id)
   if (!shelter) notFound()

@@ -46,3 +46,11 @@ export function sameOrigin(request: Request) {
     return false;
   }
 }
+
+/** Una campaña recibe aportes si está activa y su fecha límite no pasó. */
+export function isCampaignOpen(
+  c: { is_active: boolean; ends_at: string | null },
+  now = Date.now(),
+) {
+  return c.is_active && (!c.ends_at || new Date(c.ends_at).getTime() >= now);
+}

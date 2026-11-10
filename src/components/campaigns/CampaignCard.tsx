@@ -5,6 +5,7 @@ import DonationProgress from "./DonationProgress";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import type { CampaignWithShelter } from "@/types";
+import { isCampaignOpen } from "@/lib/huellas/domain";
 
 interface CampaignCardProps {
   campaign: CampaignWithShelter;
@@ -14,14 +15,20 @@ function daysUntil(isoDate: string | null): string {
   if (!isoDate) return "Sin fecha límite";
   const diff = new Date(isoDate).getTime() - Date.now();
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-  if (days < 0) return "Finalizada";
+  if (days < 0) return "Cerrada";
   if (days === 0) return "Último día";
   return `${days} día${days === 1 ? "" : "s"} restantes`;
 }
 
 export default function CampaignCard({ campaign }: CampaignCardProps) {
+  const open = isCampaignOpen(campaign);
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card p-5 gap-4 hover:border-donate/40 hover:shadow-md transition-all">
+    <div
+      className={cn(
+        "flex flex-col rounded-xl border border-border bg-card p-5 gap-4 transition-all",
+        open ? "hover:border-donate/40 hover:shadow-md" : "opacity-75",
+      )}
+    >
       {/* Header */}
       <div className="flex items-start gap-3">
         <Link
@@ -45,6 +52,11 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           )}
         </Link>
         <div className="flex-1 min-w-0">
+          {!open && (
+            <span className="mb-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+              Cerrada
+            </span>
+          )}
           <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-2">
             {campaign.title}
           </h3>
@@ -72,14 +84,23 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
       <div className="flex items-center justify-between gap-2 pt-1 border-t border-border">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <CalendarDays className="h-3.5 w-3.5" />
-          <span>{daysUntil(campaign.ends_at)}</span>
+          <span>{open ? daysUntil(campaign.ends_at) : "Cerrada"}</span>
         </div>
-        <Link
-          href={`/donate/${campaign.slug}`}
-          className={cn(buttonVariants({ size: "sm" }), "bg-brand-400 text-[#1f1300] hover:bg-brand-300")}
-        >
-          Donar ahora
-        </Link>
+        {open ? (
+          <Link
+            href={`/donate/${campaign.slug}`}
+            className={cn(buttonVariants({ size: "sm" }), "bg-brand-400 text-[#1f1300] hover:bg-brand-300")}
+          >
+            Donar ahora
+          </Link>
+        ) : (
+          <Link
+            href={`/donate/${campaign.slug}`}
+            className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
+          >
+            Ver resultado
+          </Link>
+        )}
       </div>
     </div>
   );

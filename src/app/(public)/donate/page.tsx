@@ -19,7 +19,7 @@ export default async function DonatePage({
   searchParams: Promise<{ page?: string }>
 }) {
   const params = await searchParams
-  const [{ items: campaigns, page, totalPages, total }, totals] = await Promise.all([
+  const [{ items: campaigns, page, totalPages }, totals] = await Promise.all([
     getCampaignsPage({ is_active: true }, parsePage(params.page), PAGE_SIZE),
     getCampaignTotals({ is_active: true }),
   ])
@@ -51,7 +51,8 @@ export default async function DonatePage({
             </p>
           </div>
           <div className="text-sm text-muted-foreground">
-            {total} campaña{total !== 1 ? 's' : ''} activa{total !== 1 ? 's' : ''}
+            {totals.open} campaña{totals.open !== 1 ? 's' : ''} abierta{totals.open !== 1 ? 's' : ''}
+            {totals.closed > 0 && ` · ${totals.closed} cerrada${totals.closed !== 1 ? 's' : ''}`}
           </div>
         </div>
         <DonationProgress current={totalRaised} goal={totalGoal} showNumbers={false} />

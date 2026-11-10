@@ -5,6 +5,7 @@ import {
   money,
   safeRedirect,
   paymentState,
+  isCampaignOpen,
 } from "../src/lib/huellas/domain.ts";
 test("aislamiento: un albergue no administra a otro", () => {
   const actor = { id: "a", role: "shelter", shelter_id: "s1" };
@@ -31,3 +32,11 @@ test("redirecciones solo internas", () => {
 });
 test("un compromiso no es un pago aprobado", () =>
   assert.equal(paymentState(), "pending"));
+
+test("una campaña vencida o inactiva está cerrada", () => {
+  const now = Date.parse("2026-11-10T12:00:00Z");
+  assert.equal(isCampaignOpen({ is_active: true, ends_at: null }, now), true);
+  assert.equal(isCampaignOpen({ is_active: true, ends_at: "2026-12-01T00:00:00Z" }, now), true);
+  assert.equal(isCampaignOpen({ is_active: true, ends_at: "2026-11-01T00:00:00Z" }, now), false);
+  assert.equal(isCampaignOpen({ is_active: false, ends_at: null }, now), false);
+});

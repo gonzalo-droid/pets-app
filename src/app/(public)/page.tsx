@@ -8,15 +8,16 @@ import {
 } from "lucide-react";
 import { getAnimalsPage } from "@/lib/data/animals";
 import { getShelters } from "@/lib/data/shelters";
-import { getCampaignsPage } from "@/lib/data/campaigns";
+import { getCampaignTotals, getCampaignsPage } from "@/lib/data/campaigns";
 import AnimalCard from "@/components/animals/AnimalCard";
 import CampaignCard from "@/components/campaigns/CampaignCard";
 export default async function Page() {
   // Solo se piden las tarjetas visibles; el total sale del conteo de la consulta.
-  const [animalsPage, shelters, campaignsPage] = await Promise.all([
+  const [animalsPage, shelters, campaignsPage, campaignTotals] = await Promise.all([
     getAnimalsPage({ status: "available" }, 1, 4),
     getShelters(),
     getCampaignsPage({ is_active: true }, 1, 3),
+    getCampaignTotals({ is_active: true }),
   ]);
   const animals = animalsPage.items;
   const campaigns = campaignsPage.items;
@@ -83,7 +84,7 @@ export default async function Page() {
         {[
           [shelters.length, "albergues en la comunidad"],
           [animalsPage.total, "vidas listas para un hogar"],
-          [campaignsPage.total, "campañas que puedes apoyar"],
+          [campaignTotals.open, "campañas que puedes apoyar"],
         ].map(([n, t]) => (
           <div key={t}>
             <p className="text-3xl font-bold">{n}</p>
