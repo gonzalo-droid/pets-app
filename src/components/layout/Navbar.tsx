@@ -59,9 +59,9 @@ export default function Navbar() {
             <Link
               onClick={() => setOpen(false)}
               aria-current={isActive(href) ? "page" : undefined}
-              className={`rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors ${
+              className={`rounded-full px-4 py-2.5 text-[15px] font-bold transition-colors ${
                 isActive(href)
-                  ? "bg-secondary text-primary font-semibold"
+                  ? "bg-secondary text-primary font-extrabold"
                   : "text-foreground/80 hover:bg-secondary/60 hover:text-foreground"
               }`}
               key={href}
@@ -101,7 +101,7 @@ export default function Navbar() {
               </>
             ) : (
               <Link
-                className="huellas-button text-sm flex-1 lg:flex-none"
+                className="huellas-button huellas-button--support text-sm flex-1 lg:flex-none"
                 href="/auth/login"
                 onClick={() => setOpen(false)}
               >

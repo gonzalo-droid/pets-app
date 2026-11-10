@@ -14,7 +14,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
   return (
     <Link
       href={`/shelters/${shelter.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-[box-shadow,border-color] duration-200 hover:border-primary/40 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-card transition-transform duration-200 hover:-translate-y-0.5"
     >
       {/* Portada: imagen del albergue o bloque salvia de marca */}
       <div className="relative h-28 bg-secondary sm:h-32">
@@ -53,7 +53,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
           )}
           {shelter.is_verified && (
             <span
-              className="mb-1 inline-flex items-center gap-1 rounded-full bg-success-bg px-2.5 py-1 text-xs font-semibold text-success-fg"
+              className="mb-1 inline-flex -rotate-2 items-center gap-1 rounded-full bg-highlight px-3 py-1 text-xs font-extrabold text-foreground"
               title="HUELLAS revisó la identidad del albergue. No garantiza cada una de sus actuaciones."
             >
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -63,7 +63,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
         </div>
 
         <div>
-          <h3 className="text-lg font-bold leading-snug text-foreground">
+          <h3 className="text-xl leading-snug text-foreground">
             {shelter.name}
           </h3>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -78,7 +78,7 @@ export default function ShelterCard({ shelter }: ShelterCardProps) {
           </p>
         )}
 
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-semibold text-primary">
+        <span className="mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-extrabold text-primary">
           Conocer el albergue
           <ArrowRight
             className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5"

@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Lora } from "next/font/google";
+import { Fredoka, Nunito } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-// Inter para toda la interfaz; Lora solo para palabras editoriales del hero.
-const inter = Inter({
-  variable: "--font-inter",
+// Fredoka (redondeada) para títulos; Nunito para lectura e interfaz.
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
-const lora = Lora({
-  variable: "--font-lora",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  style: ["italic"],
-  weight: ["500"],
+  weight: ["400", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${lora.variable} h-full antialiased`}
+      className={`${fredoka.variable} ${nunito.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">

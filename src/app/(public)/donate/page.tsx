@@ -30,8 +30,8 @@ export default async function DonatePage({
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="font-display font-bold text-3xl tracking-tight text-foreground">
-          Campañas de donación
+        <h1 className="text-4xl sm:text-5xl text-foreground">
+          Campañas de los albergues
         </h1>
         <p className="mt-2 text-muted-foreground">
           Cada campaña tiene un objetivo concreto de un albergue. Por ahora registras un
@@ -40,7 +40,7 @@ export default async function DonatePage({
       </div>
 
       {/* Resumen global */}
-      <div className="mb-10 rounded-2xl bg-card border border-border px-6 py-5">
+      <div className="mb-10 rounded-[28px] bg-support-soft px-6 py-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <p className="text-sm text-muted-foreground">Recaudado registrado en las campañas</p>
@@ -76,14 +76,14 @@ export default async function DonatePage({
         </>
       ) : (
         <div className="flex flex-col items-center py-20 text-center gap-3">
-          <span className="text-5xl">💛</span>
+          
           <p className="text-lg font-medium text-foreground">No hay campañas activas</p>
           <p className="text-sm text-muted-foreground">Vuelve pronto.</p>
         </div>
       )}
 
       {/* Cómo funciona */}
-      <div className="mt-14 rounded-2xl border border-border p-6 sm:p-8">
+      <div className="mt-14 rounded-[28px] bg-secondary p-6 sm:p-8">
         <h2 className="text-lg font-semibold text-foreground mb-5">¿Cómo funciona un compromiso de apoyo?</h2>
         <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[

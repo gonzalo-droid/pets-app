@@ -1,111 +1,89 @@
 import Link from "next/link";
+import { ArrowRight, Dog, HeartHandshake, Megaphone, Package, Wallet } from "lucide-react";
 import { shelterContext } from "@/lib/huellas/auth";
 import { getAnimalsByShelter } from "@/lib/data/animals";
 import { getCampaigns } from "@/lib/data/campaigns";
 import { records } from "@/lib/huellas/records";
-import { PawPrint, HeartHandshake, Package, ArrowUpRight } from "lucide-react";
+import { isCampaignOpen } from "@/lib/huellas/domain";
+
 export default async function Page() {
   const id = await shelterContext();
-  const [animals, campaigns, needs, support] = await Promise.all([
+  const [animals, campaigns, needs, support, requests] = await Promise.all([
     getAnimalsByShelter(id),
     getCampaigns({ shelter_id: id }),
     records("needs", id),
     records("support_intents", id),
+    records("adoption_requests", id),
   ]);
+
+  // Cada indicador lleva a la vista donde se gestiona.
+  const indicators = [
+    { label: "Campañas abiertas", value: campaigns.filter((c) => isCampaignOpen(c)).length, href: "/shelter/campaigns", icon: Megaphone, tone: "bg-support-soft" },
+    { label: "Compromisos pendientes", value: support.filter((s) => s.status === "pending").length, href: "/shelter/donations", icon: Wallet, tone: "bg-highlight/60" },
+    { label: "Solicitudes por revisar", value: requests.filter((r) => r.status === "pending" || r.status === "reviewing").length, href: "/shelter/requests", icon: HeartHandshake, tone: "bg-success-bg" },
+    { label: "Animales publicados", value: animals.length, href: "/shelter/animals", icon: Dog, tone: "bg-secondary" },
+    { label: "Necesidades abiertas", value: needs.filter((n) => !n.fulfilled).length, href: "/shelter/needs", icon: Package, tone: "bg-muted" },
+  ];
+
   return (
-    <div className="max-w-6xl space-y-8">
-      <div className="flex flex-wrap justify-between gap-4">
-        <div>
-          <p className="uppercase tracking-widest text-xs text-primary">
-            HUELLAS Manager
-          </p>
-          <h1 className="text-3xl font-bold mt-2">Cada cuidado cuenta.</h1>
-          <p className="mt-2 text-muted-foreground">
-            Tu albergue, organizado. Tu comunidad, más cerca.
-          </p>
-        </div>
-        <Link
-          className="huellas-button self-center"
-          href="/shelter/animals/new"
-        >
-          + Registrar animal
-        </Link>
-      </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        {[
-          ["Animales registrados", animals.length],
-          ["Campañas activas", campaigns.filter((c) => c.is_active).length],
-          ["Necesidades abiertas", needs.filter((n) => !n.fulfilled).length],
-          [
-            "Compromisos pendientes",
-            support.filter((s) => s.status === "pending").length,
-          ],
-        ].map(([label, n]) => (
-          <div className="rounded-2xl border bg-card p-5" key={label}>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-4xl font-bold mt-4">{n}</p>
-          </div>
-        ))}
-      </div>
-      <section className="rounded-3xl bg-forest text-white p-7 md:p-10">
-        <HeartHandshake size={32} />
-        <h2 className="mt-5 text-2xl font-bold">Más tiempo para cuidarlos.</h2>
-        <p className="max-w-xl text-white/80 mt-3">
-          Publica lo que necesitan, presenta a tus rescatados y conecta con
-          personas que quieran acompañarlos.
+    <div className="max-w-6xl space-y-10">
+      <div>
+        <h1 className="text-3xl sm:text-4xl">Cada cuidado cuenta</h1>
+        <p className="mt-2 text-muted-foreground">
+          Publica lo que tu albergue necesita y revisa quién quiere ayudar.
         </p>
-        <div className="flex flex-wrap gap-4 mt-6">
-          <Link
-            className="rounded-xl bg-white px-5 py-3 text-forest font-bold"
-            href="/shelter/campaigns"
-          >
-            Crear una campaña ↗
+      </div>
+
+      {/* Publicar: lo más frecuente, siempre a mano */}
+      <section aria-labelledby="publicar">
+        <h2 id="publicar" className="text-xl">Publicar</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <Link href="/shelter/campaigns" className="huellas-button huellas-button--support min-h-14 text-base">
+            <Megaphone className="h-5 w-5" aria-hidden="true" />
+            Nueva campaña
           </Link>
-          <Link
-            className="rounded-xl border border-white/30 px-5 py-3"
-            href={"/shelters/" + id}
-          >
-            Ver mi perfil público
+          <Link href="/shelter/animals/new" className="huellas-button min-h-14 text-base">
+            <Dog className="h-5 w-5" aria-hidden="true" />
+            Registrar animal
+          </Link>
+          <Link href="/shelter/needs" className="huellas-button huellas-button--secondary min-h-14 text-base">
+            <Package className="h-5 w-5" aria-hidden="true" />
+            Publicar necesidad
           </Link>
         </div>
       </section>
-      <div className="grid md:grid-cols-2 gap-5">
-        {[
-          [
-            PawPrint,
-            "Su próxima oportunidad",
-            "Actualiza sus fichas y estado de adopción.",
-            "/shelter/animals",
-          ],
-          [
-            Package,
-            "Lo que hace falta hoy",
-            "Comparte necesidades concretas con la comunidad.",
-            "/shelter/needs",
-          ],
-        ].map(([Icon, title, text, href]) => {
-          const I = Icon as typeof PawPrint;
-          return (
-            <Link
-              href={href as string}
-              key={title as string}
-              className="rounded-2xl border bg-card p-6"
-            >
-              <I className="text-primary" />
-              <h2 className="mt-4 font-bold text-xl">
-                {title as string} <ArrowUpRight className="inline" size={18} />
-              </h2>
-              <p className="text-muted-foreground text-sm mt-2">
-                {text as string}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
-      <p className="text-sm text-muted-foreground">
+
+      <section aria-labelledby="resumen">
+        <h2 id="resumen" className="text-xl">Resumen</h2>
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {indicators.map(({ label, value, href, icon: Icon, tone }) => (
+            <li key={label}>
+              <Link
+                href={href}
+                className={`flex h-full items-center gap-4 rounded-[28px] p-5 transition-transform duration-200 hover:-translate-y-0.5 ${tone}`}
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-card text-primary">
+                  <Icon className="h-6 w-6" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-display text-3xl font-semibold leading-none">{value}</span>
+                  <span className="mt-1 block text-sm font-bold text-foreground/75">{label}</span>
+                </span>
+                <ArrowRight className="h-5 w-5 shrink-0 text-foreground/60" aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="rounded-2xl bg-warning-bg px-4 py-3 text-sm text-warning-fg">
         Los compromisos son intenciones de apoyo. No equivalen a donaciones
         cobradas ni a suscripciones activas.
       </p>
+      <Link href={`/shelters/${id}`} className="inline-flex items-center gap-1.5 text-sm font-extrabold text-primary hover:underline">
+        Ver mi perfil público
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      </Link>
     </div>
   );
 }

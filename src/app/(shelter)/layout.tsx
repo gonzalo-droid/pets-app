@@ -13,25 +13,29 @@ export default async function ShelterLayout({
     <div className="flex min-h-screen">
       <ShelterSidebar />
       <div className="min-w-0 flex-1">
-        <header className="border-b px-5 py-4 flex flex-wrap justify-between gap-3">
-          <span className="font-bold">
-            HUELLAS{" "}
-            <span className="text-muted-foreground font-normal">
-              / {shelter?.name}
-            </span>
-          </span>
-          <Link href="/">Ver comunidad ↗</Link>
-          <nav className="lg:hidden flex w-full gap-4 overflow-x-auto text-sm pb-2">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-card px-5 py-4">
+          <div>
+            <p className="text-xs font-bold text-muted-foreground">Panel del albergue</p>
+            <p className="font-display text-xl font-semibold">{shelter?.name}</p>
+          </div>
+          <Link className="text-sm font-bold text-primary hover:underline" href="/">
+            Ver comunidad
+          </Link>
+          <nav aria-label="Panel del albergue" className="lg:hidden flex w-full gap-2 overflow-x-auto text-sm pb-1">
             {[
               ["dashboard", "Resumen"],
-              ["animals", "Animales"],
               ["campaigns", "Campañas"],
+              ["animals", "Animales"],
               ["needs", "Necesidades"],
               ["donations", "Apoyos"],
               ["requests", "Adopciones"],
-              ["settings", "Ajustes"],
+              ["settings", "Perfil"],
             ].map(([path, label]) => (
-              <Link className="shrink-0" key={path} href={"/shelter/" + path}>
+              <Link
+                className="shrink-0 rounded-full bg-secondary px-4 py-2 font-bold text-secondary-foreground"
+                key={path}
+                href={"/shelter/" + path}
+              >
                 {label}
               </Link>
             ))}

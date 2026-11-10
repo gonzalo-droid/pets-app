@@ -27,9 +27,9 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
     // con toda la superficie clicable (también en móvil).
     <Link
       href={`/adopt/${animal.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-[box-shadow,border-color] duration-200 hover:border-primary/40 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-border bg-card transition-transform duration-200 hover:-translate-y-0.5"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+      <div className="relative aspect-[4/3] overflow-hidden bg-support-soft">
         {coverPhoto ? (
           <Image
             src={coverPhoto.url}
@@ -48,7 +48,7 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
         {chip && (
           <span
             className={cn(
-              'absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold',
+              'absolute left-3 top-3 -rotate-2 rounded-full px-3 py-1 text-xs font-extrabold',
               chip.className,
             )}
           >
@@ -58,7 +58,7 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="text-xl font-bold leading-tight text-foreground">{animal.name}</h3>
+        <h3 className="text-2xl leading-tight text-foreground">{animal.name}</h3>
         <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <li className="flex items-center gap-1.5">
             <PawPrint className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -72,7 +72,7 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
             </li>
           )}
         </ul>
-        <span className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-primary/60 px-4 text-sm font-semibold text-primary transition-colors group-hover:bg-secondary">
+        <span className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-full border-2 border-primary px-4 text-sm font-extrabold text-primary transition-colors group-hover:bg-secondary">
           Conocer su historia
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </span>

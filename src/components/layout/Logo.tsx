@@ -1,9 +1,9 @@
-import { PawPrint } from "lucide-react";
+import { PawIcon } from "@/components/campaigns/PawProgress";
 import { cn } from "@/lib/utils";
 
 /**
- * Logo de HUELLAS: huella + nombre.
- * `tone="light"` es la versión blanca para fondos verdes (panel).
+ * Logo de HUELLAS: huella en burbuja salvia + nombre en Fredoka.
+ * `tone="light"` es la versión para fondos verdes (panel).
  */
 export function Logo({
   size = "md",
@@ -18,18 +18,21 @@ export function Logo({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 font-display font-extrabold tracking-tight",
+        "inline-flex items-center gap-2 font-display font-bold tracking-tight",
         tone === "light" ? "text-white" : "text-primary",
-        sm ? "text-lg" : "text-2xl",
+        sm ? "text-xl" : "text-2xl",
         className,
       )}
     >
-      <PawPrint
-        aria-hidden="true"
-        className={sm ? "h-5 w-5" : "h-7 w-7"}
-        fill="currentColor"
-        strokeWidth={1.5}
-      />
+      <span
+        className={cn(
+          "flex items-center justify-center rounded-2xl",
+          tone === "light" ? "bg-white/15" : "bg-secondary",
+          sm ? "h-8 w-8" : "h-10 w-10",
+        )}
+      >
+        <PawIcon className={sm ? "h-5 w-5" : "h-6 w-6"} />
+      </span>
       HUELLAS
     </span>
   );

@@ -161,11 +161,11 @@ export default async function CampaignDetailPage({
               <Link
                 href={`/donate/${slug}/confirm`}
                 className={cn(
-                  buttonVariants({ size: "lg" }),
+                  buttonVariants({ variant: "support", size: "lg" }),
                   "w-full justify-center",
                 )}
               >
-                💛 Donar ahora
+                Apoyar esta campaña
               </Link>
             ) : (
               <div className="rounded-xl border border-border bg-muted p-5 text-sm">
@@ -190,11 +190,11 @@ export default async function CampaignDetailPage({
                 <Link
                   href={`/donate/${slug}/confirm`}
                   className={cn(
-                    buttonVariants({ size: "lg" }),
+                    buttonVariants({ variant: "support", size: "lg" }),
                     "w-full justify-center",
                   )}
                 >
-                  💛 Donar ahora
+                  Apoyar esta campaña
                 </Link>
                 <p className="text-xs text-muted-foreground text-center">
                   Compromiso sin cobro. Pagos aún no habilitados.
