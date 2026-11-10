@@ -3,9 +3,12 @@ import { useState } from "react";
 export default function AuthForm({
   demo,
   register = false,
+  redirectTo,
 }: {
   demo: boolean;
   register?: boolean;
+  /** Ruta interna a la que volver tras iniciar sesión (ya validada). */
+  redirectTo?: string;
 }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -16,7 +19,7 @@ export default function AuthForm({
       const r = await fetch("/api/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, redirectTo }),
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
@@ -46,6 +49,11 @@ export default function AuthForm({
             ? "Perfiles ficticios para probar los flujos. Los cambios se guardan en este equipo."
             : "Apoya a quienes cuidan de ellos."}
         </p>
+        {redirectTo && (
+          <p className="mt-3 rounded-2xl bg-secondary px-4 py-3 text-sm text-secondary-foreground">
+            Después de ingresar volverás a lo que estabas haciendo.
+          </p>
+        )}
       </div>
       {demo ? (
         <div className="grid gap-3">
@@ -119,7 +127,10 @@ export default function AuthForm({
           </button>
           <a
             className="block text-sm underline"
-            href={register ? "/auth/login" : "/auth/register"}
+            href={
+              (register ? "/auth/login" : "/auth/register") +
+              (redirectTo ? "?redirect=" + encodeURIComponent(redirectTo) : "")
+            }
           >
             {register ? "Ya tengo cuenta" : "Crear una cuenta de donante"}
           </a>

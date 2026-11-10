@@ -20,8 +20,9 @@ export default async function DonatePage({
 }) {
   const params = await searchParams
   const [{ items: campaigns, page, totalPages }, totals] = await Promise.all([
-    getCampaignsPage({ is_active: true }, parsePage(params.page), PAGE_SIZE),
-    getCampaignTotals({ is_active: true }),
+    // Todas: las cerradas siguen visibles (marcadas) para mostrar su resultado.
+    getCampaignsPage({}, parsePage(params.page), PAGE_SIZE),
+    getCampaignTotals({}),
   ])
   const totalGoal = totals.goal
   const totalRaised = totals.raised

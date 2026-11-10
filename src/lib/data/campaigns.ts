@@ -124,10 +124,11 @@ export async function getCampaignsPage(
     const rows = (await getCampaigns(filters))
       .filter((c) => !filters?.open_only || isCampaignOpen(c))
       .sort(
-      (a, b) =>
-        (b.ends_at ? Date.parse(b.ends_at) : Infinity) -
-        (a.ends_at ? Date.parse(a.ends_at) : Infinity),
-    );
+        (a, b) =>
+          Number(b.is_active) - Number(a.is_active) ||
+          (b.ends_at ? Date.parse(b.ends_at) : Infinity) -
+            (a.ends_at ? Date.parse(a.ends_at) : Infinity),
+      );
     return slicePage(rows, page, pageSize);
   }
   const supabase = await createClient();
@@ -139,7 +140,8 @@ export async function getCampaignsPage(
           "*, shelter:shelters ( id, name, avatar_url ), animal:animals ( id, name, species )",
           { count: "exact" },
         )
-        // Las abiertas primero: sin fecha límite o con la fecha más lejana.
+        // Las abiertas primero: activas, sin fecha límite o con la más lejana.
+        .order("is_active", { ascending: false })
         .order("ends_at", { ascending: false, nullsFirst: true })
         .order("created_at", { ascending: false })
         .order("id");

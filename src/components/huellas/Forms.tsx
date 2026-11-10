@@ -6,25 +6,39 @@ type Field = {
   label: string;
   type?: string;
   value?: string | number;
+  /** Campo no obligatorio. */
+  optional?: boolean;
+  /** Texto largo: se muestra como área de texto. */
+  multiline?: boolean;
+  /** Ayuda breve debajo de la etiqueta. */
+  hint?: string;
 };
 export function ManageForm({
   action,
   shelterId,
   fields,
   title,
+  extra,
+  submitLabel = "Guardar",
+  resetOnSave,
 }: {
   action: string;
   shelterId: string;
   fields: Field[];
   title: string;
+  /** Datos adicionales enviados con el formulario (p. ej. el id que se edita). */
+  extra?: Record<string, unknown>;
+  submitLabel?: string;
+  resetOnSave?: boolean;
 }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false);
   const router = useRouter();
+  const reset = resetOnSave ?? (action !== "settings" && !extra?.id);
   return (
     <form
-      className="rounded-2xl border bg-card p-5 space-y-4"
+      className="rounded-[28px] border border-border bg-card p-5 space-y-4"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
@@ -36,13 +50,13 @@ export function ManageForm({
           const res = await fetch("/api/manage", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...values, action, shelter_id: shelterId }),
+            body: JSON.stringify({ ...values, ...extra, action, shelter_id: shelterId }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
           setSaved(true);
           router.refresh();
-          if (action !== "settings") form.reset();
+          if (reset) form.reset();
         } catch (e) {
           setError((e as Error).message);
         } finally {
@@ -50,45 +64,73 @@ export function ManageForm({
         }
       }}
     >
-      <h2 className="text-lg font-bold">{title}</h2>
-      {fields.map((f) => (
-        <label key={f.name} className="block text-sm font-medium">
-          {f.label}
-          <input
-            required
-            className="huellas-field"
-            name={f.name}
-            type={f.type ?? "text"}
-            defaultValue={f.value}
-            min={f.type === "number" ? 1 : undefined}
-            maxLength={f.name === "description" ? 1000 : 120}
-          />
-        </label>
-      ))}
+      <h2 className="text-xl">{title}</h2>
+      {fields.map((f) => {
+        const common = {
+          required: !f.optional,
+          className: "huellas-field",
+          name: f.name,
+          defaultValue: f.value,
+          "aria-describedby": f.hint ? `${action}-${f.name}-hint` : undefined,
+        };
+        return (
+          <label key={f.name} className="block text-sm font-bold">
+            {f.label}
+            {f.optional && <span className="font-normal text-muted-foreground"> (opcional)</span>}
+            {f.hint && (
+              <span id={`${action}-${f.name}-hint`} className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                {f.hint}
+              </span>
+            )}
+            {(f.multiline ?? f.name === "description") ? (
+              <textarea {...common} rows={4} maxLength={2000} />
+            ) : (
+              <input
+                {...common}
+                type={f.type ?? "text"}
+                min={
+                  f.type === "number"
+                    ? 1
+                    : f.type === "date"
+                      ? new Date().toLocaleDateString("en-CA", { timeZone: "America/Lima" })
+                      : undefined
+                }
+                maxLength={f.type === "date" || f.type === "number" ? undefined : 120}
+              />
+            )}
+          </label>
+        );
+      })}
       {error && (
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
           {error}
         </p>
       )}
       {saved && (
-        <p role="status" className="text-primary">
+        <p role="status" className="rounded-2xl bg-success-bg p-3 text-sm text-success-fg">
           Cambios guardados.
         </p>
       )}
       <button className="huellas-button" disabled={busy}>
-        {busy ? "Guardando…" : "Guardar"}
+        {busy ? "Guardando…" : submitLabel}
       </button>
     </form>
   );
 }
+
 export function ActionButton({
   endpoint = "/api/manage",
   payload,
   children,
+  confirm,
+  tone = "default",
 }: {
   endpoint?: string;
   payload: Record<string, unknown>;
   children: React.ReactNode;
+  /** Pregunta que explica la consecuencia antes de ejecutar la acción. */
+  confirm?: string;
+  tone?: "default" | "primary" | "danger";
 }) {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -96,9 +138,16 @@ export function ActionButton({
   return (
     <span className="inline-flex flex-col gap-1">
       <button
-        className="rounded-lg border px-3 py-2 text-sm hover:bg-muted"
+        className={
+          tone === "primary"
+            ? "min-h-11 rounded-full bg-primary px-4 text-sm font-bold text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
+            : tone === "danger"
+              ? "min-h-11 rounded-full border-2 border-error-fg/40 px-4 text-sm font-bold text-error-fg hover:bg-error-bg disabled:opacity-60"
+              : "min-h-11 rounded-full border-2 border-border px-4 text-sm font-bold hover:bg-muted disabled:opacity-60"
+        }
         disabled={busy}
         onClick={async () => {
+          if (confirm && !window.confirm(confirm)) return;
           setBusy(true);
           setError("");
           try {
@@ -120,7 +169,7 @@ export function ActionButton({
         {busy ? "Guardando…" : children}
       </button>
       {error && (
-        <span role="alert" className="text-xs text-red-600">
+        <span role="alert" className="text-xs font-semibold text-error-fg">
           {error}
         </span>
       )}
@@ -200,16 +249,19 @@ export function SupportForm({
               onChange={(e) => setAmount(Number(e.target.value))}
             />
           </label>
-          <button disabled={busy} className="huellas-button huellas-button--accent">
+          <button disabled={busy} className="huellas-button huellas-button--support w-full">
             {busy ? "Guardando…" : "Registrar compromiso sin cobro"}
           </button>
         </>
       )}
       {message && (
-        <p role="status" className="rounded-xl bg-muted p-4 text-sm">
+        <p
+          role="status"
+          className={`rounded-2xl p-4 text-sm ${done ? "bg-success-bg text-success-fg" : "bg-error-bg text-error-fg"}`}
+        >
           {message}{" "}
           {done && (
-            <a className="underline" href="/profile">
+            <a className="font-extrabold underline" href="/profile">
               Ver mis apoyos
             </a>
           )}

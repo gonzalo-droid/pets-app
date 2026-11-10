@@ -30,6 +30,21 @@ async function updateOne(
   if (!data?.length) throw new Error("Registro no encontrado o sin permiso");
 }
 
+// Campos editables de una campaña. La fecha límite es opcional (AAAA-MM-DD) y
+// cierra la campaña al final de ese día, hora de Perú.
+const campaignSchema = z.object({
+  title: z.string().trim().min(4).max(120),
+  description: z.string().trim().min(10).max(2000),
+  goal_amount: z.coerce.number().min(1).max(1000000),
+  ends_at: z
+    .union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+    .optional()
+    .transform((d) => (d ? `${d}T23:59:59-05:00` : null))
+    .refine((d) => !d || new Date(d).getTime() >= Date.now(), {
+      message: "La fecha límite no puede estar en el pasado.",
+    }),
+});
+
 // Estado del animal según la decisión sobre una solicitud de adopción.
 const ANIMAL_STATUS_FOR_REQUEST = {
   approved: "in_process",
@@ -128,13 +143,7 @@ export async function POST(request: Request) {
         });
       else await updateOne(db, "animals", { status }, id, shelterId);
     } else if (body.action === "campaign") {
-      const values = z
-        .object({
-          title: z.string().trim().min(4).max(120),
-          description: z.string().min(10).max(2000),
-          goal_amount: z.coerce.number().min(1).max(1000000),
-        })
-        .parse(body);
+      const values = campaignSchema.parse(body);
       const row = {
         ...values,
         id,
@@ -142,7 +151,6 @@ export async function POST(request: Request) {
         animal_id: null,
         current_amount: 0,
         is_active: true,
-        ends_at: null,
         slug: `campana-${id.slice(0, 8)}`,
         created_at: now,
         updated_at: now,
@@ -162,6 +170,32 @@ export async function POST(request: Request) {
         const { error } = await db.from("donation_campaigns").insert(row);
         if (error) throw error;
       }
+    } else if (body.action === "campaign_update") {
+      const campaignId = targetId.parse(body.id);
+      const values = campaignSchema.parse(body);
+      if (!db)
+        await mutateDemo((d) => {
+          const c = d.campaigns.find(
+            (c) => c.id === campaignId && c.shelter_id === shelterId,
+          );
+          if (!c) throw new Error("Campaña no encontrada");
+          Object.assign(c, values, { updated_at: now });
+        });
+      else await updateOne(db, "donation_campaigns", values, campaignId, shelterId);
+    } else if (body.action === "campaign_active") {
+      // Cerrar o reabrir. Cerrar no borra la campaña ni sus compromisos.
+      const campaignId = targetId.parse(body.id);
+      const is_active = z.boolean().parse(body.is_active);
+      if (!db)
+        await mutateDemo((d) => {
+          const c = d.campaigns.find(
+            (c) => c.id === campaignId && c.shelter_id === shelterId,
+          );
+          if (!c) throw new Error("Campaña no encontrada");
+          c.is_active = is_active;
+        });
+      else
+        await updateOne(db, "donation_campaigns", { is_active }, campaignId, shelterId);
     } else if (body.action === "need") {
       const values = z
         .object({
@@ -281,9 +315,14 @@ export async function POST(request: Request) {
       else await updateOne(db, "shelters", values, shelterId, shelterId);
     } else throw new Error("Acción no permitida");
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (e) {
+    // Mensajes de validación pensados para el usuario; el resto, genérico.
+    const issue =
+      e instanceof z.ZodError
+        ? e.issues.find((i) => i.message.startsWith("La fecha"))?.message
+        : undefined;
     return NextResponse.json(
-      { error: "No se pudo guardar. Revisa los campos y los permisos." },
+      { error: issue ?? "No se pudo guardar. Revisa los campos y los permisos." },
       { status: 400 },
     );
   }

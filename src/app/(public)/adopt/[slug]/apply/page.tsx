@@ -5,6 +5,8 @@ import { ArrowLeft } from 'lucide-react'
 import AdoptionForm from './AdoptionForm'
 import { getAnimalBySlug } from '@/lib/data/animals'
 import { SPECIES_LABELS } from '@/lib/utils'
+import LoginRequired from '@/components/huellas/LoginRequired'
+import { currentActor } from '@/lib/huellas/auth'
 
 interface ApplyPageProps {
   params: Promise<{ slug: string }>
@@ -21,13 +23,12 @@ export async function generateMetadata({ params }: ApplyPageProps): Promise<Meta
 
 export default async function ApplyPage({ params }: ApplyPageProps) {
   const { slug } = await params
-  const animal = await getAnimalBySlug(slug)
+  const [animal, actor] = await Promise.all([getAnimalBySlug(slug), currentActor()])
   if (!animal) notFound()
 
   if (animal.status !== 'available') {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
-        <p className="text-3xl mb-4">😔</p>
         <h1 className="text-xl font-bold text-foreground">Este animal ya no está disponible</h1>
         <p className="mt-2 text-muted-foreground">
           {animal.name} ya tiene un proceso de adopción en curso o fue adoptado.
@@ -69,7 +70,14 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
       </div>
 
       {/* Formulario (Client Component) */}
-      <AdoptionForm animalSlug={slug} animalName={animal.name} />
+      {actor ? (
+        <AdoptionForm animalSlug={slug} animalName={animal.name} />
+      ) : (
+        <LoginRequired
+          returnTo={`/adopt/${slug}/apply`}
+          action={`solicitar la adopción de ${animal.name}`}
+        />
+      )}
     </div>
   )
 }

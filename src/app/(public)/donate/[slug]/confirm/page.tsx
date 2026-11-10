@@ -6,13 +6,15 @@ import { ArrowLeft } from 'lucide-react'
 import DonationConfirmFlow from './DonationConfirmFlow'
 import { getCampaignBySlug } from '@/lib/data/campaigns'
 import { getShelterById } from '@/lib/data/shelters'
+import LoginRequired from '@/components/huellas/LoginRequired'
+import { currentActor } from '@/lib/huellas/auth'
 
 interface ConfirmPageProps {
   params: Promise<{ slug: string }>
 }
 
 export const metadata: Metadata = {
-  title: 'Confirmar donación',
+  title: 'Apoyar campaña',
 }
 
 export default async function DonationConfirmPage({ params }: ConfirmPageProps) {
@@ -22,7 +24,10 @@ export default async function DonationConfirmPage({ params }: ConfirmPageProps) 
   // Una campaña cerrada no acepta aportes: vuelve a su ficha, que lo explica.
   if (!isCampaignOpen(campaign)) redirect(`/donate/${slug}`)
 
-  const shelter = await getShelterById(campaign.shelter_id)
+  const [shelter, actor] = await Promise.all([
+    getShelterById(campaign.shelter_id),
+    currentActor(),
+  ])
   if (!shelter) notFound()
 
   return (
@@ -37,10 +42,13 @@ export default async function DonationConfirmPage({ params }: ConfirmPageProps) 
       </Link>
 
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Hacer una donación</h1>
+        <h1 className="text-2xl font-bold text-foreground">Apoyar esta campaña</h1>
         <p className="mt-1 text-sm text-muted-foreground line-clamp-1">{campaign.title}</p>
       </div>
 
+      {!actor ? (
+        <LoginRequired returnTo={`/donate/${slug}/confirm`} action="apoyar esta campaña" />
+      ) : (
       <DonationConfirmFlow
         campaignSlug={slug}
         campaignTitle={campaign.title}
@@ -50,6 +58,7 @@ export default async function DonationConfirmPage({ params }: ConfirmPageProps) 
         bankName={shelter.bank_name}
         accountHolder={shelter.account_holder}
       />
+      )}
     </div>
   )
 }
