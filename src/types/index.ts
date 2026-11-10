@@ -25,6 +25,8 @@ export interface CampaignFilters {
   shelter_id?: string
   is_active?: boolean
   animal_id?: string
+  /** Solo campañas que reciben aportes: activas y sin fecha límite vencida. */
+  open_only?: boolean
 }
 
 // ─── Tipos de UI / formularios ────────────────────────────────────────────────

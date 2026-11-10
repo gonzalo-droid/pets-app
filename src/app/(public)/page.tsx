@@ -12,7 +12,6 @@ import { getAnimalsPage } from "@/lib/data/animals";
 import { getShelters } from "@/lib/data/shelters";
 import { getCampaignTotals, getCampaignsPage } from "@/lib/data/campaigns";
 import { recordsPage } from "@/lib/huellas/records";
-import { isCampaignOpen } from "@/lib/huellas/domain";
 import AnimalCard from "@/components/animals/AnimalCard";
 import CampaignCard from "@/components/campaigns/CampaignCard";
 import HeroPets from "@/components/brand/HeroPets";
@@ -86,7 +85,7 @@ export default async function Page() {
     await Promise.all([
       getAnimalsPage({ status: "available" }, 1, 4),
       getShelters(),
-      getCampaignsPage({ is_active: true }, 1, 3),
+      getCampaignsPage({ open_only: true }, 1, 3),
       getCampaignTotals({ is_active: true }),
       recordsPage("needs", { openNeeds: true }, 1, 3),
     ]);
@@ -162,13 +161,12 @@ export default async function Page() {
           </div>
         ) : (
           <p className="rounded-[28px] border-2 border-dashed border-border bg-card p-8 text-center text-muted-foreground">
-            Por ahora no hay campañas publicadas. Puedes conocer las necesidades
-            de los albergues.
-          </p>
-        )}
-        {featured && !isCampaignOpen(featured) && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Algunas campañas ya cerraron y no reciben aportes.
+            Por ahora no hay campañas abiertas. Puedes ver las necesidades de los
+            albergues o{" "}
+            <Link href="/donate" className="font-extrabold text-primary hover:underline">
+              el resultado de campañas anteriores
+            </Link>
+            .
           </p>
         )}
       </section>

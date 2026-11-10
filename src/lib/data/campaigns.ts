@@ -121,7 +121,9 @@ export async function getCampaignsPage(
 ): Promise<Paged<CampaignWithShelter>> {
   if (isDemo()) {
     // Mismo orden que en Supabase: sin fecha límite y fechas más lejanas primero.
-    const rows = [...(await getCampaigns(filters))].sort(
+    const rows = (await getCampaigns(filters))
+      .filter((c) => !filters?.open_only || isCampaignOpen(c))
+      .sort(
       (a, b) =>
         (b.ends_at ? Date.parse(b.ends_at) : Infinity) -
         (a.ends_at ? Date.parse(a.ends_at) : Infinity),
@@ -145,6 +147,10 @@ export async function getCampaignsPage(
         query = query.eq("is_active", filters.is_active);
       if (filters?.shelter_id) query = query.eq("shelter_id", filters.shelter_id);
       if (filters?.animal_id) query = query.eq("animal_id", filters.animal_id);
+      if (filters?.open_only)
+        query = query
+          .eq("is_active", true)
+          .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`);
       return query.range(from, to);
     },
     page,
