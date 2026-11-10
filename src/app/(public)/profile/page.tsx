@@ -3,7 +3,8 @@ import { CalendarDays, HeartHandshake, Megaphone, PawPrint } from "lucide-react"
 import { requireActor } from "@/lib/huellas/auth";
 import { records } from "@/lib/huellas/records";
 import { lookupTargets } from "@/lib/huellas/targets";
-import { ActionButton } from "@/components/huellas/Forms";
+import { ActionButton, ManageForm } from "@/components/huellas/Forms";
+import { getOwnProfile } from "@/lib/huellas/profile";
 import { cn, formatPEN } from "@/lib/utils";
 
 const REQUEST_STATUS: Record<string, { label: string; className: string }> = {
@@ -32,10 +33,11 @@ export default async function Page({
 }) {
   const a = await requireActor();
   const { tab } = await searchParams;
-  const active = tab === "solicitudes" ? "solicitudes" : "apoyos";
-  const [support, requests] = await Promise.all([
+  const active = tab === "solicitudes" || tab === "perfil" ? tab : "apoyos";
+  const [support, requests, profile] = await Promise.all([
     records("support_intents", undefined, a.id),
     records("adoption_requests", undefined, a.id),
+    getOwnProfile(a),
   ]);
   const targets = await lookupTargets(
     support.map((s) => s.campaign_id ?? ""),
@@ -46,6 +48,7 @@ export default async function Page({
   const tabs = [
     { id: "apoyos", label: "Mis apoyos", count: support.length },
     { id: "solicitudes", label: "Mis solicitudes", count: requests.length },
+    { id: "perfil", label: "Mi perfil", count: null },
   ];
 
   return (
@@ -72,7 +75,7 @@ export default async function Page({
         {tabs.map((t) => (
           <Link
             key={t.id}
-            href={t.id === "apoyos" ? "/profile" : "/profile?tab=solicitudes"}
+            href={t.id === "apoyos" ? "/profile" : `/profile?tab=${t.id}`}
             aria-current={active === t.id ? "page" : undefined}
             className={cn(
               "flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-3 text-sm font-extrabold transition-colors",
@@ -82,7 +85,7 @@ export default async function Page({
             )}
           >
             {t.label}
-            <span className="rounded-full bg-card/30 px-2 text-xs">{t.count}</span>
+            {t.count !== null && <span className="rounded-full bg-card/30 px-2 text-xs">{t.count}</span>}
           </Link>
         ))}
       </nav>
@@ -180,6 +183,32 @@ export default async function Page({
               </div>
             </div>
           )}
+        </section>
+      ) : active === "perfil" ? (
+        <section aria-label="Mi perfil" className="max-w-xl space-y-4">
+          <ManageForm
+            endpoint="/api/profile"
+            action="profile"
+            shelterId=""
+            title="Tus datos"
+            submitLabel="Guardar cambios"
+            resetOnSave={false}
+            fields={[
+              { name: "full_name", label: "Nombre", value: profile.full_name },
+              {
+                name: "phone",
+                label: "Teléfono",
+                type: "tel",
+                value: profile.phone ?? "",
+                optional: true,
+                hint: "Solo números. Se usa para precargar tus solicitudes de adopción; no es público.",
+              },
+            ]}
+          />
+          <p className="text-sm text-muted-foreground">
+            Tu correo y tu tipo de cuenta no se cambian desde aquí. Los accesos de albergue y
+            administración los asigna el equipo de HUELLAS.
+          </p>
         </section>
       ) : (
         <section aria-label="Mis solicitudes de adopción" className="space-y-4">

@@ -33,6 +33,8 @@ type AdoptionFormData = z.infer<typeof adoptionSchema>;
 interface AdoptionFormProps {
   animalSlug: string;
   animalName: string;
+  /** Teléfono guardado en "Mi perfil", para no escribirlo de nuevo. */
+  defaultPhone?: string;
 }
 
 // ─── Componente de checkbox con label ─────────────────────────────────────────
@@ -77,6 +79,7 @@ function CheckField({
 export default function AdoptionForm({
   animalSlug,
   animalName,
+  defaultPhone = "",
 }: AdoptionFormProps) {
   const [submitted, setSubmitted] = useState(false);
 
@@ -93,7 +96,7 @@ export default function AdoptionForm({
       has_home: false,
       has_other_pets: false,
       has_children: false,
-      phone: "",
+      phone: defaultPhone,
       message: "",
     },
   });

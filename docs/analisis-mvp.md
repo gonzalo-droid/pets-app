@@ -15,14 +15,14 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 | E7 | Perdidos fallaba para visitantes sin sesión (permiso faltante). | Resuelto |
 | E8 | El menú no tenía "Inicio". | Resuelto |
 | E9 | La "recaudación" de las campañas (p. ej. S/ 3,060) viene de datos de ejemplo heredados, no de pagos confirmados. | **Decidido (10/11/2026): se mantiene como dato de ejemplo por ahora.** Revisar antes de producción o al integrar pagos. |
-| E10 | Las solicitudes de adopción permiten cualquier cambio de estado (p. ej. de "Completada" a "Pendiente"). La definición pide transiciones definidas. | Pendiente |
+| E10 | Las solicitudes de adopción permitían cualquier cambio de estado. | Resuelto: Pendiente → En revisión/Aprobada/Rechazada; En revisión → Aprobada/Rechazada; Aprobada → Completada/Rechazada; Rechazada y Completada son finales. Validado en la API, la interfaz y la base de datos. |
 
 ## 2. Funciones incompletas del MVP
 
 | Área | Qué falta | Prioridad |
 |---|---|---|
 | Inicio de sesión | ~~La persona no volvía a la acción tras iniciar sesión.~~ **Resuelto:** adopción, apadrinamiento y apoyo a campañas piden sesión antes del formulario y vuelven a él. | Hecho |
-| Mi espacio (donante) | **Resuelto en parte:** pestañas "Mis apoyos" y "Mis solicitudes", destino legible, fecha, periodicidad, referencia corta y cancelación que explica su efecto. Falta la pestaña "Mi perfil" (editar nombre y teléfono). | Media |
+| Mi espacio (donante) | **Resuelto en parte:** pestañas "Mis apoyos" y "Mis solicitudes", destino legible, fecha, periodicidad, referencia corta y cancelación que explica su efecto. Pestaña "Mi perfil" para editar nombre y teléfono (el teléfono se precarga en las solicitudes). | Hecho |
 | Solicitudes (albergue) | Falta el nombre del animal en cada solicitud, la regla de transiciones y una confirmación explícita para "Completar". | Alta |
 | Panel del albergue | **Resuelto en parte:** barra lateral nueva, accesos para publicar y campañas que se crean, editan, cierran y reabren, con fecha límite opcional. Falta que el perfil edite más que nombre y descripción. | Media |
 | Apadrinamiento | Falta explicar si el aporte va al animal o al fondo del albergue. | Media |

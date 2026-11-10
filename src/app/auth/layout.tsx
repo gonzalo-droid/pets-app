@@ -7,7 +7,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 px-4 py-12">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-support-soft/60 px-4 py-12">
       {/* Logo */}
       <Link
         href="/"
@@ -17,14 +17,14 @@ export default function AuthLayout({
       </Link>
 
       {/* Card centrada */}
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-sm p-8">
+      <div className="w-full max-w-md rounded-[32px] bg-card p-6 shadow-sm sm:p-8">
         {children}
       </div>
 
       {/* Volver */}
       <Link
         href="/"
-        className="mt-6 text-xs text-muted-foreground hover:text-primary transition-colors"
+        className="mt-6 inline-flex min-h-11 items-center text-sm font-bold text-muted-foreground transition-colors hover:text-primary"
       >
         ← Volver al inicio
       </Link>

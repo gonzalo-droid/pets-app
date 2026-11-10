@@ -22,6 +22,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       "202611090002_huellas.sql",
       "202611100001_huellas_fixes.sql",
       "202611100002_anon_sightings_read.sql",
+      "202611100003_request_transitions.sql",
     ])
       await db.exec(
         await readFile(
@@ -182,6 +183,25 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       );
       // Tras el rechazo puede volver a postular.
       await asUser(donor, () => insert("71000000-0000-4000-8000-000000000003"));
+    });
+    await t.test("solo cambios de estado permitidos en solicitudes", async () => {
+      const animal = (
+        await db.query(
+          `SELECT id FROM animals WHERE shelter_id='${s1}' AND status='available' OFFSET 1 LIMIT 1`,
+        )
+      ).rows[0];
+      const rid = "72000000-0000-4000-8000-000000000001";
+      await asUser(donor, () =>
+        db.exec(`INSERT INTO adoption_requests(id,animal_id,shelter_id,requester_id,message,phone,status)
+          VALUES('${rid}','${animal.id}','${s1}','${donor}','Mensaje ficticio para probar transiciones de estado.','999999999','pending')`),
+      );
+      await asUser(owner, async () => {
+        const set = (st) => db.exec(`UPDATE adoption_requests SET status='${st}' WHERE id='${rid}'`);
+        await assert.rejects(set("completed")); // completar exige aprobar antes
+        await set("approved");
+        await set("completed");
+        await assert.rejects(set("pending")); // completada es final
+      });
     });
   } finally {
     await db.close();

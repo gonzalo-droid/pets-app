@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { currentActor } from "@/lib/huellas/auth";
-import { canManage } from "@/lib/huellas/domain";
+import { canManage, canTransitionRequest, REQUEST_TRANSITIONS } from "@/lib/huellas/domain";
 import { isDemo } from "@/lib/huellas/config";
 import { mutateDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
@@ -44,6 +44,18 @@ const campaignSchema = z.object({
       message: "La fecha límite no puede estar en el pasado.",
     }),
 });
+
+// Error con un mensaje pensado para mostrarse tal cual a quien usa el panel.
+class UserError extends Error {}
+
+// Estados desde los que se puede llegar a `to` (ver REQUEST_TRANSITIONS).
+const allowedFrom = (to: string) =>
+  Object.entries(REQUEST_TRANSITIONS)
+    .filter(([, next]) => next.includes(to))
+    .map(([from]) => from);
+
+const TRANSITION_ERROR =
+  "Ese cambio de estado no está permitido. Una solicitud rechazada o completada ya no cambia, y para completar una adopción primero hay que aprobarla.";
 
 // Estado del animal según la decisión sobre una solicitud de adopción.
 const ANIMAL_STATUS_FOR_REQUEST = {
@@ -255,6 +267,7 @@ export async function POST(request: Request) {
             (r) => r.id === id && r.shelter_id === shelterId,
           );
           if (!r) throw new Error("Solicitud no encontrada");
+          if (!canTransitionRequest(r.status, status)) throw new UserError(TRANSITION_ERROR);
           r.status = status;
           const a = d.animals.find((a) => a.id === r.animal_id);
           if (!a) return;
@@ -275,9 +288,11 @@ export async function POST(request: Request) {
           .update({ status })
           .eq("id", id)
           .eq("shelter_id", shelterId)
+          // Solo desde un estado que permita el cambio (también lo valida la base).
+          .in("status", allowedFrom(status))
           .select("animal_id");
         if (error) throw error;
-        if (!data?.length) throw new Error("Solicitud no encontrada");
+        if (!data?.length) throw new UserError(TRANSITION_ERROR);
         const animalId = data[0].animal_id as string;
         if (animalStatus)
           await updateOne(db, "animals", { status: animalStatus }, animalId, shelterId);
@@ -318,9 +333,11 @@ export async function POST(request: Request) {
   } catch (e) {
     // Mensajes de validación pensados para el usuario; el resto, genérico.
     const issue =
-      e instanceof z.ZodError
-        ? e.issues.find((i) => i.message.startsWith("La fecha"))?.message
-        : undefined;
+      e instanceof UserError
+        ? e.message
+        : e instanceof z.ZodError
+          ? e.issues.find((i) => i.message.startsWith("La fecha"))?.message
+          : undefined;
     return NextResponse.json(
       { error: issue ?? "No se pudo guardar. Revisa los campos y los permisos." },
       { status: 400 },

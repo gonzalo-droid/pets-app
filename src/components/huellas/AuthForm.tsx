@@ -11,10 +11,12 @@ export default function AuthForm({
   redirectTo?: string;
 }) {
   const [error, setError] = useState(""),
+    [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false);
   async function send(values: Record<string, unknown>) {
     setBusy(true);
     setError("");
+    setNotice("");
     try {
       const r = await fetch("/api/session", {
         method: "POST",
@@ -24,7 +26,7 @@ export default function AuthForm({
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
       if (d.redirect) window.location.assign(d.redirect);
-      else setError(d.message);
+      else setNotice(d.message);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -34,10 +36,10 @@ export default function AuthForm({
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-widest text-primary">
+        <span className="inline-block -rotate-2 rounded-full bg-highlight px-3 py-1 text-xs font-extrabold">
           Comunidad HUELLAS
-        </p>
-        <h1 className="mt-2 text-3xl font-bold">
+        </span>
+        <h1 className="mt-3 text-3xl">
           {demo
             ? "Elige cómo explorar"
             : register
@@ -70,10 +72,10 @@ export default function AuthForm({
             <button
               disabled={busy}
               key={role}
-              className="rounded-xl border p-4 text-left hover:bg-muted"
+              className="min-h-16 rounded-[20px] border-2 border-border p-4 text-left transition-colors hover:border-primary/50 hover:bg-secondary/50 disabled:opacity-60"
               onClick={() => send({ demoRole: role })}
             >
-              <strong className="block">{label}</strong>
+              <strong className="block font-display text-lg font-semibold">{label}</strong>
               <span className="text-xs text-muted-foreground">{detail}</span>
             </button>
           ))}
@@ -126,7 +128,7 @@ export default function AuthForm({
             {busy ? "Un momento…" : register ? "Registrarme" : "Ingresar"}
           </button>
           <a
-            className="block text-sm underline"
+            className="block text-center text-sm font-bold text-primary underline"
             href={
               (register ? "/auth/login" : "/auth/register") +
               (redirectTo ? "?redirect=" + encodeURIComponent(redirectTo) : "")
@@ -137,8 +139,13 @@ export default function AuthForm({
         </form>
       )}
       {error && (
-        <p role="status" className="rounded-lg bg-muted p-3 text-sm">
+        <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p role="status" className="rounded-2xl bg-success-bg p-3 text-sm text-success-fg">
+          {notice}
         </p>
       )}
       <p className="text-xs text-muted-foreground">

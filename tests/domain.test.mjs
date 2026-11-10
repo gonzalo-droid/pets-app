@@ -6,6 +6,7 @@ import {
   safeRedirect,
   paymentState,
   isCampaignOpen,
+  canTransitionRequest,
 } from "../src/lib/huellas/domain.ts";
 test("aislamiento: un albergue no administra a otro", () => {
   const actor = { id: "a", role: "shelter", shelter_id: "s1" };
@@ -39,4 +40,12 @@ test("una campaña vencida o inactiva está cerrada", () => {
   assert.equal(isCampaignOpen({ is_active: true, ends_at: "2026-12-01T00:00:00Z" }, now), true);
   assert.equal(isCampaignOpen({ is_active: true, ends_at: "2026-11-01T00:00:00Z" }, now), false);
   assert.equal(isCampaignOpen({ is_active: false, ends_at: null }, now), false);
+});
+
+test("transiciones de solicitudes de adopción", () => {
+  assert.equal(canTransitionRequest("pending", "approved"), true);
+  assert.equal(canTransitionRequest("pending", "completed"), false);
+  assert.equal(canTransitionRequest("approved", "completed"), true);
+  assert.equal(canTransitionRequest("completed", "pending"), false);
+  assert.equal(canTransitionRequest("rejected", "reviewing"), false);
 });

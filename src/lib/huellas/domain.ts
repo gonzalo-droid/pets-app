@@ -54,3 +54,20 @@ export function isCampaignOpen(
 ) {
   return c.is_active && (!c.ends_at || new Date(c.ends_at).getTime() >= now);
 }
+
+/**
+ * Cambios de estado permitidos en una solicitud de adopción.
+ * Rechazada y Completada son finales. Aprobar no completa la adopción:
+ * completar es un paso explícito posterior.
+ */
+export const REQUEST_TRANSITIONS: Record<string, readonly string[]> = {
+  pending: ["reviewing", "approved", "rejected"],
+  reviewing: ["approved", "rejected"],
+  approved: ["completed", "rejected"],
+  rejected: [],
+  completed: [],
+};
+
+export function canTransitionRequest(from: string, to: string) {
+  return REQUEST_TRANSITIONS[from]?.includes(to) ?? false;
+}

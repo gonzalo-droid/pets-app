@@ -20,32 +20,46 @@ export default async function Page({
   );
   return (
     <div className="max-w-5xl space-y-7">
-      <h1 className="text-3xl font-bold">Lo que necesitamos</h1>
-      <div className="grid md:grid-cols-2 gap-6">
+      <div>
+        <h1 className="text-3xl sm:text-4xl">Necesidades</h1>
+        <p className="mt-2 text-muted-foreground">
+          Publica productos o servicios concretos. Márcalos como resueltos cuando los recibas.
+        </p>
+      </div>
+      <div className="grid items-start gap-6 md:grid-cols-2">
         <ManageForm
           action="need"
           shelterId={id}
           title="Publicar necesidad"
+          submitLabel="Publicar necesidad"
           fields={[
-            { name: "title", label: "Producto o necesidad" },
+            { name: "title", label: "Producto o necesidad", hint: "Ej.: Alimento para cachorros" },
             {
               name: "description",
               label: "Detalles para coordinar la entrega",
             },
-            { name: "quantity", label: "Cantidad y unidad" },
+            { name: "quantity", label: "Cantidad y unidad", hint: "Ej.: 10 sacos de 15 kg" },
           ]}
         />
         <div className="space-y-4">
           {needs.map((n) => (
-            <article className="rounded-2xl border bg-card p-5" key={n.id}>
-              <p className="text-xs uppercase text-primary">
-                {n.fulfilled ? "Resuelta" : "Abierta"} · {n.quantity}
-              </p>
-              <h2 className="font-bold text-lg mt-2">{n.title}</h2>
-              <p className="text-sm text-muted-foreground my-3">
-                {n.description}
-              </p>
+            <article className="rounded-[24px] border border-border bg-card p-5" key={n.id}>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-extrabold ${
+                    n.fulfilled ? "bg-success-bg text-success-fg" : "bg-highlight text-foreground"
+                  }`}
+                >
+                  {n.fulfilled ? "Resuelta" : "Abierta"}
+                </span>
+                <span className="rounded-full bg-support-soft px-2.5 py-0.5 text-xs font-extrabold">
+                  {n.quantity}
+                </span>
+              </div>
+              <h2 className="mt-3 text-xl">{n.title}</h2>
+              <p className="my-3 text-sm text-muted-foreground">{n.description}</p>
               <ActionButton
+                tone={n.fulfilled ? "default" : "primary"}
                 payload={{
                   action: "fulfill",
                   id: n.id,
@@ -57,6 +71,11 @@ export default async function Page({
               </ActionButton>
             </article>
           ))}
+          {!needs.length && (
+            <p className="rounded-[24px] border-2 border-dashed border-border bg-card p-6 text-center text-muted-foreground">
+              Aún no publicaste necesidades.
+            </p>
+          )}
           <PaginationNav
             currentPage={page}
             totalPages={totalPages}

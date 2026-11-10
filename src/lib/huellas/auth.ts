@@ -3,6 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isDemo } from "./config";
+import { readDemo } from "./demo";
 import type { Actor } from "./domain";
 const globalSecret = globalThis as typeof globalThis & {
   huellasSecret?: string;
@@ -45,7 +46,11 @@ export async function currentActor(): Promise<Actor | null> {
     )
       return null;
     const [key, expires] = payload.split(":");
-    return Number(expires) > Date.now() ? (actors[key] ?? null) : null;
+    const actor = Number(expires) > Date.now() ? (actors[key] ?? null) : null;
+    if (!actor) return null;
+    // El nombre editado en "Mi perfil" se guarda en el almacén demo.
+    const edited = (await readDemo()).profiles?.[actor.id];
+    return edited ? { ...actor, full_name: edited.full_name } : actor;
   }
   const db = await createClient();
   const {

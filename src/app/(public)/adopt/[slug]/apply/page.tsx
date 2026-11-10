@@ -7,6 +7,7 @@ import { getAnimalBySlug } from '@/lib/data/animals'
 import { SPECIES_LABELS } from '@/lib/utils'
 import LoginRequired from '@/components/huellas/LoginRequired'
 import { currentActor } from '@/lib/huellas/auth'
+import { getOwnProfile } from '@/lib/huellas/profile'
 
 interface ApplyPageProps {
   params: Promise<{ slug: string }>
@@ -71,7 +72,11 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
 
       {/* Formulario (Client Component) */}
       {actor ? (
-        <AdoptionForm animalSlug={slug} animalName={animal.name} />
+        <AdoptionForm
+          animalSlug={slug}
+          animalName={animal.name}
+          defaultPhone={(await getOwnProfile(actor)).phone ?? ''}
+        />
       ) : (
         <LoginRequired
           returnTo={`/adopt/${slug}/apply`}

@@ -21,7 +21,10 @@ export function ManageForm({
   extra,
   submitLabel = "Guardar",
   resetOnSave,
+  endpoint = "/api/manage",
 }: {
+  /** Ruta de la API que recibe el formulario. */
+  endpoint?: string;
   action: string;
   shelterId: string;
   fields: Field[];
@@ -47,7 +50,7 @@ export function ManageForm({
         const form = e.currentTarget;
         try {
           const values = Object.fromEntries(new FormData(form));
-          const res = await fetch("/api/manage", {
+          const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...values, ...extra, action, shelter_id: shelterId }),
