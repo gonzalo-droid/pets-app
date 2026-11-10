@@ -47,9 +47,11 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* ── Fuentes HUELLAS ────────────────────────────────────────── */
-  --font-display: var(--font-nunito);
-  --font-body: var(--font-jakarta);
-  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
+  --font-sans: var(--font-inter);
+  /* Serif editorial: solo palabras breves del hero, en cursiva. */
+  --font-editorial: var(--font-lora);
 
   /* ── Paleta semántica — colores fijos (no varían con tema) ──── */
   --color-brand-50: #fff4e6;
@@ -79,90 +81,113 @@
 
   /* ── Superficies de marca ─────────────────────────────────────── */
   --color-cream: var(--cream); /* fondo cálido del hero, adaptativo */
-  --color-forest: #0f2e24; /* bloques oscuros destacados, fijo */
+  --color-primary-hover: var(--primary-hover);
+  --color-highlight: var(--highlight);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-fg: var(--warning-fg);
+  --color-success-bg: var(--success-bg);
+  --color-success-fg: var(--success-fg);
+  --color-error-bg: var(--error-bg);
+  --color-error-fg: var(--error-fg);
+  --color-forest: #104332; /* bloques oscuros destacados, fijo */
 }
 
 :root {
-  /* Paleta HUELLAS — verde bosque como color principal, ámbar como acento (donar/apadrinar) */
-  --background: oklch(0.98 0.005 80);
-  --foreground: oklch(0.2 0.01 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.01 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.01 60);
-  --primary: #16634a;
+  /* Paleta HUELLAS (guía visual): verde bosque principal, fondos crema,
+     salvia para bloques secundarios, ámbar solo para avisos. */
+  --background: #f5f1e8; /* crema */
+  --foreground: #1f2d27; /* carbón verdoso */
+  --card: #fffefb; /* blanco cálido */
+  --card-foreground: #1f2d27;
+  --popover: #fffefb;
+  --popover-foreground: #1f2d27;
+  --primary: #185642; /* verde bosque */
+  --primary-hover: #104332;
   --primary-foreground: #ffffff;
-  --secondary: oklch(0.97 0.01 80);
-  --secondary-foreground: oklch(0.25 0.01 60);
-  --muted: oklch(0.96 0.005 80);
-  --muted-foreground: oklch(0.52 0.02 60);
-  --accent: #e4edde;
-  --accent-foreground: #233d32;
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.01 80);
-  --input: oklch(0.91 0.01 80);
-  --ring: #16634a;
-  --chart-1: #16634a;
-  --chart-2: oklch(0.62 0.14 40);
-  --chart-3: oklch(0.55 0.12 25);
-  --chart-4: oklch(0.8 0.12 90);
-  --chart-5: oklch(0.65 0.1 200);
-  --radius: 0.625rem;
-  /* ── Colores semánticos light ─────────────────────────────────── */
-  --rescue-light: #fff0ee;
-  --adopt-light: #dcfce7;
-  --donate-light: #fefce8;
-  --shelter-light: #eff6ff;
-  --sidebar: oklch(0.985 0.005 80);
-  --sidebar-foreground: oklch(0.2 0.01 60);
-  --sidebar-primary: #16634a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e4edde;
-  --sidebar-accent-foreground: #233d32;
-  --sidebar-border: oklch(0.91 0.01 80);
-  --sidebar-ring: #16634a;
-  --cream: #f3eddf;
+  --secondary: #e4ebdd; /* salvia */
+  --secondary-foreground: #1f2d27;
+  --muted: #ece8de;
+  --muted-foreground: #526158; /* gris verdoso */
+  --accent: #e4ebdd;
+  --accent-foreground: #185642;
+  --destructive: #a3342b;
+  --border: #dddcd3; /* gris cálido */
+  --input: #dddcd3;
+  --ring: #2563eb; /* foco de teclado */
+  --highlight: #f4c66a; /* ámbar suave: avisos y atención */
+  --warning-bg: #fff1cd;
+  --warning-fg: #6b4a00;
+  --success-bg: #e3f1e8;
+  --success-fg: #256443;
+  --error-bg: #fbe9e7;
+  --error-fg: #a3342b;
+  --chart-1: #185642;
+  --chart-2: #3f7d63;
+  --chart-3: #8fb49c;
+  --chart-4: #f4c66a;
+  --chart-5: #526158;
+  --radius: 0.75rem;
+  --rescue-light: #fbe9e7;
+  --adopt-light: #e3f1e8;
+  --donate-light: #fff1cd;
+  --shelter-light: #e4ebdd;
+  --sidebar: #185642;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #e4ebdd;
+  --sidebar-primary-foreground: #185642;
+  --sidebar-accent: #e4ebdd;
+  --sidebar-accent-foreground: #185642;
+  --sidebar-border: #2a6b55;
+  --sidebar-ring: #2563eb;
+  --cream: #f5f1e8;
 }
 
 .dark {
-  /* Paleta HUELLAS dark — fondo cálido oscuro, verde primario */
-  --background: oklch(0.14 0.01 55);
-  --foreground: oklch(0.94 0.01 75);
-  --card: oklch(0.18 0.01 55);
-  --card-foreground: oklch(0.94 0.01 75);
-  --popover: oklch(0.18 0.01 55);
-  --popover-foreground: oklch(0.94 0.01 75);
+  /* Modo oscuro: fondos neutros verdosos y superficies diferenciadas. */
+  --background: #121a16;
+  --foreground: #eef2ec;
+  --card: #19231e;
+  --card-foreground: #eef2ec;
+  --popover: #19231e;
+  --popover-foreground: #eef2ec;
   --primary: #6cc59d;
+  --primary-hover: #86d3af;
   --primary-foreground: #06261b;
-  --secondary: oklch(0.24 0.01 55);
-  --secondary-foreground: oklch(0.88 0.01 75);
-  --muted: oklch(0.22 0.01 55);
-  --muted-foreground: oklch(0.74 0.015 65);
-  --accent: #1d3328;
+  --secondary: #213129;
+  --secondary-foreground: #eef2ec;
+  --muted: #1e2a24;
+  --muted-foreground: #a9b7ae;
+  --accent: #213129;
   --accent-foreground: #cfe8d8;
-  --destructive: oklch(0.65 0.22 22);
-  --border: oklch(0.26 0.01 55);
-  --input: oklch(0.24 0.01 55);
-  --ring: #6cc59d;
+  --destructive: #f08a80;
+  --border: #2c3a33;
+  --input: #2c3a33;
+  --ring: #7aa7ff;
+  --highlight: #f4c66a;
+  --warning-bg: #3a2f12;
+  --warning-fg: #f6d68e;
+  --success-bg: #183324;
+  --success-fg: #9fdcb9;
+  --error-bg: #3a1b18;
+  --error-fg: #f4a59c;
   --chart-1: #6cc59d;
-  --chart-2: oklch(0.65 0.13 40);
-  --chart-3: oklch(0.55 0.11 25);
-  --chart-4: oklch(0.75 0.1 90);
-  --chart-5: oklch(0.6 0.09 200);
-  --sidebar: oklch(0.16 0.01 55);
-  --sidebar-foreground: oklch(0.94 0.01 75);
-  --sidebar-primary: #6cc59d;
-  --sidebar-primary-foreground: #06261b;
-  --sidebar-accent: #1d3328;
-  --sidebar-accent-foreground: #cfe8d8;
-  --sidebar-border: oklch(0.24 0.01 55);
-  --sidebar-ring: #6cc59d;
-  --cream: #1c2621;
-  /* ── Colores semánticos dark ──────────────────────────────────── */
-  --rescue-light: #3d1a1a;
-  --adopt-light: #14331f;
-  --donate-light: #332d0a;
-  --shelter-light: #0f1d35;
+  --chart-2: #4f9f7d;
+  --chart-3: #8fb49c;
+  --chart-4: #f4c66a;
+  --chart-5: #a9b7ae;
+  --rescue-light: #3a1b18;
+  --adopt-light: #183324;
+  --donate-light: #3a2f12;
+  --shelter-light: #213129;
+  --sidebar: #0f1f18;
+  --sidebar-foreground: #eef2ec;
+  --sidebar-primary: #213129;
+  --sidebar-primary-foreground: #eef2ec;
+  --sidebar-accent: #213129;
+  --sidebar-accent-foreground: #eef2ec;
+  --sidebar-border: #2c3a33;
+  --sidebar-ring: #7aa7ff;
+  --cream: #19231e;
 }
 
 @layer base {
@@ -180,36 +205,62 @@
   h2,
   h3 {
     font-family: var(--font-display);
+    letter-spacing: -0.015em;
+  }
+  .font-editorial {
+    font-family: var(--font-editorial);
+    font-style: italic;
+    font-weight: 500;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
   }
 }
 
 .huellas-field {
   display: block;
   width: 100%;
+  min-height: 2.75rem;
   border: 1px solid var(--border);
-  border-radius: 0.65rem;
-  padding: 0.7rem 0.85rem;
-  background: var(--background);
-  margin-top: 0.4rem;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--card);
+  margin-top: 0.375rem;
 }
 .huellas-button {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 0.7rem;
-  padding: 0.75rem 1.2rem;
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--primary);
+  padding: 0.625rem 1.25rem;
   background: var(--primary);
   color: var(--primary-foreground);
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 150ms, border-color 150ms, color 150ms;
 }
 .huellas-button:hover {
-  filter: brightness(1.08);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
+/* Secundario: borde y texto verde sobre fondo claro. */
+.huellas-button--secondary,
 .huellas-button--accent {
-  background: var(--color-brand-400);
-  color: #1f1300;
+  background: var(--card);
+  color: var(--primary);
+}
+.huellas-button--secondary:hover,
+.huellas-button--accent:hover {
+  background: var(--secondary);
+  color: var(--primary);
 }
 .huellas-button:disabled {
   opacity: 0.5;

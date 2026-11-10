@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Lora } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-// Títulos: Nunito · Texto: Plus Jakarta Sans (ver globals.css)
-const nunito = Nunito({
-  variable: "--font-nunito",
+// Inter para toda la interfaz; Lora solo para palabras editoriales del hero.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["600", "700", "800", "900"],
 });
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  style: ["italic"],
+  weight: ["500"],
 });
 
 export const metadata: Metadata = {
@@ -46,13 +46,13 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${nunito.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${inter.variable} ${lora.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           {process.env.NEXT_PUBLIC_DEMO_MODE === "true" && (
-            <div className="bg-amber-100 px-4 py-2 text-center text-xs text-amber-950">
+            <div className="bg-warning-bg px-4 py-2 text-center text-xs text-warning-fg">
               DEMO LOCAL · Datos ficticios · No se realizan cobros ni
               transferencias
             </div>

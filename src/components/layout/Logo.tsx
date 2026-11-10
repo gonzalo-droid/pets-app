@@ -1,32 +1,35 @@
 import { PawPrint } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Logo único de HUELLAS: icono en bloque verde + nombre. */
+/**
+ * Logo de HUELLAS: huella + nombre.
+ * `tone="light"` es la versión blanca para fondos verdes (panel).
+ */
 export function Logo({
   size = "md",
+  tone = "default",
   className,
 }: {
   size?: "sm" | "md";
+  tone?: "default" | "light";
   className?: string;
 }) {
   const sm = size === "sm";
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 font-display font-black tracking-tight text-foreground",
-        sm ? "text-lg" : "text-xl",
+        "inline-flex items-center gap-2 font-display font-extrabold tracking-tight",
+        tone === "light" ? "text-white" : "text-primary",
+        sm ? "text-lg" : "text-2xl",
         className,
       )}
     >
-      <span
+      <PawPrint
         aria-hidden="true"
-        className={cn(
-          "rounded-xl bg-primary text-primary-foreground",
-          sm ? "p-1.5" : "p-2",
-        )}
-      >
-        <PawPrint size={sm ? 18 : 23} />
-      </span>
+        className={sm ? "h-5 w-5" : "h-7 w-7"}
+        fill="currentColor"
+        strokeWidth={1.5}
+      />
       HUELLAS
     </span>
   );

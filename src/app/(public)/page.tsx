@@ -1,183 +1,246 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowUpRight,
-  ShieldCheck,
+  ArrowRight,
+  BadgeCheck,
+  ClipboardList,
+  Heart,
   HeartHandshake,
+  Megaphone,
+  Package,
   PawPrint,
 } from "lucide-react";
 import { getAnimalsPage } from "@/lib/data/animals";
 import { getShelters } from "@/lib/data/shelters";
 import { getCampaignTotals, getCampaignsPage } from "@/lib/data/campaigns";
+import { recordsPage } from "@/lib/huellas/records";
 import AnimalCard from "@/components/animals/AnimalCard";
 import CampaignCard from "@/components/campaigns/CampaignCard";
+
+function SectionHeader({
+  title,
+  text,
+  href,
+  linkLabel,
+}: {
+  title: string;
+  text: string;
+  href: string;
+  linkLabel: string;
+}) {
+  return (
+    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="max-w-2xl">
+        <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          {title}
+        </h2>
+        <p className="mt-2 text-muted-foreground">{text}</p>
+      </div>
+      <Link
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+        href={href}
+      >
+        {linkLabel}
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      </Link>
+    </div>
+  );
+}
+
 export default async function Page() {
-  // Solo se piden las tarjetas visibles; el total sale del conteo de la consulta.
-  const [animalsPage, shelters, campaignsPage, campaignTotals] = await Promise.all([
-    getAnimalsPage({ status: "available" }, 1, 4),
-    getShelters(),
-    getCampaignsPage({ is_active: true }, 1, 3),
-    getCampaignTotals({ is_active: true }),
-  ]);
+  // Solo se piden las tarjetas visibles; los totales salen de conteos reales.
+  const [animalsPage, shelters, campaignsPage, campaignTotals, needsPage] =
+    await Promise.all([
+      getAnimalsPage({ status: "available" }, 1, 4),
+      getShelters(),
+      getCampaignsPage({ is_active: true }, 1, 3),
+      getCampaignTotals({ is_active: true }),
+      recordsPage("needs", { openNeeds: true }, 1, 3),
+    ]);
   const animals = animalsPage.items;
   const campaigns = campaignsPage.items;
+  const needs = needsPage.items;
+  const shelterName = (id: string) => shelters.find((s) => s.id === id)?.name;
+
   return (
     <div>
-      <section className="mx-auto max-w-7xl px-5 py-8 md:py-12">
-        <div className="grid lg:grid-cols-2 overflow-hidden rounded-[2rem] border bg-cream text-foreground">
-          <div className="p-7 sm:p-12 lg:p-14 flex flex-col justify-center">
-            <span className="text-xs uppercase tracking-[.18em] font-bold text-primary flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              Una comunidad. Muchas segundas oportunidades.
-            </span>
-            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.06] mt-7">
-              Tu ayuda deja
-              <br />
-              una <span className="text-primary">huella</span>
-              <br />
-              para siempre.
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8">
+        <div className="grid overflow-hidden rounded-3xl border border-border bg-card lg:grid-cols-[45fr_55fr]">
+          <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+            <h1 className="text-[2.5rem] font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl xl:text-6xl">
+              Tu ayuda deja una{" "}
+              <span className="font-editorial text-primary">huella</span> para
+              siempre.
             </h1>
-            <p className="text-base leading-relaxed mt-6 max-w-md text-muted-foreground">
-              Detrás de cada rescate hay alguien que no se rindió. Conecta con
-              albergues, apadrina una vida y ayúdalos a seguir cuidando.
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
+              Conecta con albergues de tu región, conoce a sus rescatados y
+              acompaña su cuidado.
             </p>
-            <div className="flex flex-wrap gap-3 mt-8">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link className="huellas-button" href="/shelters">
-                Encuentra un albergue <ArrowUpRight size={18} />
+                <PawPrint className="h-5 w-5" aria-hidden="true" />
+                Conocer albergues
               </Link>
-              <Link
-                className="huellas-button huellas-button--accent text-sm"
-                href="/adopt"
-              >
-                Quiero apadrinar ♡
+              <Link className="huellas-button huellas-button--secondary" href="/adopt">
+                <Heart className="h-5 w-5" aria-hidden="true" />
+                Quiero apadrinar
               </Link>
             </div>
-            <div className="flex items-center gap-3 mt-8 text-xs text-muted-foreground">
-              <ShieldCheck size={20} />
-              Albergues verificados · Apoyo con transparencia
-            </div>
+            {/* Cifras reales de la plataforma, no ilustrativas */}
+            <p className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              <BadgeCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+              <span>
+                {shelters.length} albergue{shelters.length === 1 ? "" : "s"} verificado
+                {shelters.length === 1 ? "" : "s"}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>
+                {animalsPage.total} animal{animalsPage.total === 1 ? "" : "es"} buscando
+                hogar
+              </span>
+            </p>
           </div>
-          <div className="relative min-h-[350px] lg:min-h-[610px]">
+          <div className="relative min-h-[260px] sm:min-h-[340px] lg:min-h-[520px]">
             <Image
               src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=1200&q=85"
-              alt="Un perro rescatado al aire libre"
+              alt="Perro descansando al aire libre"
               fill
               priority
-              sizes="(min-width:1024px) 50vw,100vw"
-              className="object-cover"
+              sizes="(min-width:1024px) 55vw, 100vw"
+              className="object-cover object-[center_35%]"
             />
-            <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-card/95 text-card-foreground p-5 shadow-lg flex gap-4 items-center">
-              <div className="bg-accent text-accent-foreground p-3 rounded-xl">
-                <PawPrint size={24} />
-              </div>
-              <div>
-                <p className="font-bold">Una nueva historia empieza contigo.</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Adopta, apadrina o comparte. Todo suma.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-3 gap-4 text-center border-b pb-10">
-        {[
-          [shelters.length, "albergues en la comunidad"],
-          [animalsPage.total, "vidas listas para un hogar"],
-          [campaignTotals.open, "campañas que puedes apoyar"],
-        ].map(([n, t]) => (
-          <div key={t}>
-            <p className="text-3xl font-bold">{n}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t}</p>
-          </div>
-        ))}
-      </section>
-      <section className="mx-auto max-w-7xl px-5 py-14">
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-primary font-bold">
-              Historias por escribir
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-bold mt-3">
-              Alguien está esperando por ti.
-            </h2>
-            <p className="text-muted-foreground mt-3">
-              Conócelos. Tal vez tu próxima gran amistad empieza aquí.
+            <p className="absolute bottom-4 right-4 rounded-xl bg-card/95 px-4 py-3 text-sm font-medium text-card-foreground shadow-sm sm:bottom-6 sm:right-6">
+              Una nueva historia empieza contigo
             </p>
           </div>
-          <Link className="text-sm font-bold underline" href="/adopt">
-            Conocer a todos ↗
-          </Link>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {animals.map((a) => (
-            <div key={a.id}>
-              <AnimalCard
-                animal={a}
-                shelterName={shelters.find((s) => s.id === a.shelter_id)?.name}
-              />
-              <Link
-                className="block text-center py-3 text-sm font-bold text-primary"
-                href={"/sponsor/" + a.slug}
-              >
-                Apadrinar a {a.name} ♡
-              </Link>
-            </div>
-          ))}
-        </div>
-        {!animals.length && <p>Pronto compartiremos nuevas historias.</p>}
       </section>
-      <section className="bg-muted/60 border-y">
-        <div className="mx-auto max-w-7xl px-5 py-14">
-          <div className="flex flex-wrap justify-between items-end gap-4 mb-7">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-primary font-bold">
-                Un poquito de ti, mucho para ellos
-              </p>
-              <h2 className="text-3xl sm:text-4xl font-bold mt-3">
-                Ayuda donde más se necesita.
-              </h2>
-            </div>
-            <Link className="text-sm underline font-bold" href="/donate">
-              Todas las campañas ↗
-            </Link>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5">
+
+      {/* ── Campañas: prioridad tras el hero ─────────────────── */}
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+        <SectionHeader
+          title="Ayuda donde más se necesita"
+          text={
+            campaignTotals.open > 0
+              ? `Campañas de los albergues para cuidados concretos. ${campaignTotals.open} abierta${campaignTotals.open === 1 ? "" : "s"} ahora.`
+              : "Campañas de los albergues para cuidados concretos."
+          }
+          href="/donate"
+          linkLabel="Ver todas las campañas"
+        />
+        {campaigns.length > 0 ? (
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {campaigns.map((c) => (
               <CampaignCard key={c.id} campaign={c} />
             ))}
           </div>
+        ) : (
+          <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">
+            Por ahora no hay campañas publicadas. Puedes conocer las necesidades
+            de los albergues.
+          </p>
+        )}
+      </section>
+
+      {/* ── Animales ─────────────────────────────────────────── */}
+      <section className="border-y border-border bg-secondary/50">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <SectionHeader
+            title="Alguien está esperando por ti"
+            text="Conoce su historia. Puedes solicitar su adopción o acompañar su cuidado como padrino."
+            href="/adopt"
+            linkLabel="Ver todos los animales"
+          />
+          {animals.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {animals.map((a) => (
+                <AnimalCard key={a.id} animal={a} shelterName={shelterName(a.shelter_id)} />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-muted-foreground">
+              Pronto compartiremos nuevas historias.
+            </p>
+          )}
         </div>
       </section>
-      <section className="max-w-7xl mx-auto px-5 py-14">
-        <div className="rounded-3xl bg-forest text-white p-8 sm:p-12 grid md:grid-cols-2 gap-10">
+
+      {/* ── Necesidades ──────────────────────────────────────── */}
+      {needs.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <SectionHeader
+            title="Lo que necesitan hoy"
+            text="Productos y servicios concretos. Coordina con el albergue antes de hacer una entrega."
+            href="/needs"
+            linkLabel="Ver todas las necesidades"
+          />
+          <div className="grid gap-5 md:grid-cols-3">
+            {needs.map((n) => (
+              <Link
+                key={n.id}
+                href={`/shelters/${n.shelter_id}`}
+                className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-[box-shadow,border-color] hover:border-primary/40 hover:shadow-md"
+              >
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
+                  <Package className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <h3 className="text-lg font-bold text-foreground">{n.title}</h3>
+                <span className="self-start rounded-full bg-warning-bg px-3 py-1 text-sm font-semibold text-warning-fg">
+                  {n.quantity}
+                </span>
+                <p className="mt-auto text-sm text-muted-foreground">
+                  {shelterName(n.shelter_id)} ·{" "}
+                  <span className="font-semibold text-primary group-hover:underline">
+                    Coordinar con el albergue
+                  </span>
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── HUELLAS Gestión ──────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="grid gap-10 rounded-3xl bg-primary p-8 text-primary-foreground sm:p-12 md:grid-cols-2">
           <div>
-            <HeartHandshake size={36} />
-            <h2 className="text-3xl font-bold mt-5">
-              Ellos cuidan de sus vidas.
-              <br />
-              Nosotros, de su misión.
+            <HeartHandshake className="h-9 w-9" aria-hidden="true" />
+            <h2 className="mt-5 text-3xl font-bold">
+              ¿Tienes un albergue? Organízalo en un solo lugar.
             </h2>
-            <p className="mt-4 text-white/80 leading-relaxed">
-              HUELLAS Manager reúne animales, necesidades y campañas en un solo
-              espacio. Menos pendientes, más tiempo para cuidar.
+            <p className="mt-4 leading-relaxed text-primary-foreground/85">
+              HUELLAS Gestión reúne animales, solicitudes, campañas y
+              necesidades. Menos pendientes, más tiempo para cuidar.
             </p>
           </div>
-          <div className="flex flex-col justify-center gap-5">
-            <p className="border-b border-white/20 pb-4">
-              01 &nbsp; Organiza las fichas de tus rescatados
-            </p>
-            <p className="border-b border-white/20 pb-4">
-              02 &nbsp; Comparte necesidades con tu comunidad
-            </p>
-            <p>03 &nbsp; Acompaña cada intención de apoyo</p>
-            <Link
-              className="self-start rounded-xl bg-white px-5 py-3 font-bold text-forest"
-              href="/auth/login"
-            >
-              Entrar a mi albergue ↗
-            </Link>
-          </div>
+          <ul className="flex flex-col justify-center gap-4">
+            {[
+              [ClipboardList, "Fichas de tus rescatados y solicitudes de adopción"],
+              [Package, "Necesidades que tu comunidad puede ver"],
+              [Megaphone, "Campañas y compromisos de apoyo, sin confundirlos con pagos"],
+            ].map(([Icon, text]) => {
+              const I = Icon as typeof Package;
+              return (
+                <li
+                  key={text as string}
+                  className="flex items-center gap-3 border-b border-primary-foreground/20 pb-4 last:border-0"
+                >
+                  <I className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  {text as string}
+                </li>
+              );
+            })}
+            <li>
+              <Link
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-card px-5 font-semibold text-primary hover:bg-secondary"
+                href="/auth/login"
+              >
+                Entrar a mi albergue
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </li>
+          </ul>
         </div>
       </section>
     </div>

@@ -22,14 +22,15 @@ export default function DonationProgress({
         </div>
       )}
       {/* Barra de progreso */}
-      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+      <div className="h-2.5 w-full rounded-full bg-secondary overflow-hidden">
         <div
-          className="h-full rounded-full bg-donate transition-all"
+          className="h-full rounded-full bg-primary transition-all"
           style={{ width: `${pct}%` }}
           role="progressbar"
           aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}
+          aria-label="Avance de la meta"
         />
       </div>
       <p className="text-xs text-muted-foreground">{pct}% recaudado</p>

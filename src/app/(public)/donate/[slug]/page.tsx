@@ -53,7 +53,7 @@ export default async function CampaignDetailPage({
       {/* Breadcrumb */}
       <Link
         href="/donate"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-donate transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a campañas
@@ -135,7 +135,7 @@ export default async function CampaignDetailPage({
               </div>
               <div className="text-center">
                 <p className="text-xs text-muted-foreground">Completado</p>
-                <p className="font-bold text-donate mt-0.5">{pct}%</p>
+                <p className="font-bold text-primary mt-0.5">{pct}%</p>
               </div>
             </div>
 
@@ -253,28 +253,6 @@ export default async function CampaignDetailPage({
                 </div>
               </Link>
 
-              {/* Métodos de pago disponibles */}
-              <div className="pt-3 border-t border-border flex flex-col gap-2">
-                <p className="text-xs font-medium text-foreground">
-                  Canales de pago no habilitados en este MVP:
-                </p>
-                {shelter.yape_number && (
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="h-5 w-5 flex items-center justify-center rounded bg-[#742483] text-white text-[10px] font-bold">
-                      Y
-                    </span>
-                    Yape disponible
-                  </span>
-                )}
-                {shelter.bank_account && (
-                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="h-5 w-5 flex items-center justify-center rounded bg-donate/20 text-donate-dark text-[10px] font-bold">
-                      B
-                    </span>
-                    Transferencia bancaria
-                  </span>
-                )}
-              </div>
             </div>
           )}
 
