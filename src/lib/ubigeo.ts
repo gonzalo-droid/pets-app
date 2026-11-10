@@ -56,3 +56,11 @@ export const LAMBAYEQUE_DISTRICTS: District[] = [
 export const DISTRICT_LABEL: Record<string, string> = Object.fromEntries(
   LAMBAYEQUE_DISTRICTS.map((d) => [d.ubigeo, d.label])
 )
+
+// Departamento → prefijo de ubigeo (2 dígitos INEI). Solo Lambayeque por ahora.
+const DEPARTMENT_PREFIX: Record<string, string> = { Lambayeque: '14' }
+
+/** Prefijo de ubigeo del departamento, o null si no está soportado. */
+export function departmentPrefix(name: string): string | null {
+  return DEPARTMENT_PREFIX[name] ?? null
+}

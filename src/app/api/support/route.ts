@@ -9,6 +9,9 @@ import { readDemo, mutateDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
 import { getAnimalBySlug } from "@/lib/data/animals";
 import { getCampaignBySlug } from "@/lib/data/campaigns";
+// Una persona solo puede tener una solicitud activa por animal (igual que el índice SQL).
+const ACTIVE_REQUEST = ["pending", "reviewing", "approved"];
+
 export async function POST(request: Request) {
   if (!sameOrigin(request))
     return NextResponse.json({ error: "Origen inválido" }, { status: 403 });
@@ -71,7 +74,7 @@ export async function POST(request: Request) {
               (r) =>
                 r.animal_id === animal.id &&
                 r.requester_id === actor.id &&
-                r.status === "pending",
+                ACTIVE_REQUEST.includes(r.status),
             )
           )
             throw new Error();

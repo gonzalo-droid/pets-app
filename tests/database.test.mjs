@@ -20,6 +20,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
     for (const f of [
       "202611090001_legacy_baseline.sql",
       "202611090002_huellas.sql",
+      "202611100001_huellas_fixes.sql",
     ])
       await db.exec(
         await readFile(
@@ -161,6 +162,26 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
         );
       }),
     );
+    await t.test("solo una solicitud de adopción activa por animal", async () => {
+      const animal = (
+        await db.query(
+          `SELECT id FROM animals WHERE shelter_id='${s1}' AND status='available' LIMIT 1`,
+        )
+      ).rows[0];
+      const insert = (id) =>
+        db.exec(`INSERT INTO adoption_requests(id,animal_id,shelter_id,requester_id,message,phone,status)
+          VALUES('${id}','${animal.id}','${s1}','${donor}','Mensaje ficticio para la prueba de solicitudes.','999999999','pending')`);
+      const first = "71000000-0000-4000-8000-000000000001";
+      await asUser(donor, async () => {
+        await insert(first);
+        await assert.rejects(insert("71000000-0000-4000-8000-000000000002"));
+      });
+      await asUser(owner, () =>
+        db.exec(`UPDATE adoption_requests SET status='rejected' WHERE id='${first}'`),
+      );
+      // Tras el rechazo puede volver a postular.
+      await asUser(donor, () => insert("71000000-0000-4000-8000-000000000003"));
+    });
   } finally {
     await db.close();
   }

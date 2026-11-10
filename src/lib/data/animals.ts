@@ -1,11 +1,15 @@
 import { isDemo } from "@/lib/huellas/config";
 import { readDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
+import { departmentPrefix } from "@/lib/ubigeo";
 import type { AnimalWithPhotos, AnimalFilters } from "@/types";
 
 export async function getAnimals(
   filters?: AnimalFilters,
 ): Promise<AnimalWithPhotos[]> {
+  // Un departamento no soportado no devuelve resultados (igual en demo y Supabase).
+  const prefix = filters?.department ? departmentPrefix(filters.department) : null;
+  if (filters?.department && !prefix) return [];
   if (isDemo()) {
     const d = await readDemo();
     return d.animals.filter(
@@ -15,7 +19,7 @@ export async function getAnimals(
         (!filters?.size || a.size === filters.size) &&
         (!filters?.status || a.status === filters.status) &&
         (!filters?.ubigeo || a.ubigeo === filters.ubigeo) &&
-        (!filters?.department || filters.department === "Lambayeque"),
+        (!prefix || a.ubigeo.startsWith(prefix)),
     );
   }
   const supabase = await createClient();
@@ -29,11 +33,7 @@ export async function getAnimals(
   if (filters?.size) query = query.eq("size", filters.size);
   if (filters?.status) query = query.eq("status", filters.status);
   if (filters?.ubigeo) query = query.eq("ubigeo", filters.ubigeo);
-  if (filters?.department) {
-    // Los ubigeos de Lambayeque empiezan en '14'
-    const deptCode = filters.department === "Lambayeque" ? "14" : null;
-    if (deptCode) query = query.like("ubigeo", `${deptCode}%`);
-  }
+  if (prefix) query = query.like("ubigeo", `${prefix}%`);
 
   const { data, error } = await query;
 

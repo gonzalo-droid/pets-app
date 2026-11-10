@@ -7,6 +7,34 @@ import { canManage } from "@/lib/huellas/domain";
 import { isDemo } from "@/lib/huellas/config";
 import { mutateDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
+
+type Db = Awaited<ReturnType<typeof createClient>>;
+const targetId = z.string().min(1).max(64);
+
+// Supabase no devuelve error si un UPDATE no toca filas (id inexistente o
+// bloqueado por RLS); sin esta comprobación el panel mostraría "guardado".
+async function updateOne(
+  db: Db,
+  table: string,
+  values: Record<string, unknown>,
+  id: string,
+  shelterId: string,
+) {
+  const { data, error } = await db
+    .from(table)
+    .update(values)
+    .eq("id", id)
+    .eq(table === "shelters" ? "id" : "shelter_id", shelterId)
+    .select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error("Registro no encontrado o sin permiso");
+}
+
+// Estado del animal según la decisión sobre una solicitud de adopción.
+const ANIMAL_STATUS_FOR_REQUEST = {
+  approved: "in_process",
+  completed: "adopted",
+} as const;
 const animalSchema = z.object({
   name: z.string().trim().min(1).max(60),
   species: z.enum(["dog", "cat", "other"]),
@@ -89,22 +117,16 @@ export async function POST(request: Request) {
       const status = z
         .enum(["available", "in_process", "adopted"])
         .parse(body.status);
+      const id = targetId.parse(body.id);
       if (!db)
         await mutateDemo((d) => {
           const a = d.animals.find(
-            (a) => a.id === body.id && a.shelter_id === shelterId,
+            (a) => a.id === id && a.shelter_id === shelterId,
           );
           if (!a) throw new Error("Animal no encontrado");
           a.status = status;
         });
-      else {
-        const { error } = await db
-          .from("animals")
-          .update({ status })
-          .eq("id", body.id)
-          .eq("shelter_id", shelterId);
-        if (error) throw error;
-      }
+      else await updateOne(db, "animals", { status }, id, shelterId);
     } else if (body.action === "campaign") {
       const values = z
         .object({
@@ -158,28 +180,24 @@ export async function POST(request: Request) {
         if (error) throw error;
       }
     } else if (body.action === "fulfill") {
+      const id = targetId.parse(body.id);
+      const fulfilled = z.boolean().parse(body.fulfilled);
       if (!db)
         await mutateDemo((d) => {
           const n = d.needs.find(
-            (n) => n.id === body.id && n.shelter_id === shelterId,
+            (n) => n.id === id && n.shelter_id === shelterId,
           );
           if (!n) throw new Error("Necesidad no encontrada");
-          n.fulfilled = !n.fulfilled;
+          n.fulfilled = fulfilled;
         });
-      else {
-        const { error } = await db
-          .from("needs")
-          .update({ fulfilled: z.boolean().parse(body.fulfilled) })
-          .eq("id", body.id)
-          .eq("shelter_id", shelterId);
-        if (error) throw error;
-      }
+      else await updateOne(db, "needs", { fulfilled }, id, shelterId);
     } else if (body.action === "verify" && actor.role === "admin") {
       const verified = z.boolean().parse(body.verified);
       if (!db)
         await mutateDemo((d) => {
           const s = d.shelters.find((s) => s.id === shelterId);
-          if (s) s.is_verified = verified;
+          if (!s) throw new Error("Albergue no encontrado");
+          s.is_verified = verified;
         });
       else {
         const { error } = await db.rpc("verify_shelter", {
@@ -192,21 +210,60 @@ export async function POST(request: Request) {
       const status = z
         .enum(["reviewing", "approved", "rejected", "completed"])
         .parse(body.status);
+      const id = targetId.parse(body.id);
+      const animalStatus =
+        status in ANIMAL_STATUS_FOR_REQUEST
+          ? ANIMAL_STATUS_FOR_REQUEST[status as keyof typeof ANIMAL_STATUS_FOR_REQUEST]
+          : null;
       if (!db)
         await mutateDemo((d) => {
           const r = d.requests.find(
-            (r) => r.id === body.id && r.shelter_id === shelterId,
+            (r) => r.id === id && r.shelter_id === shelterId,
           );
           if (!r) throw new Error("Solicitud no encontrada");
           r.status = status;
+          const a = d.animals.find((a) => a.id === r.animal_id);
+          if (!a) return;
+          if (animalStatus) a.status = animalStatus;
+          // Al rechazar, el animal vuelve a estar disponible si no queda otra aprobada.
+          else if (
+            status === "rejected" &&
+            a.status === "in_process" &&
+            !d.requests.some(
+              (o) => o.animal_id === a.id && o.status === "approved",
+            )
+          )
+            a.status = "available";
         });
       else {
-        const { error } = await db
+        const { data, error } = await db
           .from("adoption_requests")
           .update({ status })
-          .eq("id", body.id)
-          .eq("shelter_id", shelterId);
+          .eq("id", id)
+          .eq("shelter_id", shelterId)
+          .select("animal_id");
         if (error) throw error;
+        if (!data?.length) throw new Error("Solicitud no encontrada");
+        const animalId = data[0].animal_id as string;
+        if (animalStatus)
+          await updateOne(db, "animals", { status: animalStatus }, animalId, shelterId);
+        else if (status === "rejected") {
+          const { count, error: countError } = await db
+            .from("adoption_requests")
+            .select("id", { count: "exact", head: true })
+            .eq("animal_id", animalId)
+            .eq("status", "approved");
+          if (countError) throw countError;
+          if (!count) {
+            const { error: resetError } = await db
+              .from("animals")
+              .update({ status: "available" })
+              .eq("id", animalId)
+              .eq("shelter_id", shelterId)
+              .eq("status", "in_process");
+            if (resetError) throw resetError;
+          }
+        }
       }
     } else if (body.action === "settings") {
       const values = z
@@ -218,15 +275,10 @@ export async function POST(request: Request) {
       if (!db)
         await mutateDemo((d) => {
           const s = d.shelters.find((s) => s.id === shelterId);
-          if (s) Object.assign(s, values);
+          if (!s) throw new Error("Albergue no encontrado");
+          Object.assign(s, values);
         });
-      else {
-        const { error } = await db
-          .from("shelters")
-          .update(values)
-          .eq("id", shelterId);
-        if (error) throw error;
-      }
+      else await updateOne(db, "shelters", values, shelterId, shelterId);
     } else throw new Error("Acción no permitida");
     return NextResponse.json({ ok: true });
   } catch {

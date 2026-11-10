@@ -1,18 +1,22 @@
 import { isDemo } from "@/lib/huellas/config";
 import { readDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
+import { departmentPrefix } from "@/lib/ubigeo";
 import type { LostReportWithSightings, LostReportFilters } from "@/types";
 
 export async function getLostReports(
   filters?: LostReportFilters,
 ): Promise<LostReportWithSightings[]> {
+  const prefix = filters?.department ? departmentPrefix(filters.department) : null;
+  if (filters?.department && !prefix) return [];
   if (isDemo())
     return (await readDemo()).reports.filter(
       (r) =>
         (!filters?.type || r.type === filters.type) &&
         (filters?.is_resolved === undefined ||
           r.is_resolved === filters.is_resolved) &&
-        (!filters?.ubigeo || r.ubigeo === filters.ubigeo),
+        (!filters?.ubigeo || r.ubigeo === filters.ubigeo) &&
+        (!prefix || r.ubigeo.startsWith(prefix)),
     );
   const supabase = await createClient();
 
@@ -25,10 +29,7 @@ export async function getLostReports(
   if (filters?.is_resolved !== undefined)
     query = query.eq("is_resolved", filters.is_resolved);
   if (filters?.ubigeo) query = query.eq("ubigeo", filters.ubigeo);
-  if (filters?.department) {
-    const deptCode = filters.department === "Lambayeque" ? "14" : null;
-    if (deptCode) query = query.like("ubigeo", `${deptCode}%`);
-  }
+  if (prefix) query = query.like("ubigeo", `${prefix}%`);
 
   const { data, error } = await query;
 
