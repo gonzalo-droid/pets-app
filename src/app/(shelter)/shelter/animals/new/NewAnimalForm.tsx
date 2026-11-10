@@ -67,8 +67,8 @@ function ToggleGroup<T extends string>({
             className={cn(
               "rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors",
               value === opt.value
-                ? "border-brand-400 bg-brand-400 text-white"
-                : "border-border text-muted-foreground hover:border-brand-400/40",
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary/40",
             )}
           >
             {opt.label}
@@ -144,7 +144,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
         <div className="flex gap-3 mt-2">
           <a
             href="/shelter/animals"
-            className="text-sm text-brand-400 hover:underline"
+            className="text-sm text-primary hover:underline"
           >
             ← Volver a mis animales
           </a>

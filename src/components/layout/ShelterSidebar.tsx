@@ -10,6 +10,7 @@ import {
   Wallet,
   ChevronLeft,
   Settings,
+  PawPrint,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -46,8 +47,8 @@ export default function ShelterSidebar() {
 
       {/* Logo del panel */}
       <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
-        <span className="text-lg leading-none" aria-hidden="true">
-          🐾
+        <span aria-hidden="true" className="rounded-lg bg-primary p-1.5 text-primary-foreground">
+          <PawPrint size={16} />
         </span>
         <span className="font-display font-bold text-sm text-foreground">
           Panel Albergue

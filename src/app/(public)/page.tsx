@@ -20,20 +20,20 @@ export default async function Page() {
   return (
     <div>
       <section className="mx-auto max-w-7xl px-5 py-8 md:py-12">
-        <div className="grid lg:grid-cols-2 overflow-hidden rounded-[2rem] border bg-[#f3eddf] text-[#233d32]">
+        <div className="grid lg:grid-cols-2 overflow-hidden rounded-[2rem] border bg-cream text-foreground">
           <div className="p-7 sm:p-12 lg:p-14 flex flex-col justify-center">
-            <span className="text-xs uppercase tracking-[.18em] font-bold flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-700" />
+            <span className="text-xs uppercase tracking-[.18em] font-bold text-primary flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-primary" />
               Una comunidad. Muchas segundas oportunidades.
             </span>
             <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.06] mt-7">
               Tu ayuda deja
               <br />
-              una <span className="italic font-serif font-medium">huella</span>
+              una <span className="text-primary">huella</span>
               <br />
               para siempre.
             </h1>
-            <p className="text-base leading-relaxed mt-6 max-w-md text-[#506156]">
+            <p className="text-base leading-relaxed mt-6 max-w-md text-muted-foreground">
               Detrás de cada rescate hay alguien que no se rindió. Conecta con
               albergues, apadrina una vida y ayúdalos a seguir cuidando.
             </p>
@@ -42,13 +42,13 @@ export default async function Page() {
                 Encuentra un albergue <ArrowUpRight size={18} />
               </Link>
               <Link
-                className="rounded-xl border border-[#233d32]/25 px-5 py-3 font-bold text-sm"
+                className="huellas-button huellas-button--accent text-sm"
                 href="/adopt"
               >
                 Quiero apadrinar ♡
               </Link>
             </div>
-            <div className="flex items-center gap-3 mt-8 text-xs text-[#506156]">
+            <div className="flex items-center gap-3 mt-8 text-xs text-muted-foreground">
               <ShieldCheck size={20} />
               Albergues verificados · Apoyo con transparencia
             </div>
@@ -62,13 +62,13 @@ export default async function Page() {
               sizes="(min-width:1024px) 50vw,100vw"
               className="object-cover"
             />
-            <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-white/95 p-5 shadow-lg flex gap-4 items-center">
-              <div className="bg-[#e4edde] p-3 rounded-xl">
+            <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-card/95 text-card-foreground p-5 shadow-lg flex gap-4 items-center">
+              <div className="bg-accent text-accent-foreground p-3 rounded-xl">
                 <PawPrint size={24} />
               </div>
               <div>
                 <p className="font-bold">Una nueva historia empieza contigo.</p>
-                <p className="text-xs text-[#506156] mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Adopta, apadrina o comparte. Todo suma.
                 </p>
               </div>
@@ -91,7 +91,7 @@ export default async function Page() {
       <section className="mx-auto max-w-7xl px-5 py-14">
         <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
           <div>
-            <p className="text-xs uppercase tracking-widest text-emerald-700 font-bold">
+            <p className="text-xs uppercase tracking-widest text-primary font-bold">
               Historias por escribir
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold mt-3">
@@ -113,7 +113,7 @@ export default async function Page() {
                 shelterName={shelters.find((s) => s.id === a.shelter_id)?.name}
               />
               <Link
-                className="block text-center py-3 text-sm font-bold text-emerald-700"
+                className="block text-center py-3 text-sm font-bold text-primary"
                 href={"/sponsor/" + a.slug}
               >
                 Apadrinar a {a.name} ♡
@@ -127,7 +127,7 @@ export default async function Page() {
         <div className="mx-auto max-w-7xl px-5 py-14">
           <div className="flex flex-wrap justify-between items-end gap-4 mb-7">
             <div>
-              <p className="text-xs uppercase tracking-widest text-emerald-700 font-bold">
+              <p className="text-xs uppercase tracking-widest text-primary font-bold">
                 Un poquito de ti, mucho para ellos
               </p>
               <h2 className="text-3xl sm:text-4xl font-bold mt-3">
@@ -146,7 +146,7 @@ export default async function Page() {
         </div>
       </section>
       <section className="max-w-7xl mx-auto px-5 py-14">
-        <div className="rounded-3xl bg-emerald-950 text-white p-8 sm:p-12 grid md:grid-cols-2 gap-10">
+        <div className="rounded-3xl bg-forest text-white p-8 sm:p-12 grid md:grid-cols-2 gap-10">
           <div>
             <HeartHandshake size={36} />
             <h2 className="text-3xl font-bold mt-5">
@@ -154,7 +154,7 @@ export default async function Page() {
               <br />
               Nosotros, de su misión.
             </h2>
-            <p className="mt-4 text-emerald-100 leading-relaxed">
+            <p className="mt-4 text-white/80 leading-relaxed">
               HUELLAS Manager reúne animales, necesidades y campañas en un solo
               espacio. Menos pendientes, más tiempo para cuidar.
             </p>
@@ -168,7 +168,7 @@ export default async function Page() {
             </p>
             <p>03 &nbsp; Acompaña cada intención de apoyo</p>
             <Link
-              className="self-start rounded-xl bg-white px-5 py-3 font-bold text-emerald-950"
+              className="self-start rounded-xl bg-white px-5 py-3 font-bold text-forest"
               href="/auth/login"
             >
               Entrar a mi albergue ↗

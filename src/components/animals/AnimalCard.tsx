@@ -95,7 +95,7 @@ export default function AnimalCard({ animal, shelterName, shelterId }: AnimalCar
             {shelterId ? (
               <Link
                 href={`/shelters/${shelterId}`}
-                className="text-xs text-brand-400 hover:underline truncate block"
+                className="text-xs text-primary hover:underline truncate block"
               >
                 {shelterName}
               </Link>

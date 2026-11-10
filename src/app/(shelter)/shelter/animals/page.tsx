@@ -168,7 +168,7 @@ export default async function ShelterAnimalsPage() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/adopt/${animal.slug}`}
-                          className="text-xs text-brand-400 hover:underline"
+                          className="text-xs text-primary hover:underline"
                           target="_blank"
                         >
                           Ver público →

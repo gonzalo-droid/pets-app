@@ -12,7 +12,7 @@ export default async function NewAnimalPage() {
     <div className="max-w-2xl">
       <Link
         href="/shelter/animals"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand-400 transition-colors mb-8"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a mis animales

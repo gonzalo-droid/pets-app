@@ -86,7 +86,7 @@ export default async function AnimalDetailPage({
             Un compromiso mensual ayuda a planificar sus cuidados.
           </p>
         </div>
-        <Link className="huellas-button" href={`/sponsor/${slug}`}>
+        <Link className="huellas-button huellas-button--accent" href={`/sponsor/${slug}`}>
           Apadrinar a {animal.name} ♡
         </Link>
       </div>

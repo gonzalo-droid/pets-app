@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { Logo } from "@/components/layout/Logo";
 export default function Footer() {
   return (
     <footer className="border-t mt-auto">
       <div className="max-w-7xl mx-auto px-5 py-10 flex flex-wrap justify-between gap-6">
         <div>
-          <Link href="/" className="font-black text-xl">
-            🐾 HUELLAS
+          <Link href="/" aria-label="HUELLAS, inicio">
+            <Logo size="sm" />
           </Link>
           <p className="mt-3 text-sm text-muted-foreground">
             Pequeños actos. Grandes vidas.

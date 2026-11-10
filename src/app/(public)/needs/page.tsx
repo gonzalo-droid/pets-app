@@ -12,7 +12,7 @@ export default async function Page() {
   return (
     <div className="max-w-6xl mx-auto px-5 py-12 space-y-8">
       <div className="max-w-2xl">
-        <p className="text-xs uppercase tracking-widest text-emerald-700">
+        <p className="text-xs uppercase tracking-widest text-primary">
           Ayuda que se convierte en cuidado
         </p>
         <h1 className="text-4xl font-bold mt-3">
@@ -28,7 +28,7 @@ export default async function Page() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {visible.map((n) => (
           <article key={n.id} className="rounded-2xl border bg-card p-6">
-            <span className="text-xs rounded-full bg-emerald-100 text-emerald-900 px-3 py-1">
+            <span className="text-xs rounded-full bg-accent text-accent-foreground px-3 py-1">
               {n.quantity}
             </span>
             <h2 className="text-xl font-bold mt-5">{n.title}</h2>

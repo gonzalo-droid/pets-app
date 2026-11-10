@@ -16,7 +16,7 @@ export default async function Page() {
     <div className="max-w-6xl space-y-8">
       <div className="flex flex-wrap justify-between gap-4">
         <div>
-          <p className="uppercase tracking-widest text-xs text-emerald-700">
+          <p className="uppercase tracking-widest text-xs text-primary">
             HUELLAS Manager
           </p>
           <h1 className="text-3xl font-bold mt-2">Cada cuidado cuenta.</h1>
@@ -47,16 +47,16 @@ export default async function Page() {
           </div>
         ))}
       </div>
-      <section className="rounded-3xl bg-emerald-950 text-white p-7 md:p-10">
+      <section className="rounded-3xl bg-forest text-white p-7 md:p-10">
         <HeartHandshake size={32} />
         <h2 className="mt-5 text-2xl font-bold">Más tiempo para cuidarlos.</h2>
-        <p className="max-w-xl text-emerald-100 mt-3">
+        <p className="max-w-xl text-white/80 mt-3">
           Publica lo que necesitan, presenta a tus rescatados y conecta con
           personas que quieran acompañarlos.
         </p>
         <div className="flex flex-wrap gap-4 mt-6">
           <Link
-            className="rounded-xl bg-white px-5 py-3 text-emerald-950 font-bold"
+            className="rounded-xl bg-white px-5 py-3 text-forest font-bold"
             href="/shelter/campaigns"
           >
             Crear una campaña ↗
@@ -91,7 +91,7 @@ export default async function Page() {
               key={title as string}
               className="rounded-2xl border bg-card p-6"
             >
-              <I className="text-emerald-700" />
+              <I className="text-primary" />
               <h2 className="mt-4 font-bold text-xl">
                 {title as string} <ArrowUpRight className="inline" size={18} />
               </h2>

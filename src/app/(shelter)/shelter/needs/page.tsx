@@ -24,7 +24,7 @@ export default async function Page() {
         <div className="space-y-4">
           {needs.map((n) => (
             <article className="rounded-2xl border bg-card p-5" key={n.id}>
-              <p className="text-xs uppercase text-emerald-700">
+              <p className="text-xs uppercase text-primary">
                 {n.fulfilled ? "Resuelta" : "Abierta"} · {n.quantity}
               </p>
               <h2 className="font-bold text-lg mt-2">{n.title}</h2>

@@ -31,7 +31,7 @@ export default function AuthForm({
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-widest text-brand-600">
+        <p className="text-xs uppercase tracking-widest text-primary">
           Comunidad HUELLAS
         </p>
         <h1 className="mt-2 text-3xl font-bold">

@@ -160,7 +160,7 @@ export default function DonationsManager({ donations, donorNames, campaignTitles
                     <div className="flex gap-1.5 ml-2">
                       <button
                         onClick={() => approve(don.id)}
-                        className="rounded bg-green-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                        className="rounded bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/85 transition-colors"
                       >
                         Aprobar
                       </button>

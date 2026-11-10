@@ -11,7 +11,7 @@ export default async function Page() {
   return (
     <div className="max-w-4xl mx-auto px-5 py-12 space-y-8">
       <div>
-        <p className="text-xs uppercase tracking-widest text-emerald-700">
+        <p className="text-xs uppercase tracking-widest text-primary">
           Mi comunidad
         </p>
         <h1 className="text-3xl font-bold mt-2">Hola, {a.full_name}</h1>

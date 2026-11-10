@@ -76,29 +76,33 @@
   --color-adopt-light: var(--adopt-light);
   --color-donate-light: var(--donate-light);
   --color-shelter-light: var(--shelter-light);
+
+  /* ── Superficies de marca ─────────────────────────────────────── */
+  --color-cream: var(--cream); /* fondo cálido del hero, adaptativo */
+  --color-forest: #0f2e24; /* bloques oscuros destacados, fijo */
 }
 
 :root {
-  /* Paleta HUELLAS — ámbar cálido como color primario */
+  /* Paleta HUELLAS — verde bosque como color principal, ámbar como acento (donar/apadrinar) */
   --background: oklch(0.98 0.005 80);
   --foreground: oklch(0.2 0.01 60);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.01 60);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.01 60);
-  --primary: oklch(0.72 0.17 55); /* amber-500 aprox */
-  --primary-foreground: oklch(0.15 0.02 55);
+  --primary: #16634a;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0.01 80);
   --secondary-foreground: oklch(0.25 0.01 60);
   --muted: oklch(0.96 0.005 80);
   --muted-foreground: oklch(0.52 0.02 60);
-  --accent: oklch(0.94 0.04 80); /* amber-50 aprox */
-  --accent-foreground: oklch(0.35 0.08 55);
+  --accent: #e4edde;
+  --accent-foreground: #233d32;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.91 0.01 80);
   --input: oklch(0.91 0.01 80);
-  --ring: oklch(0.72 0.17 55);
-  --chart-1: oklch(0.72 0.17 55);
+  --ring: #16634a;
+  --chart-1: #16634a;
   --chart-2: oklch(0.62 0.14 40);
   --chart-3: oklch(0.55 0.12 25);
   --chart-4: oklch(0.8 0.12 90);
@@ -111,47 +115,49 @@
   --shelter-light: #eff6ff;
   --sidebar: oklch(0.985 0.005 80);
   --sidebar-foreground: oklch(0.2 0.01 60);
-  --sidebar-primary: oklch(0.72 0.17 55);
-  --sidebar-primary-foreground: oklch(0.15 0.02 55);
-  --sidebar-accent: oklch(0.94 0.04 80);
-  --sidebar-accent-foreground: oklch(0.35 0.08 55);
+  --sidebar-primary: #16634a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e4edde;
+  --sidebar-accent-foreground: #233d32;
   --sidebar-border: oklch(0.91 0.01 80);
-  --sidebar-ring: oklch(0.72 0.17 55);
+  --sidebar-ring: #16634a;
+  --cream: #f3eddf;
 }
 
 .dark {
-  /* Paleta HUELLAS dark — fondo cálido oscuro, amber primario */
+  /* Paleta HUELLAS dark — fondo cálido oscuro, verde primario */
   --background: oklch(0.14 0.01 55);
   --foreground: oklch(0.94 0.01 75);
   --card: oklch(0.18 0.01 55);
   --card-foreground: oklch(0.94 0.01 75);
   --popover: oklch(0.18 0.01 55);
   --popover-foreground: oklch(0.94 0.01 75);
-  --primary: oklch(0.78 0.16 55);
-  --primary-foreground: oklch(0.1 0.02 55);
+  --primary: #6cc59d;
+  --primary-foreground: #06261b;
   --secondary: oklch(0.24 0.01 55);
   --secondary-foreground: oklch(0.88 0.01 75);
   --muted: oklch(0.22 0.01 55);
   --muted-foreground: oklch(0.74 0.015 65);
-  --accent: oklch(0.26 0.03 55);
-  --accent-foreground: oklch(0.88 0.05 60);
+  --accent: #1d3328;
+  --accent-foreground: #cfe8d8;
   --destructive: oklch(0.65 0.22 22);
   --border: oklch(0.26 0.01 55);
   --input: oklch(0.24 0.01 55);
-  --ring: oklch(0.78 0.16 55);
-  --chart-1: oklch(0.78 0.16 55);
+  --ring: #6cc59d;
+  --chart-1: #6cc59d;
   --chart-2: oklch(0.65 0.13 40);
   --chart-3: oklch(0.55 0.11 25);
   --chart-4: oklch(0.75 0.1 90);
   --chart-5: oklch(0.6 0.09 200);
   --sidebar: oklch(0.16 0.01 55);
   --sidebar-foreground: oklch(0.94 0.01 75);
-  --sidebar-primary: oklch(0.78 0.16 55);
-  --sidebar-primary-foreground: oklch(0.1 0.02 55);
-  --sidebar-accent: oklch(0.24 0.02 55);
-  --sidebar-accent-foreground: oklch(0.88 0.05 60);
+  --sidebar-primary: #6cc59d;
+  --sidebar-primary-foreground: #06261b;
+  --sidebar-accent: #1d3328;
+  --sidebar-accent-foreground: #cfe8d8;
   --sidebar-border: oklch(0.24 0.01 55);
-  --sidebar-ring: oklch(0.78 0.16 55);
+  --sidebar-ring: #6cc59d;
+  --cream: #1c2621;
   /* ── Colores semánticos dark ──────────────────────────────────── */
   --rescue-light: #3d1a1a;
   --adopt-light: #14331f;
@@ -177,10 +183,6 @@
   }
 }
 
-:root {
-  --font-nunito: "Avenir Next", "Segoe UI", sans-serif;
-  --font-jakarta: "Avenir Next", "Segoe UI", sans-serif;
-}
 .huellas-field {
   display: block;
   width: 100%;
@@ -197,21 +199,24 @@
   gap: 0.5rem;
   border-radius: 0.7rem;
   padding: 0.75rem 1.2rem;
-  background: #16634a;
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-weight: 700;
   cursor: pointer;
+}
+.huellas-button:hover {
+  filter: brightness(1.08);
+}
+.huellas-button--accent {
+  background: var(--color-brand-400);
+  color: #1f1300;
 }
 .huellas-button:disabled {
   opacity: 0.5;
   cursor: wait;
 }
 :focus-visible {
-  outline: 3px solid #d28a34;
+  outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
 
-.dark .text-emerald-700,
-.dark .text-green-700 {
-  color: #86d5ad;
-}

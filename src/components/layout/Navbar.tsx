@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
+import { Logo } from "@/components/layout/Logo";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { PawPrint, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { Actor } from "@/lib/huellas/domain";
 export default function Navbar() {
@@ -25,13 +26,10 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4">
         <Link
-          className="flex items-center gap-2 text-xl font-black tracking-tight"
+          className="flex items-center gap-3"
           href="/"
         >
-          <span className="rounded-xl bg-emerald-800 p-2 text-white">
-            <PawPrint size={23} />
-          </span>
-          HUELLAS
+          <Logo />
           <span className="hidden xl:block border-l pl-3 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
             Pequeños actos.
             <br />

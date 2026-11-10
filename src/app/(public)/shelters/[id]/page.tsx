@@ -235,7 +235,7 @@ export default async function ShelterPublicPage({
             </h2>
             <Link
               href="/adopt"
-              className="flex items-center gap-1 text-xs text-brand-400 hover:underline"
+              className="flex items-center gap-1 text-xs text-primary hover:underline"
             >
               Ver todos <ArrowRight className="h-3 w-3" />
             </Link>

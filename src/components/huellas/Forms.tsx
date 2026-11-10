@@ -71,7 +71,7 @@ export function ManageForm({
         </p>
       )}
       {saved && (
-        <p role="status" className="text-green-700">
+        <p role="status" className="text-primary">
           Cambios guardados.
         </p>
       )}
@@ -180,7 +180,7 @@ export function SupportForm({
                 key={n}
                 type="button"
                 aria-pressed={amount === n}
-                className={`rounded-xl border px-5 py-3 ${amount === n ? "bg-emerald-800 text-white" : "bg-muted"}`}
+                className={`rounded-xl border px-5 py-3 ${amount === n ? "bg-primary text-primary-foreground" : "bg-muted"}`}
                 onClick={() => setAmount(n)}
               >
                 S/ {n}
@@ -200,7 +200,7 @@ export function SupportForm({
               onChange={(e) => setAmount(Number(e.target.value))}
             />
           </label>
-          <button disabled={busy} className="huellas-button">
+          <button disabled={busy} className="huellas-button huellas-button--accent">
             {busy ? "Guardando…" : "Registrar compromiso sin cobro"}
           </button>
         </>

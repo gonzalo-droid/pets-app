@@ -11,7 +11,7 @@ export default async function Page() {
     : ((await (await createClient()).from("shelters").select("*")).data ?? []);
   return (
     <div className="max-w-5xl mx-auto px-5 py-12 space-y-6">
-      <p className="uppercase tracking-widest text-xs text-emerald-700">
+      <p className="uppercase tracking-widest text-xs text-primary">
         Administración HUELLAS
       </p>
       <h1 className="text-3xl font-bold">Una red en la que confiar.</h1>

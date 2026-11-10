@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/layout/Logo";
 
 export default function AuthLayout({
   children,
@@ -12,12 +13,7 @@ export default function AuthLayout({
         href="/"
         className="flex items-center gap-1.5 mb-8 hover:opacity-90 transition-opacity"
       >
-        <span className="text-2xl leading-none" aria-hidden="true">
-          🐾
-        </span>
-        <span className="font-display font-black text-xl leading-none">
-          <span className="text-emerald-700">HUELLAS</span>
-        </span>
+        <Logo />
       </Link>
 
       {/* Card centrada */}
@@ -28,7 +24,7 @@ export default function AuthLayout({
       {/* Volver */}
       <Link
         href="/"
-        className="mt-6 text-xs text-muted-foreground hover:text-brand-400 transition-colors"
+        className="mt-6 text-xs text-muted-foreground hover:text-primary transition-colors"
       >
         ← Volver al inicio
       </Link>

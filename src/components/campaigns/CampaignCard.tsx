@@ -50,7 +50,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           </h3>
           <Link
             href={`/shelters/${campaign.shelter.id}`}
-            className="text-xs text-muted-foreground hover:text-brand-400 transition-colors mt-0.5 block"
+            className="text-xs text-muted-foreground hover:text-primary transition-colors mt-0.5 block"
           >
             {campaign.shelter.name}
           </Link>
@@ -76,7 +76,7 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
         </div>
         <Link
           href={`/donate/${campaign.slug}`}
-          className={cn(buttonVariants({ size: "sm" }))}
+          className={cn(buttonVariants({ size: "sm" }), "bg-brand-400 text-[#1f1300] hover:bg-brand-300")}
         >
           Donar ahora
         </Link>
