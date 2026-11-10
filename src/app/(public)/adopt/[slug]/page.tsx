@@ -162,8 +162,8 @@ export default async function AnimalDetailPage({
                   Apadrinar a {animal.name}
                 </Link>
                 <p className="text-center text-xs text-muted-foreground">
-                  Apadrinar es un compromiso mensual sin cobro y no reemplaza la
-                  adopción.
+                  Tu aporte mensual va al cuidado de {animal.name}. Sin cobro por ahora;
+                  no reemplaza la adopción.
                 </p>
               </>
             )}

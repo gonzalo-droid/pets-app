@@ -30,9 +30,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const SPECIES_OPTIONS = [
-  { value: "dog", label: "🐶 Perro" },
-  { value: "cat", label: "🐱 Gato" },
-  { value: "other", label: "🐾 Otro" },
+  { value: "dog", label: "Perro" },
+  { value: "cat", label: "Gato" },
+  { value: "other", label: "Otro" },
 ];
 const SIZE_OPTIONS = [
   { value: "small", label: "Pequeño" },
@@ -63,12 +63,13 @@ function ToggleGroup<T extends string>({
           <button
             key={opt.value}
             type="button"
+            aria-pressed={value === opt.value}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors",
+              "inline-flex min-h-11 items-center rounded-full border-2 px-4 text-sm font-extrabold transition-colors",
               value === opt.value
                 ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:border-primary/40",
+                : "border-border bg-card text-foreground hover:border-primary/50",
             )}
           >
             {opt.label}
@@ -81,7 +82,33 @@ function ToggleGroup<T extends string>({
 }
 
 
-export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
+/** Datos actuales de un animal, para editarlo con el mismo formulario. */
+export type EditableAnimal = {
+  id: string;
+  slug: string;
+  name: string;
+  species: FormData["species"];
+  breed: string | null;
+  age_months: number | null;
+  size: FormData["size"];
+  gender: FormData["gender"];
+  color: string | null;
+  description: string | null;
+  is_vaccinated: boolean;
+  is_neutered: boolean;
+  is_microchipped: boolean;
+  ubigeo: string;
+};
+
+export default function NewAnimalForm({
+  shelterId,
+  animal,
+}: {
+  shelterId: string;
+  /** Si se pasa, el formulario edita ese animal en lugar de registrar uno nuevo. */
+  animal?: EditableAnimal;
+}) {
+  const editing = Boolean(animal);
   const [submitted, setSubmitted] = useState(false);
   const [photoUrls, setPhotoUrls] = useState<string[]>(["", "", ""]);
 
@@ -94,20 +121,35 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema) as Resolver<FormData>,
-    defaultValues: {
-      name: "",
-      species: "dog",
-      breed: "",
-      age_months: "",
-      size: "medium",
-      gender: "unknown",
-      color: "",
-      description: "",
-      is_vaccinated: false,
-      is_neutered: false,
-      is_microchipped: false,
-      ubigeo: "140101",
-    },
+    defaultValues: animal
+      ? {
+          name: animal.name,
+          species: animal.species,
+          breed: animal.breed ?? "",
+          age_months: animal.age_months != null ? String(animal.age_months) : "",
+          size: animal.size,
+          gender: animal.gender,
+          color: animal.color ?? "",
+          description: animal.description ?? "",
+          is_vaccinated: animal.is_vaccinated,
+          is_neutered: animal.is_neutered,
+          is_microchipped: animal.is_microchipped,
+          ubigeo: animal.ubigeo,
+        }
+      : {
+          name: "",
+          species: "dog",
+          breed: "",
+          age_months: "",
+          size: "medium",
+          gender: "unknown",
+          color: "",
+          description: "",
+          is_vaccinated: false,
+          is_neutered: false,
+          is_microchipped: false,
+          ubigeo: "140101",
+        },
   });
   // useWatch es compatible con el React Compiler (watch() no lo es).
   const [species, size, gender, description] = useWatch({
@@ -122,10 +164,11 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...data,
-        action: "animal",
+        action: editing ? "animal_update" : "animal",
+        id: animal?.id,
         shelter_id: shelterId,
         age_months: data.age_months ? Number(data.age_months) : null,
-        photos,
+        photos: editing ? undefined : photos,
       }),
     });
     const result = await response.json();
@@ -139,25 +182,32 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
   if (submitted) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <CheckCircle2 className="h-14 w-14 text-adopt" />
-        <h2 className="font-display font-bold text-xl">¡Animal publicado!</h2>
-        <p className="text-muted-foreground text-sm max-w-sm">
-          Ya aparece en el feed público de adopciones.
+        <CheckCircle2 className="h-14 w-14 text-success-fg" aria-hidden="true" />
+        <h2 className="text-2xl">{editing ? "Cambios guardados" : "Animal registrado"}</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          {editing
+            ? "La ficha pública ya muestra los datos actualizados."
+            : "Su ficha aparece en el portal mientras tu albergue esté verificado."}
         </p>
-        <div className="flex gap-3 mt-2">
-          <a
-            href="/shelter/animals"
-            className="text-sm text-primary hover:underline"
-          >
-            ← Volver a mis animales
+        <div className="mt-2 flex flex-wrap justify-center gap-3">
+          <a href="/shelter/animals" className="huellas-button">
+            Volver a animales
           </a>
+          {animal && (
+            <a href={`/adopt/${animal.slug}`} className="huellas-button huellas-button--secondary">
+              Ver ficha pública
+            </a>
+          )}
         </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-6 rounded-[28px] border border-border bg-card p-5 sm:p-7"
+    >
       {/* Nombre */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">
@@ -243,17 +293,20 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
         <Label>Estado de salud</Label>
         <div className="flex flex-wrap gap-3">
           {[
-            { key: "is_vaccinated", label: "💉 Vacunado" },
-            { key: "is_neutered", label: "✂️ Castrado/a" },
-            { key: "is_microchipped", label: "📡 Microchip" },
+            { key: "is_vaccinated", label: "Vacunado" },
+            { key: "is_neutered", label: "Esterilizado" },
+            { key: "is_microchipped", label: "Con microchip" },
           ].map(({ key, label }) => (
-            <label key={key} className="flex items-center gap-2 cursor-pointer">
+            <label
+              key={key}
+              className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-border bg-card px-4 has-[:checked]:border-primary has-[:checked]:bg-secondary"
+            >
               <input
                 type="checkbox"
                 {...register(key as keyof FormData)}
                 className="accent-primary"
               />
-              <span className="text-sm text-foreground">{label}</span>
+              <span className="text-sm font-bold text-foreground">{label}</span>
             </label>
           ))}
         </div>
@@ -267,7 +320,7 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
         <select
           id="ubigeo"
           {...register("ubigeo")}
-          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="huellas-field mt-0"
         >
           {LAMBAYEQUE_DISTRICTS.map((d) => (
             <option key={d.ubigeo} value={d.ubigeo}>
@@ -303,7 +356,8 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
         </div>
       </div>
 
-      {/* Fotos */}
+      {/* Fotos (solo al registrar; las fotos publicadas aún no se editan) */}
+      {!editing && (
       <div className="flex flex-col gap-3">
         <div>
           <Label>Fotos (máx. 3)</Label>
@@ -345,14 +399,15 @@ export default function NewAnimalForm({ shelterId }: { shelterId: string }) {
           </div>
         ))}
       </div>
+      )}
 
       {errors.root && (
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
           {errors.root.message}
         </p>
       )}
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Publicando..." : "Publicar animal"}
+        {isSubmitting ? "Guardando…" : editing ? "Guardar cambios" : "Registrar animal"}
       </Button>
     </form>
   );

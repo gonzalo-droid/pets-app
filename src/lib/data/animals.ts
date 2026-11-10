@@ -168,3 +168,22 @@ export async function getAnimalsByShelterPage(
     "getAnimalsByShelterPage",
   );
 }
+
+/** Un animal del albergue indicado (panel), aunque no esté publicado. */
+export async function getShelterAnimal(
+  id: string,
+  shelterId: string,
+): Promise<AnimalWithPhotos | null> {
+  if (isDemo())
+    return (
+      (await readDemo()).animals.find((a) => a.id === id && a.shelter_id === shelterId) ?? null
+    );
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("animals")
+    .select("*, animal_photos(*)")
+    .eq("id", id)
+    .eq("shelter_id", shelterId)
+    .maybeSingle();
+  return (data as AnimalWithPhotos | null) ?? null;
+}

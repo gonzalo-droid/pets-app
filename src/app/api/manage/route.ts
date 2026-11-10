@@ -140,6 +140,25 @@ export async function POST(request: Request) {
         });
         if (error) throw error;
       }
+    } else if (body.action === "animal_update") {
+      // Datos de la ficha. El estado, las fotos y el albergue no se cambian aquí.
+      const animalId = targetId.parse(body.id);
+      const values = animalSchema.parse(body);
+      const changes = {
+        ...values,
+        age_months: values.age_months ?? null,
+        breed: values.breed || null,
+        color: values.color || null,
+      };
+      if (!db)
+        await mutateDemo((d) => {
+          const a = d.animals.find(
+            (a) => a.id === animalId && a.shelter_id === shelterId,
+          );
+          if (!a) throw new Error("Animal no encontrado");
+          Object.assign(a, changes, { updated_at: now });
+        });
+      else await updateOne(db, "animals", changes, animalId, shelterId);
     } else if (body.action === "animal_status") {
       const status = z
         .enum(["available", "in_process", "adopted"])
@@ -315,10 +334,29 @@ export async function POST(request: Request) {
         }
       }
     } else if (body.action === "settings") {
+      // Campos opcionales: vacío → null. Las redes se guardan sin "@".
+      const optional = (schema: z.ZodType<string>) =>
+        z
+          .union([z.literal(""), schema])
+          .optional()
+          .transform((v) => (v ? v : null));
+      const handle = z
+        .string()
+        .trim()
+        .transform((v) => v.replace(/^@/, ""))
+        .pipe(z.string().regex(/^[A-Za-z0-9._-]{1,60}$/, "Usuario de red social no válido."));
       const values = z
         .object({
           name: z.string().trim().min(2).max(100),
-          description: z.string().min(10).max(1000),
+          description: z.string().trim().min(10).max(1000),
+          long_description: optional(z.string().trim().max(3000)),
+          address: optional(z.string().trim().max(160)),
+          phone: optional(z.string().trim().regex(/^\d{6,15}$/, "El teléfono solo admite números.")),
+          whatsapp: optional(z.string().trim().regex(/^\d{9,15}$/, "El WhatsApp solo admite números.")),
+          email: optional(z.email("Correo no válido.")),
+          instagram: optional(handle),
+          facebook: optional(handle),
+          tiktok: optional(handle),
         })
         .parse(body);
       if (!db)
@@ -336,7 +374,9 @@ export async function POST(request: Request) {
       e instanceof UserError
         ? e.message
         : e instanceof z.ZodError
-          ? e.issues.find((i) => i.message.startsWith("La fecha"))?.message
+          ? e.issues.find((i) =>
+              /^(La fecha|El teléfono|El WhatsApp|Correo|Usuario de red)/.test(i.message),
+            )?.message
           : undefined;
     return NextResponse.json(
       { error: issue ?? "No se pudo guardar. Revisa los campos y los permisos." },

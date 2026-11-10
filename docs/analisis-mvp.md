@@ -23,11 +23,11 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 |---|---|---|
 | Inicio de sesión | ~~La persona no volvía a la acción tras iniciar sesión.~~ **Resuelto:** adopción, apadrinamiento y apoyo a campañas piden sesión antes del formulario y vuelven a él. | Hecho |
 | Mi espacio (donante) | **Resuelto en parte:** pestañas "Mis apoyos" y "Mis solicitudes", destino legible, fecha, periodicidad, referencia corta y cancelación que explica su efecto. Pestaña "Mi perfil" para editar nombre y teléfono (el teléfono se precarga en las solicitudes). | Hecho |
-| Solicitudes (albergue) | Falta el nombre del animal en cada solicitud, la regla de transiciones y una confirmación explícita para "Completar". | Alta |
-| Panel del albergue | **Resuelto en parte:** barra lateral nueva, accesos para publicar y campañas que se crean, editan, cierran y reabren, con fecha límite opcional. Falta que el perfil edite más que nombre y descripción. | Media |
-| Apadrinamiento | Falta explicar si el aporte va al animal o al fondo del albergue. | Media |
-| Administración | No explica qué pasa al retirar una verificación (deja de verse en el portal). | Media |
-| Perfil del albergue (público) | Revisar contra la guía visual y mostrar sus necesidades abiertas. | Media |
+| Solicitudes (albergue) | Muestran el animal y el contexto del solicitante, solo los botones permitidos y confirmación al aprobar, completar o rechazar. | Hecho |
+| Panel del albergue | **Resuelto en parte:** barra lateral nueva, accesos para publicar y campañas que se crean, editan, cierran y reabren, con fecha límite opcional. Se editan los datos de cada animal; el perfil del albergue edita historia, dirección, WhatsApp, teléfono, correo y redes. Falta subir fotos (perfil, portada y fotos de animales ya publicados). | Media |
+| Apadrinamiento | **Decidido (10/11/2026): el aporte va al animal.** La página lo explica: no da propiedad, no reemplaza la adopción, al ser adoptado no recibe nuevos apadrinamientos y nunca se redirige sin consentimiento. | Hecho |
+| Administración | Rediseñada, con totales y confirmación que explica las consecuencias de verificar o retirar la verificación. | Hecho |
+| Perfil del albergue (público) | Rediseñado con pestañas Campañas / Animales / Necesidades y contacto autorizado. | Hecho |
 
 ## 3. Ampliaciones (fase posterior)
 

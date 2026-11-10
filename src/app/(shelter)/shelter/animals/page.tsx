@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Check, Plus } from "lucide-react";
+import { ArrowRight, Check, Pencil, Plus } from "lucide-react";
 import { shelterContext } from "@/lib/huellas/auth";
 import { ActionButton } from "@/components/huellas/Forms";
 import { PawIcon } from "@/components/campaigns/PawProgress";
@@ -125,6 +125,13 @@ export default async function ShelterAnimalsPage({
                         {STATUS_ACTIONS[status].label}
                       </ActionButton>
                     ))}
+                  <Link
+                    href={`/shelter/animals/${animal.id}/edit`}
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-primary px-4 text-sm font-extrabold text-primary hover:bg-secondary"
+                  >
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                    Editar
+                  </Link>
                   <Link
                     href={`/adopt/${animal.slug}`}
                     target="_blank"
