@@ -1,11 +1,13 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import NewAnimalForm from './NewAnimalForm'
+import { shelterContext } from "@/lib/huellas/auth";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import NewAnimalForm from "./NewAnimalForm";
 
-export const metadata: Metadata = { title: 'Publicar animal — Panel Albergue' }
+export const metadata: Metadata = { title: "Publicar animal — Panel Albergue" };
 
-export default function NewAnimalPage() {
+export default async function NewAnimalPage() {
+  const shelterId = await shelterContext();
   return (
     <div className="max-w-2xl">
       <Link
@@ -16,12 +18,14 @@ export default function NewAnimalPage() {
         Volver a mis animales
       </Link>
       <div className="mb-8">
-        <h1 className="font-display font-bold text-2xl text-foreground">Publicar nuevo animal</h1>
+        <h1 className="font-display font-bold text-2xl text-foreground">
+          Publicar nuevo animal
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          El animal aparecerá en el feed público de adopciones inmediatamente.
+          La ficha será pública cuando el albergue esté verificado.
         </p>
       </div>
-      <NewAnimalForm />
+      <NewAnimalForm shelterId={shelterId} />
     </div>
-  )
+  );
 }

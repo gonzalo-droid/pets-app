@@ -1,273 +1,181 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
-import AnimalFeedFilter from '@/components/animals/AnimalFeedFilter'
-import CampaignCard from '@/components/campaigns/CampaignCard'
-import LostReportCard from '@/components/lost/LostReportCard'
-import ShelterCard from '@/components/shelters/ShelterCard'
-import { getAnimals } from '@/lib/data/animals'
-import { getCampaigns } from '@/lib/data/campaigns'
-import { getLostReports } from '@/lib/data/lost-reports'
-import { getShelters } from '@/lib/data/shelters'
-
-export default async function HomePage() {
-  const [animals, campaigns, lostReports, shelters] = await Promise.all([
-    getAnimals({ status: 'available' }),
-    getCampaigns({ is_active: true }),
-    getLostReports({ is_resolved: false }),
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowUpRight,
+  ShieldCheck,
+  HeartHandshake,
+  PawPrint,
+} from "lucide-react";
+import { getAnimals } from "@/lib/data/animals";
+import { getShelters } from "@/lib/data/shelters";
+import { getCampaigns } from "@/lib/data/campaigns";
+import AnimalCard from "@/components/animals/AnimalCard";
+import CampaignCard from "@/components/campaigns/CampaignCard";
+export default async function Page() {
+  const [animals, shelters, campaigns] = await Promise.all([
+    getAnimals({ status: "available" }),
     getShelters(),
-  ])
-
-  const shelterNames = Object.fromEntries(shelters.map((s) => [s.id, s.name]))
-  const shelterIds = Object.fromEntries(shelters.map((s) => [s.id, s.id]))
-  const availableCount = animals.length // getAnimals pre-filters by status: 'available'
-
+    getCampaigns({ is_active: true }),
+  ]);
   return (
-    <div className="flex flex-col">
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] min-h-[520px]">
-          {/* Columna izquierda — texto + CTAs */}
-          <div className="flex flex-col justify-center gap-6 bg-gradient-to-br from-brand-400 to-orange-500 px-8 py-16 sm:px-12 lg:px-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/70">
-              Lambayeque · Rescate animal
-            </p>
-            <h1
-              className="font-display font-black text-white leading-tight"
-              style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)' }}
-            >
-              Encuentra tu<br />
-              compañero<br />
-              para siempre 🐾
+    <div>
+      <section className="mx-auto max-w-7xl px-5 py-8 md:py-12">
+        <div className="grid lg:grid-cols-2 overflow-hidden rounded-[2rem] border bg-[#f3eddf] text-[#233d32]">
+          <div className="p-7 sm:p-12 lg:p-14 flex flex-col justify-center">
+            <span className="text-xs uppercase tracking-[.18em] font-bold flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-700" />
+              Una comunidad. Muchas segundas oportunidades.
+            </span>
+            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.06] mt-7">
+              Tu ayuda deja
+              <br />
+              una <span className="italic font-serif font-medium">huella</span>
+              <br />
+              para siempre.
             </h1>
-            <p className="text-white/80 text-sm max-w-sm leading-relaxed">
-              Adopta, reporta animales perdidos y apoya a los albergues de Lambayeque.
-              Todo en un solo lugar, sin Facebook.
+            <p className="text-base leading-relaxed mt-6 max-w-md text-[#506156]">
+              Detrás de cada rescate hay alguien que no se rindió. Conecta con
+              albergues, apadrina una vida y ayúdalos a seguir cuidando.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/adopt"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-brand-500 hover:bg-white/90 transition-colors"
-              >
-                Ver animales en adopción
+            <div className="flex flex-wrap gap-3 mt-8">
+              <Link className="huellas-button" href="/shelters">
+                Encuentra un albergue <ArrowUpRight size={18} />
               </Link>
               <Link
-                href="/lost"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/70 px-6 py-3 text-sm font-bold text-white hover:bg-white/10 transition-colors"
+                className="rounded-xl border border-[#233d32]/25 px-5 py-3 font-bold text-sm"
+                href="/adopt"
               >
-                Buscar perdidos
+                Quiero apadrinar ♡
               </Link>
             </div>
-            <p className="text-white/60 text-xs">
-              🐾 {availableCount} en adopción
-              &nbsp;·&nbsp;
-              🔍 {lostReports.length} reportes activos
-              &nbsp;·&nbsp;
-              🏠 {shelters.length} albergues
-            </p>
+            <div className="flex items-center gap-3 mt-8 text-xs text-[#506156]">
+              <ShieldCheck size={20} />
+              Albergues verificados · Apoyo con transparencia
+            </div>
           </div>
-
-          {/* Columna derecha — foto del animal */}
-          <div className="relative h-64 lg:h-auto">
+          <div className="relative min-h-[350px] lg:min-h-[610px]">
             <Image
-              src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=900&q=80"
-              alt="Animal esperando adopción"
+              src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=1200&q=85"
+              alt="Un perro rescatado al aire libre"
               fill
               priority
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="object-cover object-center dark:brightness-90"
+              sizes="(min-width:1024px) 50vw,100vw"
+              className="object-cover"
             />
+            <div className="absolute bottom-6 left-6 right-6 rounded-2xl bg-white/95 p-5 shadow-lg flex gap-4 items-center">
+              <div className="bg-[#e4edde] p-3 rounded-xl">
+                <PawPrint size={24} />
+              </div>
+              <div>
+                <p className="font-bold">Una nueva historia empieza contigo.</p>
+                <p className="text-xs text-[#506156] mt-1">
+                  Adopta, apadrina o comparte. Todo suma.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* ── Accesos rápidos ───────────────────────────────────────────────── */}
-      <section className="py-10 px-4">
-        <div className="mx-auto max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link
-            href="/adopt"
-            className="flex flex-col gap-3 rounded-2xl border-l-4 border-adopt bg-adopt-light p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
-          >
-            <span className="text-3xl">🐾</span>
-            <div>
-              <p className="font-display font-bold text-foreground text-sm">Adoptar</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{availableCount} disponibles</p>
-            </div>
-            <span className="text-xs font-semibold text-adopt-dark">Ver todos →</span>
-          </Link>
-
-          <Link
-            href="/lost"
-            className="flex flex-col gap-3 rounded-2xl border-l-4 border-rescue bg-rescue-light p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
-          >
-            <span className="text-3xl">🔍</span>
-            <div>
-              <p className="font-display font-bold text-foreground text-sm">Perdidos</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{lostReports.length} activos</p>
-            </div>
-            <span className="text-xs font-semibold text-rescue-dark">Ver reportes →</span>
-          </Link>
-
-          <Link
-            href="/donate"
-            className="flex flex-col gap-3 rounded-2xl border-l-4 border-donate bg-donate-light p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
-          >
-            <span className="text-3xl">💛</span>
-            <div>
-              <p className="font-display font-bold text-foreground text-sm">Donar</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{campaigns.length} campañas</p>
-            </div>
-            <span className="text-xs font-semibold text-donate-dark">Ver campañas →</span>
-          </Link>
-
-          <Link
-            href="/shelters"
-            className="flex flex-col gap-3 rounded-2xl border-l-4 border-shelter bg-shelter-light p-5 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
-          >
-            <span className="text-3xl">🏠</span>
-            <div>
-              <p className="font-display font-bold text-foreground text-sm">Albergues</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{shelters.length} verificados</p>
-            </div>
-            <span className="text-xs font-semibold text-shelter-dark">Conocerlos →</span>
+      <section className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-3 gap-4 text-center border-b pb-10">
+        {[
+          [shelters.length, "albergues en la comunidad"],
+          [animals.length, "vidas listas para un hogar"],
+          [campaigns.length, "campañas que puedes apoyar"],
+        ].map(([n, t]) => (
+          <div key={t}>
+            <p className="text-3xl font-bold">{n}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t}</p>
+          </div>
+        ))}
+      </section>
+      <section className="mx-auto max-w-7xl px-5 py-14">
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-7">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-emerald-700 font-bold">
+              Historias por escribir
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold mt-3">
+              Alguien está esperando por ti.
+            </h2>
+            <p className="text-muted-foreground mt-3">
+              Conócelos. Tal vez tu próxima gran amistad empieza aquí.
+            </p>
+          </div>
+          <Link className="text-sm font-bold underline" href="/adopt">
+            Conocer a todos ↗
           </Link>
         </div>
-      </section>
-
-      {/* ── Feed adopciones ───────────────────────────────────────────────── */}
-      <section className="py-12 px-4 bg-muted/20">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            title="Animales en adopción"
-            subtitle="Todos esperando un hogar responsable en Lambayeque"
-            href="/adopt"
-          />
-          <AnimalFeedFilter animals={animals} shelterNames={shelterNames} shelterIds={shelterIds} />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {animals.slice(0, 4).map((a) => (
+            <div key={a.id}>
+              <AnimalCard
+                animal={a}
+                shelterName={shelters.find((s) => s.id === a.shelter_id)?.name}
+              />
+              <Link
+                className="block text-center py-3 text-sm font-bold text-emerald-700"
+                href={"/sponsor/" + a.slug}
+              >
+                Apadrinar a {a.name} ♡
+              </Link>
+            </div>
+          ))}
         </div>
+        {!animals.length && <p>Pronto compartiremos nuevas historias.</p>}
       </section>
-
-      {/* ── Campañas activas ──────────────────────────────────────────────── */}
-      <section className="py-12 px-4 bg-neutral-900 dark:bg-neutral-800">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex items-end justify-between gap-4 mb-7">
+      <section className="bg-muted/60 border-y">
+        <div className="mx-auto max-w-7xl px-5 py-14">
+          <div className="flex flex-wrap justify-between items-end gap-4 mb-7">
             <div>
-              <h2 className="font-display font-bold text-2xl tracking-tight text-white">
-                Campañas de donación activas
+              <p className="text-xs uppercase tracking-widest text-emerald-700 font-bold">
+                Un poquito de ti, mucho para ellos
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-bold mt-3">
+                Ayuda donde más se necesita.
               </h2>
-              <p className="mt-1 text-sm text-neutral-400">Tu aporte en soles hace la diferencia</p>
             </div>
-            <Link
-              href="/donate"
-              className="flex items-center gap-1 text-sm font-semibold text-brand-300 hover:text-brand-400 hover:underline shrink-0 transition-colors"
-            >
-              Ver todos
-              <ArrowRight className="h-4 w-4" />
+            <Link className="text-sm underline font-bold" href="/donate">
+              Todas las campañas ↗
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {campaigns.map((campaign) => (
-              <CampaignCard key={campaign.id} campaign={campaign} />
+          <div className="grid md:grid-cols-3 gap-5">
+            {campaigns.slice(0, 3).map((c) => (
+              <CampaignCard key={c.id} campaign={c} />
             ))}
           </div>
         </div>
       </section>
-
-      {/* ── Perdidos recientes ────────────────────────────────────────────── */}
-      <section className="py-12 px-4 bg-rescue-light">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            title="Perdidos y encontrados"
-            subtitle="Ayuda a reunir mascotas con sus familias"
-            href="/lost"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {lostReports.slice(0, 4).map((report) => (
-              <LostReportCard key={report.id} report={report} />
-            ))}
+      <section className="max-w-7xl mx-auto px-5 py-14">
+        <div className="rounded-3xl bg-emerald-950 text-white p-8 sm:p-12 grid md:grid-cols-2 gap-10">
+          <div>
+            <HeartHandshake size={36} />
+            <h2 className="text-3xl font-bold mt-5">
+              Ellos cuidan de sus vidas.
+              <br />
+              Nosotros, de su misión.
+            </h2>
+            <p className="mt-4 text-emerald-100 leading-relaxed">
+              HUELLAS Manager reúne animales, necesidades y campañas en un solo
+              espacio. Menos pendientes, más tiempo para cuidar.
+            </p>
           </div>
-          <div className="mt-6 text-center">
+          <div className="flex flex-col justify-center gap-5">
+            <p className="border-b border-white/20 pb-4">
+              01 &nbsp; Organiza las fichas de tus rescatados
+            </p>
+            <p className="border-b border-white/20 pb-4">
+              02 &nbsp; Comparte necesidades con tu comunidad
+            </p>
+            <p>03 &nbsp; Acompaña cada intención de apoyo</p>
             <Link
-              href="/lost/new"
-              className={cn(buttonVariants({ variant: 'outline' }), 'dark:border-rescue dark:text-rescue hover:dark:bg-rescue/10')}
+              className="self-start rounded-xl bg-white px-5 py-3 font-bold text-emerald-950"
+              href="/auth/login"
             >
-              Reportar animal perdido o encontrado
+              Entrar a mi albergue ↗
             </Link>
           </div>
         </div>
       </section>
-
-      {/* ── Albergues verificados ─────────────────────────────────────────── */}
-      <section id="shelters" className="py-12 px-4">
-        <div className="mx-auto max-w-7xl">
-          <SectionHeader
-            title="Albergues verificados"
-            subtitle="Organizaciones comprometidas con el rescate animal en Lambayeque"
-            href="/shelters"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {shelters.slice(0, 4).map((shelter) => (
-              <ShelterCard key={shelter.id} shelter={shelter} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA para albergues ────────────────────────────────────────────── */}
-      <section className="py-16 px-4 bg-brand-50 dark:bg-brand-600/10 border-t border-brand-100 dark:border-brand-600/20">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display font-bold text-2xl text-foreground">¿Tienes un albergue?</h2>
-          <p className="mt-3 text-muted-foreground">
-            Regístrate gratis y gestiona tus animales, solicitudes de adopción y campañas
-            de donación desde un solo panel. Sin comisiones en el MVP.
-          </p>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/auth/register" className={cn(buttonVariants({ size: 'lg' }))}>
-              Registrar mi albergue
-            </Link>
-            <Link
-              href="/shelter/dashboard"
-              className={cn(buttonVariants({ variant: 'ghost', size: 'lg' }))}
-            >
-              Ver demo del panel
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
     </div>
-  )
-}
-
-// ── Componente interno reutilizable ────────────────────────────────────────────
-
-function SectionHeader({
-  title,
-  subtitle,
-  href,
-}: {
-  title: string
-  subtitle?: string
-  href?: string
-}) {
-  return (
-    <div className="flex items-end justify-between gap-4 mb-7">
-      <div>
-        <h2 className="font-display font-bold text-2xl tracking-tight text-foreground">{title}</h2>
-        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
-      </div>
-      {href && (
-        <Link
-          href={href}
-          className="flex items-center gap-1 text-sm font-semibold text-brand-400 hover:text-brand-500 hover:underline shrink-0 transition-colors"
-        >
-          Ver todos
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      )}
-    </div>
-  )
+  );
 }

@@ -1,57 +1,56 @@
-import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { BadgeCheck, Phone, Mail, MapPin, ArrowRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
-import { getShelterWithPhotos } from '@/lib/data/shelters'
-import { getAnimalsByShelter } from '@/lib/data/animals'
-import AnimalCard from '@/components/animals/AnimalCard'
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { BadgeCheck, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { getShelterWithPhotos } from "@/lib/data/shelters";
+import { getAnimalsByShelter } from "@/lib/data/animals";
+import AnimalCard from "@/components/animals/AnimalCard";
 
 const CITY_BY_UBIGEO: Record<string, string> = {
-  '140101': 'Chiclayo',
-  '140108': 'José L. Ortiz',
-  '140110': 'La Victoria',
-  '140201': 'Ferreñafe',
-  '140301': 'Lambayeque',
-}
+  "140101": "Chiclayo",
+  "140108": "José L. Ortiz",
+  "140110": "La Victoria",
+  "140201": "Ferreñafe",
+  "140301": "Lambayeque",
+};
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params
-  const shelter = await getShelterWithPhotos(id)
-  if (!shelter) return { title: 'Albergue no encontrado' }
+  const { id } = await params;
+  const shelter = await getShelterWithPhotos(id);
+  if (!shelter) return { title: "Albergue no encontrado" };
   return {
-    title: `${shelter.name} — PawRescue`,
+    title: `${shelter.name} — HUELLAS`,
     description: shelter.description ?? undefined,
-  }
+  };
 }
 
 export default async function ShelterPublicPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
+  const { id } = await params;
   const [shelter, animals] = await Promise.all([
     getShelterWithPhotos(id),
     getAnimalsByShelter(id),
-  ])
+  ]);
 
-  if (!shelter) notFound()
+  if (!shelter) notFound();
 
-  const city = CITY_BY_UBIGEO[shelter.ubigeo] ?? 'Lambayeque'
+  const city = CITY_BY_UBIGEO[shelter.ubigeo] ?? "Lambayeque";
   const availableAnimals = animals
-    .filter((a) => a.status === 'available' || a.status === 'in_process')
-    .slice(0, 4)
+    .filter((a) => a.status === "available" || a.status === "in_process")
+    .slice(0, 4);
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
-
       {/* ── Hero: banner + avatar + nombre ── */}
       <div className="rounded-2xl overflow-hidden border border-border">
         {/* Banner */}
@@ -74,6 +73,7 @@ export default async function ShelterPublicPage({
               {shelter.avatar_url ? (
                 <Image
                   src={shelter.avatar_url}
+                  unoptimized={shelter.avatar_url.includes("api.dicebear.com")}
                   alt={shelter.name}
                   width={80}
                   height={80}
@@ -91,8 +91,12 @@ export default async function ShelterPublicPage({
               )}
             </div>
             <div className="pt-12">
-              <h1 className="font-display font-bold text-xl text-foreground leading-tight">{shelter.name}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">{city}, Lambayeque</p>
+              <h1 className="font-display font-bold text-xl text-foreground leading-tight">
+                {shelter.name}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {city}, Lambayeque
+              </p>
             </div>
           </div>
         </div>
@@ -101,7 +105,9 @@ export default async function ShelterPublicPage({
       {/* ── Historia / descripción ── */}
       {(shelter.long_description || shelter.description) && (
         <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">Sobre nosotros</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">
+            Sobre nosotros
+          </h2>
           <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
             {shelter.long_description ?? shelter.description}
           </div>
@@ -111,7 +117,9 @@ export default async function ShelterPublicPage({
       {/* ── Galería ── */}
       {shelter.shelter_photos.length > 0 && (
         <section>
-          <h2 className="text-base font-semibold text-foreground mb-3">Galería</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3">
+            Galería
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {shelter.shelter_photos.map((photo) => (
               <div
@@ -133,14 +141,22 @@ export default async function ShelterPublicPage({
 
       {/* ── Contacto ── */}
       <section>
-        <h2 className="text-base font-semibold text-foreground mb-3">Contacto</h2>
+        <h2 className="text-base font-semibold text-foreground mb-3">
+          Contacto
+        </h2>
         <div className="flex flex-wrap gap-3">
           {shelter.address && (
-            <ContactChip icon={<MapPin className="h-3.5 w-3.5" />} label={shelter.address} />
+            <ContactChip
+              icon={<MapPin className="h-3.5 w-3.5" />}
+              label={shelter.address}
+            />
           )}
           {shelter.phone && (
             <a href={`tel:${shelter.phone}`}>
-              <ContactChip icon={<Phone className="h-3.5 w-3.5" />} label={shelter.phone} />
+              <ContactChip
+                icon={<Phone className="h-3.5 w-3.5" />}
+                label={shelter.phone}
+              />
             </a>
           )}
           {shelter.whatsapp && (
@@ -150,14 +166,19 @@ export default async function ShelterPublicPage({
               rel="noopener noreferrer"
             >
               <ContactChip
-                icon={<span className="text-[11px] font-bold leading-none">WA</span>}
+                icon={
+                  <span className="text-[11px] font-bold leading-none">WA</span>
+                }
                 label={`WhatsApp ${shelter.whatsapp}`}
               />
             </a>
           )}
           {shelter.email && (
             <a href={`mailto:${shelter.email}`}>
-              <ContactChip icon={<Mail className="h-3.5 w-3.5" />} label={shelter.email} />
+              <ContactChip
+                icon={<Mail className="h-3.5 w-3.5" />}
+                label={shelter.email}
+              />
             </a>
           )}
           {shelter.instagram && (
@@ -167,7 +188,9 @@ export default async function ShelterPublicPage({
               rel="noopener noreferrer"
             >
               <ContactChip
-                icon={<span className="text-[11px] font-bold leading-none">IG</span>}
+                icon={
+                  <span className="text-[11px] font-bold leading-none">IG</span>
+                }
                 label={`@${shelter.instagram}`}
               />
             </a>
@@ -179,7 +202,9 @@ export default async function ShelterPublicPage({
               rel="noopener noreferrer"
             >
               <ContactChip
-                icon={<span className="text-[11px] font-bold leading-none">FB</span>}
+                icon={
+                  <span className="text-[11px] font-bold leading-none">FB</span>
+                }
                 label={shelter.facebook}
               />
             </a>
@@ -191,7 +216,9 @@ export default async function ShelterPublicPage({
               rel="noopener noreferrer"
             >
               <ContactChip
-                icon={<span className="text-[11px] font-bold leading-none">TT</span>}
+                icon={
+                  <span className="text-[11px] font-bold leading-none">TT</span>
+                }
                 label={`@${shelter.tiktok}`}
               />
             </a>
@@ -203,7 +230,9 @@ export default async function ShelterPublicPage({
       {availableAnimals.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground">Animales disponibles</h2>
+            <h2 className="text-base font-semibold text-foreground">
+              Animales disponibles
+            </h2>
             <Link
               href="/adopt"
               className="flex items-center gap-1 text-xs text-brand-400 hover:underline"
@@ -224,20 +253,20 @@ export default async function ShelterPublicPage({
         </section>
       )}
     </div>
-  )
+  );
 }
 
 function ContactChip({
   icon,
   label,
 }: {
-  icon: React.ReactNode
-  label: string
+  icon: React.ReactNode;
+  label: string;
 }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:border-shelter/40 transition-colors cursor-pointer">
       {icon}
       {label}
     </span>
-  )
+  );
 }

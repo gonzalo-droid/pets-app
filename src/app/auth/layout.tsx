@@ -1,6 +1,10 @@
-import Link from 'next/link'
+import Link from "next/link";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 px-4 py-12">
       {/* Logo */}
@@ -8,10 +12,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         href="/"
         className="flex items-center gap-1.5 mb-8 hover:opacity-90 transition-opacity"
       >
-        <span className="text-2xl leading-none" aria-hidden="true">🐾</span>
+        <span className="text-2xl leading-none" aria-hidden="true">
+          🐾
+        </span>
         <span className="font-display font-black text-xl leading-none">
-          <span className="text-brand-400">Paw</span>
-          <span className="text-foreground">Rescue</span>
+          <span className="text-emerald-700">HUELLAS</span>
         </span>
       </Link>
 
@@ -28,5 +33,5 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         ← Volver al inicio
       </Link>
     </div>
-  )
+  );
 }

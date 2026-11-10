@@ -486,6 +486,20 @@ INSERT INTO donation_campaigns (
   )
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO auth.users(id,instance_id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,is_super_admin,created_at,updated_at,confirmation_token,email_change,email_change_token_new,recovery_token)
+VALUES('10000000-0000-4000-8000-000000000099','00000000-0000-0000-0000-000000000000','authenticated','authenticated','admin@huellas.test',crypt('PawRescue2024!',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{"full_name":"Admin HUELLAS"}',false,now(),now(),'','','','') ON CONFLICT(id) DO NOTHING;
+INSERT INTO auth.identities(id,provider_id,user_id,identity_data,provider,created_at,updated_at)
+SELECT gen_random_uuid(),id::text,id,jsonb_build_object('sub',id::text,'email',email,'email_verified',true),'email',now(),now() FROM auth.users
+WHERE id IN(SELECT id FROM public.profiles)
+ON CONFLICT(provider_id,provider) DO NOTHING;
+-- Asignación confiable, solo en seed local: el trigger ignora metadata.role.
+UPDATE profiles SET role='shelter' WHERE id IN (SELECT profile_id FROM shelters);
+UPDATE profiles SET role='admin' WHERE id='10000000-0000-4000-8000-000000000099';
+-- No se presenta recaudación ficticia como pago recibido.
+UPDATE donation_campaigns SET current_amount=0, ends_at=NULL;
+UPDATE shelters SET yape_number=NULL,bank_account=NULL,bank_name=NULL,account_holder=NULL;
+INSERT INTO needs(shelter_id,title,description,quantity)
+SELECT id,'Alimento para nuestros rescatados','Necesitamos alimento seco. Coordina una entrega con nuestro equipo.','10 sacos de 15 kg' FROM shelters ORDER BY created_at LIMIT 1;
 COMMIT;
 
 -- ============================================================

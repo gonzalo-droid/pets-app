@@ -1,22 +1,22 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import { CalendarDays } from 'lucide-react'
-import DonationProgress from './DonationProgress'
-import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
-import type { CampaignWithShelter } from '@/types'
+import Image from "next/image";
+import Link from "next/link";
+import { CalendarDays } from "lucide-react";
+import DonationProgress from "./DonationProgress";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import type { CampaignWithShelter } from "@/types";
 
 interface CampaignCardProps {
-  campaign: CampaignWithShelter
+  campaign: CampaignWithShelter;
 }
 
 function daysUntil(isoDate: string | null): string {
-  if (!isoDate) return 'Sin fecha límite'
-  const diff = new Date(isoDate).getTime() - Date.now()
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days < 0) return 'Finalizada'
-  if (days === 0) return 'Último día'
-  return `${days} día${days === 1 ? '' : 's'} restantes`
+  if (!isoDate) return "Sin fecha límite";
+  const diff = new Date(isoDate).getTime() - Date.now();
+  const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+  if (days < 0) return "Finalizada";
+  if (days === 0) return "Último día";
+  return `${days} día${days === 1 ? "" : "s"} restantes`;
 }
 
 export default function CampaignCard({ campaign }: CampaignCardProps) {
@@ -31,6 +31,9 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
           {campaign.shelter.avatar_url ? (
             <Image
               src={campaign.shelter.avatar_url}
+              unoptimized={campaign.shelter.avatar_url.includes(
+                "api.dicebear.com",
+              )}
               alt={campaign.shelter.name}
               width={40}
               height={40}
@@ -60,7 +63,10 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
       </p>
 
       {/* Progreso */}
-      <DonationProgress current={campaign.current_amount} goal={campaign.goal_amount} />
+      <DonationProgress
+        current={campaign.current_amount}
+        goal={campaign.goal_amount}
+      />
 
       {/* Footer */}
       <div className="flex items-center justify-between gap-2 pt-1 border-t border-border">
@@ -70,11 +76,11 @@ export default function CampaignCard({ campaign }: CampaignCardProps) {
         </div>
         <Link
           href={`/donate/${campaign.slug}`}
-          className={cn(buttonVariants({ size: 'sm' }))}
+          className={cn(buttonVariants({ size: "sm" }))}
         >
           Donar ahora
         </Link>
       </div>
     </div>
-  )
+  );
 }

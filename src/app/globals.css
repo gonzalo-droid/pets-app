@@ -46,53 +46,53 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* ── Fuentes PawRescue ────────────────────────────────────────── */
+  /* ── Fuentes HUELLAS ────────────────────────────────────────── */
   --font-display: var(--font-nunito);
   --font-body: var(--font-jakarta);
   --font-sans: var(--font-jakarta);
 
   /* ── Paleta semántica — colores fijos (no varían con tema) ──── */
-  --color-brand-50:  #FFF4E6;
-  --color-brand-100: #FFE4BC;
-  --color-brand-300: #FFB347;
-  --color-brand-400: #FF9500;
-  --color-brand-500: #E07800;
-  --color-brand-600: #C06000;
+  --color-brand-50: #fff4e6;
+  --color-brand-100: #ffe4bc;
+  --color-brand-300: #ffb347;
+  --color-brand-400: #ff9500;
+  --color-brand-500: #e07800;
+  --color-brand-600: #c06000;
 
-  --color-rescue:      #FF4D4D;
-  --color-rescue-dark: #CC2E2E;
+  --color-rescue: #ff4d4d;
+  --color-rescue-dark: #cc2e2e;
 
-  --color-adopt:      #22C55E;
-  --color-adopt-dark: #15803D;
+  --color-adopt: #22c55e;
+  --color-adopt-dark: #15803d;
 
-  --color-donate:      #EAB308;
-  --color-donate-dark: #A16207;
+  --color-donate: #eab308;
+  --color-donate-dark: #a16207;
 
-  --color-shelter:      #3B82F6;
-  --color-shelter-dark: #1D4ED8;
+  --color-shelter: #3b82f6;
+  --color-shelter-dark: #1d4ed8;
 
   /* ── Colores *-light — adaptativos por tema (CSS var) ─────────── */
-  --color-rescue-light:  var(--rescue-light);
-  --color-adopt-light:   var(--adopt-light);
-  --color-donate-light:  var(--donate-light);
+  --color-rescue-light: var(--rescue-light);
+  --color-adopt-light: var(--adopt-light);
+  --color-donate-light: var(--donate-light);
   --color-shelter-light: var(--shelter-light);
 }
 
 :root {
-  /* Paleta PawRescue — ámbar cálido como color primario */
+  /* Paleta HUELLAS — ámbar cálido como color primario */
   --background: oklch(0.98 0.005 80);
   --foreground: oklch(0.2 0.01 60);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.01 60);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.01 60);
-  --primary: oklch(0.72 0.17 55);          /* amber-500 aprox */
+  --primary: oklch(0.72 0.17 55); /* amber-500 aprox */
   --primary-foreground: oklch(0.15 0.02 55);
   --secondary: oklch(0.97 0.01 80);
   --secondary-foreground: oklch(0.25 0.01 60);
   --muted: oklch(0.96 0.005 80);
   --muted-foreground: oklch(0.52 0.02 60);
-  --accent: oklch(0.94 0.04 80);           /* amber-50 aprox */
+  --accent: oklch(0.94 0.04 80); /* amber-50 aprox */
   --accent-foreground: oklch(0.35 0.08 55);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.91 0.01 80);
@@ -101,14 +101,14 @@
   --chart-1: oklch(0.72 0.17 55);
   --chart-2: oklch(0.62 0.14 40);
   --chart-3: oklch(0.55 0.12 25);
-  --chart-4: oklch(0.80 0.12 90);
-  --chart-5: oklch(0.65 0.10 200);
+  --chart-4: oklch(0.8 0.12 90);
+  --chart-5: oklch(0.65 0.1 200);
   --radius: 0.625rem;
   /* ── Colores semánticos light ─────────────────────────────────── */
-  --rescue-light:  #FFF0EE;
-  --adopt-light:   #DCFCE7;
-  --donate-light:  #FEFCE8;
-  --shelter-light: #EFF6FF;
+  --rescue-light: #fff0ee;
+  --adopt-light: #dcfce7;
+  --donate-light: #fefce8;
+  --shelter-light: #eff6ff;
   --sidebar: oklch(0.985 0.005 80);
   --sidebar-foreground: oklch(0.2 0.01 60);
   --sidebar-primary: oklch(0.72 0.17 55);
@@ -120,7 +120,7 @@
 }
 
 .dark {
-  /* Paleta PawRescue dark — fondo cálido oscuro, amber primario */
+  /* Paleta HUELLAS dark — fondo cálido oscuro, amber primario */
   --background: oklch(0.14 0.01 55);
   --foreground: oklch(0.94 0.01 75);
   --card: oklch(0.18 0.01 55);
@@ -128,11 +128,11 @@
   --popover: oklch(0.18 0.01 55);
   --popover-foreground: oklch(0.94 0.01 75);
   --primary: oklch(0.78 0.16 55);
-  --primary-foreground: oklch(0.10 0.02 55);
+  --primary-foreground: oklch(0.1 0.02 55);
   --secondary: oklch(0.24 0.01 55);
   --secondary-foreground: oklch(0.88 0.01 75);
   --muted: oklch(0.22 0.01 55);
-  --muted-foreground: oklch(0.58 0.02 65);
+  --muted-foreground: oklch(0.74 0.015 65);
   --accent: oklch(0.26 0.03 55);
   --accent-foreground: oklch(0.88 0.05 60);
   --destructive: oklch(0.65 0.22 22);
@@ -142,21 +142,21 @@
   --chart-1: oklch(0.78 0.16 55);
   --chart-2: oklch(0.65 0.13 40);
   --chart-3: oklch(0.55 0.11 25);
-  --chart-4: oklch(0.75 0.10 90);
-  --chart-5: oklch(0.60 0.09 200);
+  --chart-4: oklch(0.75 0.1 90);
+  --chart-5: oklch(0.6 0.09 200);
   --sidebar: oklch(0.16 0.01 55);
   --sidebar-foreground: oklch(0.94 0.01 75);
   --sidebar-primary: oklch(0.78 0.16 55);
-  --sidebar-primary-foreground: oklch(0.10 0.02 55);
+  --sidebar-primary-foreground: oklch(0.1 0.02 55);
   --sidebar-accent: oklch(0.24 0.02 55);
   --sidebar-accent-foreground: oklch(0.88 0.05 60);
   --sidebar-border: oklch(0.24 0.01 55);
   --sidebar-ring: oklch(0.78 0.16 55);
   /* ── Colores semánticos dark ──────────────────────────────────── */
-  --rescue-light:  #3D1A1A;
-  --adopt-light:   #14331F;
-  --donate-light:  #332D0A;
-  --shelter-light: #0F1D35;
+  --rescue-light: #3d1a1a;
+  --adopt-light: #14331f;
+  --donate-light: #332d0a;
+  --shelter-light: #0f1d35;
 }
 
 @layer base {
@@ -170,7 +170,48 @@
   html {
     font-family: var(--font-body);
   }
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
   }
+}
+
+:root {
+  --font-nunito: "Avenir Next", "Segoe UI", sans-serif;
+  --font-jakarta: "Avenir Next", "Segoe UI", sans-serif;
+}
+.huellas-field {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--background);
+  margin-top: 0.4rem;
+}
+.huellas-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.7rem;
+  padding: 0.75rem 1.2rem;
+  background: #16634a;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+.huellas-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+:focus-visible {
+  outline: 3px solid #d28a34;
+  outline-offset: 3px;
+}
+
+.dark .text-emerald-700,
+.dark .text-green-700 {
+  color: #86d5ad;
 }

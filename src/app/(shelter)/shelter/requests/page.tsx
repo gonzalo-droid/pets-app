@@ -1,26 +1,44 @@
-import type { Metadata } from 'next'
-import { getRequestsByShelter, MOCK_REQUESTER_NAMES, MOCK_ANIMAL_NAMES } from '@/lib/mock/requests'
-import RequestsManager from './RequestsManager'
-
-export const metadata: Metadata = { title: 'Solicitudes de adopción — Panel Albergue' }
-
-const MOCK_SHELTER_ID = 'shelter-001'
-
-export default async function RequestsPage() {
-  const requests = await getRequestsByShelter(MOCK_SHELTER_ID)
+import { shelterContext } from "@/lib/huellas/auth";
+import { records } from "@/lib/huellas/records";
+import { ActionButton } from "@/components/huellas/Forms";
+export default async function Page() {
+  const id = await shelterContext();
+  const rows = await records("adoption_requests", id);
   return (
-    <div className="max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">Solicitudes de adopción</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {requests.filter((r) => r.status === 'pending').length} pendientes de revisión
+    <div className="max-w-4xl space-y-6">
+      <h1 className="text-3xl font-bold">Adopciones responsables</h1>
+      {rows.map((r) => (
+        <article className="rounded-xl border bg-card p-5 space-y-3" key={r.id}>
+          <p className="font-bold">Solicitud · {r.status}</p>
+          <p>{r.message}</p>
+          <p className="text-sm">Contacto privado: {r.phone}</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ["reviewing", "En revisión"],
+              ["approved", "Aprobar"],
+              ["rejected", "Rechazar"],
+              ["completed", "Completar"],
+            ].map(([status, label]) => (
+              <ActionButton
+                key={status}
+                payload={{
+                  action: "request_status",
+                  id: r.id,
+                  shelter_id: id,
+                  status,
+                }}
+              >
+                {label}
+              </ActionButton>
+            ))}
+          </div>
+        </article>
+      ))}
+      {!rows.length && (
+        <p className="text-muted-foreground">
+          Aún no hay solicitudes. Comparte los perfiles de tus animales.
         </p>
-      </div>
-      <RequestsManager
-        requests={requests}
-        requesterNames={MOCK_REQUESTER_NAMES}
-        animalNames={MOCK_ANIMAL_NAMES}
-      />
+      )}
     </div>
-  )
+  );
 }
