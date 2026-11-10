@@ -1,6 +1,15 @@
 import path from 'node:path'
 import type { NextConfig } from 'next'
 
+// Imágenes subidas por los albergues a Supabase Storage (bucket público "huellas").
+const supabaseHost = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').hostname
+  } catch {
+    return null
+  }
+})()
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
@@ -13,6 +22,15 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'api.dicebear.com' },
       // Fotos de galería de albergues (mock)
       { protocol: 'https', hostname: 'picsum.photos' },
+      ...(supabaseHost
+        ? [
+            {
+              protocol: 'https' as const,
+              hostname: supabaseHost,
+              pathname: '/storage/v1/object/public/huellas/**',
+            },
+          ]
+        : []),
     ],
   },
 }

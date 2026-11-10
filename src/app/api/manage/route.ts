@@ -7,6 +7,7 @@ import { canManage, canTransitionRequest, REQUEST_TRANSITIONS } from "@/lib/huel
 import { isDemo } from "@/lib/huellas/config";
 import { mutateDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
+import { isOwnUpload } from "@/lib/huellas/uploads";
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 const targetId = z.string().min(1).max(64);
@@ -118,8 +119,9 @@ export async function POST(request: Request) {
         created_at: now,
         updated_at: now,
       };
+      // Solo fotos subidas por HUELLAS a la carpeta de este albergue.
       const urls = z
-        .array(z.url().refine((u) => u.startsWith("https://")))
+        .array(z.string().refine((u) => isOwnUpload(u, shelterId)))
         .max(3)
         .parse(body.photos ?? []);
       const photos = urls.map((url, i) => ({
@@ -139,6 +141,93 @@ export async function POST(request: Request) {
           photos: urls,
         });
         if (error) throw error;
+      }
+    } else if (body.action === "shelter_images") {
+      // Foto de perfil o portada. Vacío quita la imagen.
+      const image = z
+        .union([z.literal(""), z.string().refine((u) => isOwnUpload(u, shelterId))])
+        .transform((u) => u || null);
+      const values = z
+        .object({ avatar_url: image.optional(), banner_url: image.optional() })
+        .parse(body);
+      if (!db)
+        await mutateDemo((d) => {
+          const s = d.shelters.find((s) => s.id === shelterId);
+          if (!s) throw new Error("Albergue no encontrado");
+          Object.assign(s, values);
+        });
+      else await updateOne(db, "shelters", values, shelterId, shelterId);
+    } else if (body.action === "animal_photo_add") {
+      const animalId = targetId.parse(body.animal_id);
+      const url = z.string().refine((u) => isOwnUpload(u, shelterId)).parse(body.url);
+      if (!db)
+        await mutateDemo((d) => {
+          const a = d.animals.find((a) => a.id === animalId && a.shelter_id === shelterId);
+          if (!a) throw new Error("Animal no encontrado");
+          if (a.animal_photos.length >= 3) throw new UserError("Cada animal puede tener hasta 3 fotos.");
+          a.animal_photos.push({
+            id,
+            animal_id: animalId,
+            url,
+            is_cover: a.animal_photos.length === 0,
+            order_index: a.animal_photos.length,
+          });
+        });
+      else {
+        const { data: animal } = await db
+          .from("animals")
+          .select("id, animal_photos(id)")
+          .eq("id", animalId)
+          .eq("shelter_id", shelterId)
+          .maybeSingle();
+        if (!animal) throw new Error("Animal no encontrado");
+        const count = (animal.animal_photos as { id: string }[]).length;
+        if (count >= 3) throw new UserError("Cada animal puede tener hasta 3 fotos.");
+        const { error } = await db
+          .from("animal_photos")
+          .insert({ animal_id: animalId, url, is_cover: count === 0, order_index: count });
+        if (error) throw error;
+      }
+    } else if (body.action === "animal_photo_cover" || body.action === "animal_photo_remove") {
+      const photoId = targetId.parse(body.id);
+      const animalId = targetId.parse(body.animal_id);
+      const remove = body.action === "animal_photo_remove";
+      if (!db)
+        await mutateDemo((d) => {
+          const a = d.animals.find((a) => a.id === animalId && a.shelter_id === shelterId);
+          const photo = a?.animal_photos.find((p) => p.id === photoId);
+          if (!a || !photo) throw new Error("Foto no encontrada");
+          if (remove) {
+            a.animal_photos = a.animal_photos.filter((p) => p.id !== photoId);
+            // Si era la portada, la siguiente foto pasa a serlo.
+            if (photo.is_cover && a.animal_photos[0]) a.animal_photos[0].is_cover = true;
+          } else a.animal_photos.forEach((p) => (p.is_cover = p.id === photoId));
+        });
+      else {
+        const { data: animal } = await db
+          .from("animals")
+          .select("id, animal_photos(id, is_cover, order_index)")
+          .eq("id", animalId)
+          .eq("shelter_id", shelterId)
+          .maybeSingle();
+        const photos = (animal?.animal_photos ?? []) as { id: string; is_cover: boolean; order_index: number }[];
+        const photo = photos.find((p) => p.id === photoId);
+        if (!animal || !photo) throw new Error("Foto no encontrada");
+        const coverId = remove
+          ? photo.is_cover
+            ? photos.filter((p) => p.id !== photoId).sort((x, y) => x.order_index - y.order_index)[0]?.id
+            : undefined
+          : photoId;
+        if (remove) {
+          const { error } = await db.from("animal_photos").delete().eq("id", photoId).eq("animal_id", animalId);
+          if (error) throw error;
+        }
+        if (coverId) {
+          const { error: e1 } = await db.from("animal_photos").update({ is_cover: false }).eq("animal_id", animalId);
+          if (e1) throw e1;
+          const { error: e2 } = await db.from("animal_photos").update({ is_cover: true }).eq("id", coverId);
+          if (e2) throw e2;
+        }
       }
     } else if (body.action === "animal_update") {
       // Datos de la ficha. El estado, las fotos y el albergue no se cambian aquí.

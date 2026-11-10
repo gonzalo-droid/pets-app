@@ -23,6 +23,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       "202611100001_huellas_fixes.sql",
       "202611100002_anon_sightings_read.sql",
       "202611100003_request_transitions.sql",
+      "202611110001_photo_uploads.sql",
     ])
       await db.exec(
         await readFile(

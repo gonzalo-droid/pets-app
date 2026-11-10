@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { shelterContext } from "@/lib/huellas/auth";
 import { getShelterById } from "@/lib/data/shelters";
 import { ManageForm } from "@/components/huellas/Forms";
+import ShelterImages from "@/components/huellas/ShelterImages";
 
 export const metadata: Metadata = { title: "Perfil del albergue — Panel" };
 
@@ -17,6 +18,11 @@ export default async function Page() {
           quieras compartir.
         </p>
       </div>
+      <ShelterImages
+        shelterId={id}
+        avatarUrl={s?.avatar_url ?? null}
+        bannerUrl={s?.banner_url ?? null}
+      />
       <ManageForm
         action="settings"
         shelterId={id}
@@ -49,8 +55,7 @@ export default async function Page() {
         ]}
       />
       <p className="rounded-2xl bg-secondary px-4 py-3 text-sm">
-        La verificación solo puede modificarla la administración de HUELLAS. La foto de perfil y
-        la portada se podrán subir cuando habilitemos la carga de imágenes.{" "}
+        La verificación solo puede modificarla la administración de HUELLAS.{" "}
         <a className="font-extrabold text-primary hover:underline" href={`/shelters/${id}`}>
           Ver mi página pública
         </a>

@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle2, ImageOff } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import ImageUpload from "@/components/huellas/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -110,7 +111,7 @@ export default function NewAnimalForm({
 }) {
   const editing = Boolean(animal);
   const [submitted, setSubmitted] = useState(false);
-  const [photoUrls, setPhotoUrls] = useState<string[]>(["", "", ""]);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
   const {
     register,
@@ -360,44 +361,43 @@ export default function NewAnimalForm({
       {!editing && (
       <div className="flex flex-col gap-3">
         <div>
-          <Label>Fotos (máx. 3)</Label>
-          <p className="text-xs text-muted-foreground mt-1">
-            La primera URL será la foto de portada. Usa HTTPS y un host
-            autorizado en next.config.ts.
+          <Label>Fotos (hasta 3)</Label>
+          <p className="mt-1 text-xs text-muted-foreground">
+            La primera será la portada. JPG, PNG o WebP de hasta 4 MB.
           </p>
         </div>
-        {photoUrls.map((url, idx) => (
-          <div key={idx} className="flex gap-3 items-center">
-            <div className="h-14 w-14 shrink-0 rounded-lg border border-border bg-muted overflow-hidden flex items-center justify-center">
-              {url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={url}
-                  alt={`Preview ${idx + 1}`}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              ) : (
-                <ImageOff className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-            <Input
-              placeholder={
-                idx === 0
-                  ? "URL de la foto de portada"
-                  : `URL de la foto ${idx + 1} (opcional)`
-              }
-              value={url}
-              onChange={(e) => {
-                const updated = [...photoUrls];
-                updated[idx] = e.target.value;
-                setPhotoUrls(updated);
-              }}
-            />
-          </div>
-        ))}
+        {photoUrls.length > 0 && (
+          <ul className="grid grid-cols-3 gap-3">
+            {photoUrls.map((url, idx) => (
+              <li key={url} className="overflow-hidden rounded-[18px] border border-border">
+                <div className="relative aspect-square bg-muted">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`Foto ${idx + 1}`} className="h-full w-full object-cover" />
+                  {idx === 0 && (
+                    <span className="absolute left-1.5 top-1.5 rounded-full bg-highlight px-2 py-0.5 text-[11px] font-extrabold">
+                      Portada
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPhotoUrls(photoUrls.filter((u) => u !== url))}
+                  className="min-h-10 w-full text-xs font-extrabold text-error-fg hover:bg-error-bg"
+                >
+                  Quitar
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {photoUrls.length < 3 && (
+          <ImageUpload
+            shelterId={shelterId}
+            kind="animal"
+            label={photoUrls.length ? "Agregar otra foto" : "Subir foto"}
+            onUploaded={(url) => setPhotoUrls((list) => [...list, url].slice(0, 3))}
+          />
+        )}
       </div>
       )}
 

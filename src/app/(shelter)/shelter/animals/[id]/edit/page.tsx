@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { shelterContext } from "@/lib/huellas/auth";
 import { getShelterAnimal } from "@/lib/data/animals";
 import NewAnimalForm from "../../new/NewAnimalForm";
+import AnimalPhotos from "@/components/huellas/AnimalPhotos";
 
 export const metadata: Metadata = { title: "Editar animal — Panel del albergue" };
 
@@ -31,11 +32,13 @@ export default async function EditAnimalPage({
       <div className="mb-8">
         <h1 className="text-3xl text-foreground sm:text-4xl">Editar a {animal.name}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Actualiza su ficha pública. El estado se cambia desde la lista de animales y las
-          fotos publicadas todavía no se pueden editar.
+          Actualiza su ficha pública y sus fotos. El estado se cambia desde la lista de animales.
         </p>
       </div>
-      <NewAnimalForm shelterId={shelterId} animal={animal} />
+      <div className="space-y-6">
+        <AnimalPhotos shelterId={shelterId} animalId={animal.id} photos={animal.animal_photos} />
+        <NewAnimalForm shelterId={shelterId} animal={animal} />
+      </div>
     </div>
   );
 }
