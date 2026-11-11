@@ -9,7 +9,7 @@ import { getShelterStats, getSheltersPage } from "@/lib/data/shelters";
 import { parsePage, queryWithoutPage } from "@/lib/pagination";
 
 export const metadata: Metadata = {
-  title: "Albergues — HUELLAS",
+  title: "Albergues",
   description:
     "Conoce los albergues y refugios de animales en Lambayeque, Perú.",
 };
