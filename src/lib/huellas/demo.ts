@@ -55,7 +55,10 @@ export type DemoData = {
   needs: Need[];
   requests: RequestRecord[];
   /** Cambios que cada perfil demo hizo en "Mi perfil". */
-  profiles?: Record<string, { full_name: string; phone: string | null }>;
+  profiles?: Record<
+    string,
+    { full_name: string; phone: string | null; role?: "shelter"; shelter_id?: string }
+  >;
 };
 const directory = path.join(process.cwd(), ".huellas-demo");
 const file = path.join(directory, "data.json");

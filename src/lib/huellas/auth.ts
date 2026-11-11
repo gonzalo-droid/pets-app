@@ -50,7 +50,14 @@ export async function currentActor(): Promise<Actor | null> {
     if (!actor) return null;
     // El nombre editado en "Mi perfil" se guarda en el almacén demo.
     const edited = (await readDemo()).profiles?.[actor.id];
-    return edited ? { ...actor, full_name: edited.full_name } : actor;
+    // También el albergue registrado desde "Registrar mi albergue".
+    return edited
+      ? {
+          ...actor,
+          full_name: edited.full_name,
+          ...(edited.role ? { role: edited.role, shelter_id: edited.shelter_id } : {}),
+        }
+      : actor;
   }
   const db = await createClient();
   const {

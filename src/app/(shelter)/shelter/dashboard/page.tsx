@@ -5,10 +5,17 @@ import { getAnimalsByShelter } from "@/lib/data/animals";
 import { getCampaigns } from "@/lib/data/campaigns";
 import { records } from "@/lib/huellas/records";
 import { isCampaignOpen } from "@/lib/huellas/domain";
+import { getShelterById } from "@/lib/data/shelters";
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ nuevo?: string }>;
+}) {
   const id = await shelterContext();
-  const [animals, campaigns, needs, support, requests] = await Promise.all([
+  const { nuevo } = await searchParams;
+  const [shelter, animals, campaigns, needs, support, requests] = await Promise.all([
+    getShelterById(id),
     getAnimalsByShelter(id),
     getCampaigns({ shelter_id: id }),
     records("needs", id),
@@ -27,6 +34,21 @@ export default async function Page() {
 
   return (
     <div className="max-w-6xl space-y-10">
+      {shelter && !shelter.is_verified && (
+        <section className="rounded-[28px] bg-warning-bg p-5 text-warning-fg sm:p-6" aria-labelledby="pendiente">
+          <h2 id="pendiente" className="text-xl">
+            {nuevo ? "¡Albergue registrado! Está pendiente de verificación" : "Tu albergue está pendiente de verificación"}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed">
+            Todavía no aparece en el portal. Mientras tanto, completa tu perfil con fotos y
+            contacto, y registra a tus rescatados y campañas: se publicarán cuando la administración
+            de HUELLAS verifique tu albergue.
+          </p>
+          <Link href="/shelter/settings" className="mt-3 inline-flex min-h-11 items-center font-extrabold underline">
+            Completar el perfil del albergue
+          </Link>
+        </section>
+      )}
       <div>
         <h1 className="text-3xl sm:text-4xl">Cada cuidado cuenta</h1>
         <p className="mt-2 text-muted-foreground">

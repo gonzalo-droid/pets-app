@@ -46,3 +46,6 @@ next-env.d.ts
 
 /.huellas-demo/
 !.env.example
+
+# configuración local de Claude Code
+.claude/settings.local.json

@@ -287,9 +287,9 @@ export default async function Page() {
             <li>
               <Link
                 className="inline-flex min-h-12 items-center gap-2 rounded-full bg-highlight px-6 font-extrabold text-foreground hover:brightness-95"
-                href="/auth/login"
+                href="/registrar-albergue"
               >
-                Publicar con mi albergue
+                Registrar mi albergue
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </li>

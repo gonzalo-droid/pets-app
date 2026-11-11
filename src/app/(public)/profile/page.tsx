@@ -206,8 +206,11 @@ export default async function Page({
             ]}
           />
           <p className="text-sm text-muted-foreground">
-            Tu correo y tu tipo de cuenta no se cambian desde aquí. Los accesos de albergue y
-            administración los asigna el equipo de HUELLAS.
+            Tu correo y tu tipo de cuenta no se cambian desde aquí. ¿Tienes un albergue?{" "}
+            <Link href="/registrar-albergue" className="font-bold text-primary underline">
+              Regístralo
+            </Link>
+            .
           </p>
         </section>
       ) : (

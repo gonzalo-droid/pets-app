@@ -15,6 +15,7 @@ export default function Footer() {
         <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
           <Link href="/shelters">Albergues</Link>
           <Link href="/needs">Necesidades</Link>
+          <Link href="/registrar-albergue">Registra tu albergue</Link>
           <Link href="/auth/login">Mi espacio</Link>
         </div>
         <p className="text-xs text-muted-foreground max-w-xs">

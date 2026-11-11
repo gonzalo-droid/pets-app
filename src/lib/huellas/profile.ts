@@ -23,7 +23,7 @@ export async function getOwnProfile(actor: Actor): Promise<OwnProfile> {
 export async function saveOwnProfile(actor: Actor, values: OwnProfile) {
   if (isDemo()) {
     await mutateDemo((d) => {
-      d.profiles = { ...d.profiles, [actor.id]: values };
+      d.profiles = { ...d.profiles, [actor.id]: { ...d.profiles?.[actor.id], ...values } };
     });
     return;
   }

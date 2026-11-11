@@ -29,6 +29,12 @@ Fecha: 10/11/2026. Compara lo que existe con la definición de producto y la gu�
 | Administración | Rediseñada, con totales y confirmación que explica las consecuencias de verificar o retirar la verificación. | Hecho |
 | Perfil del albergue (público) | Rediseñado con pestañas Campañas / Animales / Necesidades y contacto autorizado. | Hecho |
 
+## 2b. Agregado el 11/11/2026
+
+- Incorporación de albergues: `/registrar-albergue` (pendiente hasta verificación; aviso en el panel).
+- Recuperación de contraseña por correo (`/auth/forgot` → enlace → `/auth/reset`). Requiere la Redirect URL `/auth/callback` en Supabase.
+- Limpieza del repositorio: archivos locales y código heredado sin uso.
+
 ## 3. Ampliaciones (fase posterior)
 
 Votación comunitaria de campañas (ver sección 6), pagos y suscripciones reales, notificaciones, subida de imágenes, onboarding y equipos de albergue, actualizaciones para padrinos, informes de transparencia, voluntariado, fichas veterinarias privadas, gastos e inventario, participación empresarial, auditoría y moderación, varios países. El módulo heredado de perdidos sigue fuera del alcance.

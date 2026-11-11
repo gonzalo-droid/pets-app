@@ -127,6 +127,11 @@ export default function AuthForm({
           <button className="huellas-button w-full" disabled={busy}>
             {busy ? "Un momento…" : register ? "Registrarme" : "Ingresar"}
           </button>
+          {!register && (
+            <a className="block text-center text-sm font-bold text-muted-foreground underline" href="/auth/forgot">
+              ¿Olvidaste tu contraseña?
+            </a>
+          )}
           <a
             className="block text-center text-sm font-bold text-primary underline"
             href={
@@ -149,8 +154,11 @@ export default function AuthForm({
         </p>
       )}
       <p className="text-xs text-muted-foreground">
-        Los accesos de albergue y administrador se asignan por invitación del
-        equipo.
+        ¿Tienes un albergue?{" "}
+        <a className="font-bold text-primary underline" href="/registrar-albergue">
+          Regístralo aquí
+        </a>{" "}
+        con tu cuenta.
       </p>
     </div>
   );

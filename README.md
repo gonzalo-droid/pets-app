@@ -7,7 +7,7 @@ Plataforma multi-albergue de gestión y apoyo animal. Refactorización del proye
 Requisitos: Node.js 22.15+ (recomendado 22 LTS o superior) y npm.
 
 ```bash
-cd /Volumes/Neko/webs/pets-app
+cd pets-app
 npm ci
 npm run dev
 ```
@@ -23,14 +23,17 @@ Los cambios se guardan en `.huellas-demo/data.json`, ignorado por Git. Para volv
 
 ## Qué funciona
 
-- Portal de albergues verificados y perfiles con fotos.
-- Animales filtrables, fichas públicas, solicitud de adopción y apadrinamiento.
-- Panel por albergue: alta de animales y fotos mediante URL HTTPS, actualización de estado de adopción, campañas, necesidades, presentación pública y solicitudes privadas.
-- Campañas con metas y necesidades con cantidad, descripción y resolución.
-- Donantes: historial propio de compromisos y solicitudes; cancelación del apoyo.
-- Administración: listado de albergues y verificación/retiro de verificación.
-- Sesiones reales de Supabase en modo conectado; roles `admin`, `shelter` y `user` (donante, nombre heredado por compatibilidad).
-- Lecturas/escrituras conectadas mediante el JWT del usuario y RLS. No se usa `service_role`.
+- **Portal:** portada con campañas primero, directorio de albergues verificados, perfiles con pestañas (campañas, animales, necesidades) y contacto autorizado.
+- **Animales:** directorio con búsqueda y filtros, ficha pública, solicitud de adopción y apadrinamiento (el aporte va al animal).
+- **Campañas:** abiertas y cerradas, avance de la meta, fecha límite opcional; una campaña cerrada no acepta aportes.
+- **Necesidades:** lista pública para coordinar entregas.
+- **Mi espacio (donante):** apoyos con destino y estado, cancelación, solicitudes con su avance y perfil editable.
+- **Panel del albergue:** resumen, campañas (crear, editar, cerrar, reabrir), animales (registrar, editar datos y fotos, cambiar estado), solicitudes con transiciones controladas, necesidades, apoyos y perfil (fotos, historia y contacto).
+- **Incorporación de albergues:** una cuenta de la comunidad registra su albergue en `/registrar-albergue`; queda pendiente y no aparece en el portal hasta que la administración lo verifique.
+- **Administración:** verificación y retiro de verificación, con sus consecuencias explicadas.
+- **Fotos:** subida a Supabase Storage (bucket `huellas`, JPG/PNG/WebP hasta 4 MB); cada albergue solo escribe en su carpeta.
+- **Cuentas:** registro, ingreso con retorno a la acción iniciada y recuperación de contraseña por correo.
+- Sesiones reales de Supabase en modo conectado; roles `admin`, `shelter` y `user` (comunidad). Lecturas y escrituras con el JWT del usuario y RLS; no se usa `service_role`.
 
 ### Donaciones y apadrinamientos
 
@@ -58,8 +61,8 @@ npm run dev:connected
 
 ### Base nueva o base existente
 
-- **Nueva con CLI:** las migraciones `202611090001_legacy_baseline.sql` y `202611090002_huellas.sql` se aplican en orden. El seed es exclusivamente local.
-- **Nueva con SQL Editor:** ejecuta `supabase/schema.sql` una sola vez. Contiene ambos pasos. No ejecutes además la primera migración sobre esas tablas.
+- **Nueva con CLI:** todas las migraciones de `supabase/migrations` se aplican en orden. El seed es exclusivamente local.
+- **Nueva con SQL Editor:** ejecuta `supabase/schema.sql` una sola vez. Contiene todos los pasos. No ejecutes además la primera migración sobre esas tablas.
 - **Base existente con el esquema anterior:** respalda primero, verifica en una copia de staging y ejecuta **solo** `supabase/migrations/202611090002_huellas.sql`. No ejecutes `schema.sql`, `db reset` ni `seed.sql` sobre datos reales. El upgrade conserva tablas y registros; reemplaza políticas heredadas inseguras y restringe permisos de columnas. Si usas CLI, registra el baseline como ya aplicado antes de desplegar el segundo paso.
 
 No se ha ejecutado ninguna migración contra tu Supabase real.
@@ -129,8 +132,8 @@ Los módulos de animales perdidos del proyecto anterior se conservan para consul
 
 1. Probar migración y autenticación contra una instancia Supabase de staging con datos representativos; revisar los accesos heredados antes de publicar.
 2. Integrar una pasarela apropiada para Perú: checkout alojado, webhooks firmados, idempotencia del proveedor, conciliación, reembolsos y suscripciones. El estado cobrado debe venir de eventos verificados del proveedor.
-3. Incorporar onboarding/aprobación de albergues, invitaciones de equipo, recuperación de contraseña, SMTP y notificaciones.
-4. Añadir subida de imágenes a Storage con cuotas, validación y políticas por tenant. Actualmente se admiten URLs HTTPS; el optimizador solo permite los hosts configurados en `next.config.ts`. Agrega tu host de Storage al conectar archivos reales.
+3. Configurar SMTP propio en Supabase y añadir `https://<tu-dominio>/auth/callback` a las Redirect URLs (Authentication → URL Configuration) para que funcionen la confirmación de cuentas y la recuperación de contraseña. Pendiente: invitaciones de equipo y notificaciones.
+4. Limpiar del almacenamiento las fotos que se quitan de una ficha (hoy quedan guardadas sin mostrarse).
 5. Definir política de privacidad, consentimiento, retención, responsabilidades y moderación antes de recoger datos de personas reales.
 6. Rate limiting, auditoría de cambios, observabilidad, backups y restauración, pruebas de concurrencia y accesibilidad ampliadas.
 7. Fichas veterinarias privadas, gastos/reportes de impacto, voluntariado y monetización SaaS siguen fuera del alcance de este MVP.

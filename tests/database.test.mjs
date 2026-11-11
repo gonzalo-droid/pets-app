@@ -24,6 +24,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       "202611100002_anon_sightings_read.sql",
       "202611100003_request_transitions.sql",
       "202611110001_photo_uploads.sql",
+      "202611110002_shelter_onboarding.sql",
     ])
       await db.exec(
         await readFile(
@@ -203,6 +204,33 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
         await set("completed");
         await assert.rejects(set("pending")); // completada es final
       });
+    });
+    await t.test("registro de albergue: queda sin verificar y no se repite", async () => {
+      const nuevo = "93000000-0000-4000-8000-000000000001";
+      await db.exec(
+        `INSERT INTO auth.users(id,raw_user_meta_data)VALUES('${nuevo}','{"full_name":"Responsable"}')`,
+      );
+      const sid = await asUser(nuevo, async () =>
+        (await db.query(
+          "SELECT request_shelter('Refugio Nuevo','Rescatamos perros y gatos en la ciudad.','140101','987654321') AS id",
+        )).rows[0].id,
+      );
+      const row = (await db.query(`SELECT is_verified, profile_id FROM shelters WHERE id='${sid}'`)).rows[0];
+      assert.equal(row.is_verified, false);
+      assert.equal(row.profile_id, nuevo);
+      assert.equal((await db.query(`SELECT role FROM profiles WHERE id='${nuevo}'`)).rows[0].role, "shelter");
+      await asUser(nuevo, async () => {
+        // Ya es albergue: no puede registrar otro ni autoverificarse.
+        await assert.rejects(db.query("SELECT request_shelter('Otro','Descripción suficientemente larga.','140101',null)"));
+        await assert.rejects(db.exec(`UPDATE shelters SET is_verified=true WHERE id='${sid}'`));
+      });
+      // Un visitante anónimo no lo ve mientras no esté verificado.
+      await db.exec("SET ROLE anon; SELECT set_config('request.jwt.claim.sub','',false);");
+      try {
+        assert.equal((await db.query(`SELECT id FROM shelters WHERE id='${sid}'`)).rows.length, 0);
+      } finally {
+        await db.exec("RESET ROLE");
+      }
     });
   } finally {
     await db.close();

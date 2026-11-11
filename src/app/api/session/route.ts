@@ -22,6 +22,34 @@ export async function POST(request: Request) {
       if (!isDemo()) await (await createClient()).auth.signOut();
       return NextResponse.json({ redirect: "/" });
     }
+    if (body.action === "recover") {
+      // Siempre la misma respuesta: no revela si el correo tiene cuenta.
+      const message =
+        "Si ese correo tiene una cuenta, te enviamos un enlace para crear una nueva contraseña. Revisa también la carpeta de spam.";
+      if (isDemo())
+        return NextResponse.json({ message: "En la demo no hay contraseñas: elige un perfil para entrar." });
+      const { email } = z.object({ email: z.email() }).parse(body);
+      const origin = new URL(request.url).origin;
+      await (await createClient()).auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/auth/callback?next=/auth/reset`,
+      });
+      return NextResponse.json({ message });
+    }
+    if (body.action === "update_password") {
+      if (isDemo()) throw new Error("Sin contraseñas en la demo");
+      const { password } = z
+        .object({ password: z.string().min(8).max(128) })
+        .parse(body);
+      const db = await createClient();
+      // Requiere la sesión temporal creada por el enlace del correo.
+      const { error } = await db.auth.updateUser({ password });
+      if (error)
+        return NextResponse.json(
+          { error: "El enlace venció o ya se usó. Pide uno nuevo." },
+          { status: 400 },
+        );
+      return NextResponse.json({ redirect: "/profile" });
+    }
     if (isDemo()) {
       (await cookies()).set("huellas_demo", demoToken(body.demoRole), {
         httpOnly: true,
