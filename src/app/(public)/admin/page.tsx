@@ -69,7 +69,7 @@ export default async function Page({
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
       <section className="rounded-[32px] bg-secondary p-6 sm:p-10">
-        <span className="inline-block -rotate-2 rounded-full bg-highlight px-4 py-1.5 text-sm font-extrabold">
+        <span className="inline-block rounded-full bg-highlight px-4 py-1.5 text-sm font-extrabold">
           Administración HUELLAS
         </span>
         <h1 className="mt-4 text-4xl sm:text-5xl">Albergues de la red</h1>

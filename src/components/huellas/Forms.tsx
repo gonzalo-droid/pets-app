@@ -189,7 +189,8 @@ export function SupportForm({
   title: string;
 }) {
   const monthly = kind === "sponsorship";
-  const [amount, setAmount] = useState(30),
+  const presets = monthly ? [10, 30, 50, 100] : [20, 50, 100, 200];
+  const [amount, setAmount] = useState(monthly ? 30 : 50),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [ref, setRef] = useState(""),
@@ -198,7 +199,7 @@ export function SupportForm({
   // Confirmación: solo tras guardar correctamente, y sin parecer un pago.
   if (ref)
     return (
-      <div role="status" className="space-y-4 rounded-[28px] bg-support-soft p-6">
+      <div role="status" className="space-y-4 rounded-[28px] bg-card p-6">
         <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-success-bg text-success-fg">
           <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M5 12l5 5 9-10" />
@@ -223,7 +224,7 @@ export function SupportForm({
 
   return (
     <form
-      className="space-y-5 rounded-[28px] bg-support-soft p-6"
+      className="space-y-4 rounded-[28px] bg-card p-5 sm:p-6"
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
@@ -244,14 +245,9 @@ export function SupportForm({
         }
       }}
     >
-      <div>
-        <p className="text-sm font-bold text-muted-foreground">{title}</p>
-        <h2 className="mt-1 text-2xl">
-          {monthly ? "¿Cuánto quieres aportar cada mes?" : "¿Cuánto quieres aportar?"}
-        </h2>
-      </div>
+      <h2 className="text-2xl">{monthly ? "¿Cuánto al mes?" : "¿Cuánto quieres aportar?"}</h2>
       <div role="group" aria-label="Importes sugeridos" className="grid grid-cols-4 gap-2">
-        {[10, 30, 50, 100].map((n) => (
+        {presets.map((n) => (
           <button
             key={n}
             type="button"
@@ -259,7 +255,7 @@ export function SupportForm({
             className={`min-h-12 rounded-2xl border-2 text-base font-extrabold transition-colors ${
               amount === n
                 ? "border-support bg-support text-support-foreground"
-                : "border-card bg-card text-foreground hover:border-support/40"
+                : "border-input bg-card text-foreground hover:bg-secondary"
             }`}
             onClick={() => setAmount(n)}
           >
@@ -268,7 +264,7 @@ export function SupportForm({
         ))}
       </div>
       <label className="block text-sm font-bold">
-        Otro importe en soles{monthly ? " por mes" : ""}
+        Otro monto en soles{monthly ? " por mes" : ""}
         <input
           className="huellas-field"
           type="number"
@@ -280,20 +276,21 @@ export function SupportForm({
           onChange={(e) => setAmount(Number(e.target.value))}
         />
       </label>
-      <p className="rounded-2xl bg-warning-bg p-3 text-sm text-warning-fg">
-        No se realizará ningún cobro{monthly ? " ni débito automático" : ""}. No ingreses datos de
-        tarjetas ni hagas transferencias.
-      </p>
       {error && (
         <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
           {error}
         </p>
       )}
       <button disabled={busy} className="huellas-button huellas-button--support w-full min-h-13 text-base">
-        {busy ? "Guardando…" : `Registrar compromiso de S/ ${amount || 0}`}
+        {busy
+          ? "Guardando…"
+          : monthly
+            ? `Apadrinar con S/ ${amount || 0} al mes`
+            : `Registrar compromiso de S/ ${amount || 0}`}
       </button>
-      <p className="text-xs text-muted-foreground">
-        Los compromisos pendientes no incrementan la recaudación. Puedes cancelarlos desde Mi espacio.
+      <p className="text-sm leading-relaxed text-muted-foreground">
+        Es un compromiso de apoyo: hoy no se cobra nada{monthly ? " ni se activa un débito" : ""}.
+        Puedes cancelarlo cuando quieras en Mi espacio. No ingreses datos de tarjetas.
       </p>
     </form>
   );

@@ -25,6 +25,7 @@ export interface CampaignFilters {
   shelter_id?: string
   is_active?: boolean
   animal_id?: string
+  kind?: import('./database').CampaignKind
   /** Solo campañas que reciben aportes: activas y sin fecha límite vencida. */
   open_only?: boolean
   /** Solo campañas cerradas: inactivas o con la fecha límite vencida. */

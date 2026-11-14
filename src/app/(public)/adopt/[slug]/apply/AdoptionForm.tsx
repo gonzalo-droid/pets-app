@@ -6,10 +6,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 // ─── Schema de validación ──────────────────────────────────────────────────────
 
@@ -55,19 +51,19 @@ function CheckField({
   return (
     <label
       htmlFor={id}
-      className="flex items-start gap-3 p-4 rounded-lg border border-border hover:border-primary/40 cursor-pointer transition-colors has-[:checked]:border-primary has-[:checked]:bg-accent/40"
+      className="flex min-h-14 cursor-pointer items-center gap-4 rounded-2xl border-2 border-input bg-card p-4 transition-colors hover:bg-secondary/50 has-[:checked]:border-primary has-[:checked]:bg-secondary/60"
     >
       <input
         id={id}
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+        className="h-6 w-6 shrink-0 accent-primary"
       />
       <div>
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="font-bold text-foreground">{label}</p>
         {description && (
-          <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
         )}
       </div>
     </label>
@@ -124,16 +120,16 @@ export default function AdoptionForm({
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
         <CheckCircle2 className="h-16 w-16 text-primary" />
-        <h2 className="text-xl font-bold text-foreground">
-          ¡Solicitud enviada!
+        <h2 className="text-2xl text-foreground">
+          Solicitud enviada
         </h2>
         <p className="text-muted-foreground max-w-sm text-sm">
           El albergue revisará tu solicitud y se pondrá en contacto contigo por
           teléfono en los próximos días. ¡Gracias por querer darle un hogar a{" "}
           {animalName}!
         </p>
-        <Link href="/adopt" className="mt-2 text-sm text-primary hover:underline">
-          Ver más animales en adopción →
+        <Link href="/profile?tab=solicitudes" className="huellas-button mt-2">
+          Ver mis solicitudes
         </Link>
       </div>
     );
@@ -143,9 +139,9 @@ export default function AdoptionForm({
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-7">
       {/* Perfil del hogar */}
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-foreground">Tu hogar</h2>
-        <p className="text-xs text-muted-foreground -mt-1">
-          Esta información ayuda al albergue a evaluar la compatibilidad.
+        <h2 className="text-xl text-foreground">Tu hogar</h2>
+        <p className="text-sm text-muted-foreground -mt-1">
+          Ayuda al albergue a saber si {animalName} estará a gusto. Marca lo que corresponda.
         </p>
         <CheckField
           id="has_home"
@@ -172,64 +168,66 @@ export default function AdoptionForm({
 
       {/* Contacto */}
       <section className="flex flex-col gap-2">
-        <Label htmlFor="phone">
-          Número de contacto <span className="text-destructive">*</span>
-        </Label>
-        <Input
+        <label htmlFor="phone" className="font-extrabold">
+          Tu teléfono
+        </label>
+        <input
           id="phone"
           type="tel"
           placeholder="987654321"
           inputMode="numeric"
+          autoComplete="tel"
+          required
+          className="huellas-field mt-0 text-base"
           {...register("phone")}
           aria-invalid={!!errors.phone}
+          aria-describedby="phone-hint"
         />
         {errors.phone && (
-          <p className="text-xs text-destructive">{errors.phone.message}</p>
+          <p role="alert" className="text-sm text-error-fg">{errors.phone.message}</p>
         )}
-        <p className="text-xs text-muted-foreground">
-          El albergue usará este número para contactarte. No se muestra
-          públicamente.
+        <p id="phone-hint" className="text-sm text-muted-foreground">
+          Solo lo ve el albergue, para llamarte.
         </p>
       </section>
 
       {/* Mensaje */}
       <section className="flex flex-col gap-2">
-        <Label htmlFor="message">
-          ¿Por qué quieres adoptar a {animalName}?{" "}
-          <span className="text-destructive">*</span>
-        </Label>
-        <Textarea
+        <label htmlFor="message" className="font-extrabold">
+          ¿Por qué quieres adoptar a {animalName}?
+        </label>
+        <textarea
           id="message"
           rows={5}
-          placeholder={`Cuéntanos sobre tu estilo de vida, por qué ${animalName} encajaría en tu hogar y qué puedes ofrecerle...`}
+          required
+          placeholder="Cuéntanos cómo es tu casa, tu rutina y qué le ofrecerías."
+          className="huellas-field mt-0 text-base leading-relaxed"
           {...register("message")}
           aria-invalid={!!errors.message}
         />
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-3">
           {errors.message ? (
-            <p className="text-xs text-destructive">{errors.message.message}</p>
+            <p role="alert" className="text-sm text-error-fg">{errors.message.message}</p>
           ) : (
             <span />
           )}
-          <p className="text-xs text-muted-foreground">
-            {message.length}/1000
+          <p className="shrink-0 text-sm text-muted-foreground">
+            {message.length} de 1000
           </p>
         </div>
       </section>
 
       {/* Submit */}
       {errors.root && (
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="rounded-2xl bg-error-bg p-3 text-sm text-error-fg">
           {errors.root.message}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting
-          ? "Enviando solicitud..."
-          : "Enviar solicitud de adopción"}
-      </Button>
+      <button type="submit" disabled={isSubmitting} className="huellas-button min-h-[52px] text-base">
+        {isSubmitting ? "Enviando…" : "Enviar solicitud"}
+      </button>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-sm text-muted-foreground text-center">
         Al enviar, aceptas que el albergue revise tu información de contacto.
       </p>
     </form>

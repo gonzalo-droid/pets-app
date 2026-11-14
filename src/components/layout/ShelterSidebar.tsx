@@ -17,7 +17,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/layout/Logo";
 
 const SHELTER_LINKS = [
-  { href: "/shelter/dashboard", label: "Resumen", icon: LayoutDashboard },
+  { href: "/shelter/dashboard", label: "Inicio", icon: LayoutDashboard },
   { href: "/shelter/campaigns", label: "Campañas", icon: HeartHandshake },
   { href: "/shelter/animals", label: "Animales", icon: Dog },
   { href: "/shelter/needs", label: "Necesidades", icon: Package },

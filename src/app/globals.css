@@ -86,6 +86,9 @@
   --color-support-foreground: var(--support-foreground);
   --color-support-soft: var(--support-soft);
   --color-highlight: var(--highlight);
+  --color-tag: var(--tag);
+  --color-track: var(--track);
+  --color-track-border: var(--track-border);
   --color-warning-bg: var(--warning-bg);
   --color-warning-fg: var(--warning-fg);
   --color-success-bg: var(--success-bg);
@@ -99,30 +102,34 @@
   /* Paleta HUELLAS (propuesta A + B): verde bosque para confianza y
      navegación, coral para apoyar y aportar, durazno y salvia como
      superficies tiernas, mantequilla para "stickers". */
-  --background: #fff8f1; /* crema cálida */
-  --foreground: #24342d; /* tinta verdosa */
+  --background: #f6f7f2; /* papel */
+  --foreground: #1e2b25; /* tinta verdosa */
   --card: #ffffff;
-  --card-foreground: #24342d;
+  --card-foreground: #1e2b25;
   --popover: #ffffff;
-  --popover-foreground: #24342d;
+  --popover-foreground: #1e2b25;
   --primary: #2f6b54; /* verde bosque */
   --primary-hover: #24543f;
   --primary-foreground: #ffffff;
-  --support: #c4513a; /* coral: apoyar y aportar */
-  --support-hover: #a8432f;
+  --support: #b8324b; /* hocico: solo acciones de apoyo */
+  --support-hover: #9c2a40;
   --support-foreground: #ffffff;
-  --support-soft: #ffe3d3; /* durazno */
-  --secondary: #dce8d3; /* salvia */
-  --secondary-foreground: #24342d;
-  --muted: #f3ece2;
+  --support-soft: #fbe4e7; /* almohadilla */
+  --secondary: #e3ecdf; /* salvia */
+  --secondary-foreground: #1e2b25;
+  --muted: #eef1ea;
   --muted-foreground: #55625b;
-  --accent: #dce8d3;
+  --accent: #e3ecdf;
   --accent-foreground: #1f4d3c;
   --destructive: #a3342b;
-  --border: #e8e1d3;
-  --input: #e2dacb;
+  --border: #dfe5da;
+  --input: #c9d3c4;
   --ring: #2563eb; /* foco de teclado */
-  --highlight: #f7dc8a; /* mantequilla: stickers */
+  --highlight: #fbebc0; /* mantequilla suave */
+  --tag: #f2c14e; /* placa de collar: solo nombres de animales */
+  --tag-shadow: #c99a2e;
+  --track: #e3ecdf; /* fondo de barras de avance */
+  --track-border: #c9d3c4;
   --warning-bg: #fff1cd;
   --warning-fg: #6b4a00;
   --success-bg: #cdebdd; /* menta */
@@ -130,24 +137,24 @@
   --error-bg: #fbe9e7;
   --error-fg: #a3342b;
   --chart-1: #2f6b54;
-  --chart-2: #c4513a;
+  --chart-2: #b8324b;
   --chart-3: #8fb49c;
   --chart-4: #f7dc8a;
   --chart-5: #55625b;
   --radius: 1rem;
   --rescue-light: #fbe9e7;
   --adopt-light: #cdebdd;
-  --donate-light: #ffe3d3;
-  --shelter-light: #dce8d3;
+  --donate-light: #fbe4e7;
+  --shelter-light: #e3ecdf;
   --sidebar: #2f6b54;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #dce8d3;
+  --sidebar-primary: #e3ecdf;
   --sidebar-primary-foreground: #1f4d3c;
-  --sidebar-accent: #dce8d3;
+  --sidebar-accent: #e3ecdf;
   --sidebar-accent-foreground: #1f4d3c;
   --sidebar-border: #3f7d64;
   --sidebar-ring: #2563eb;
-  --cream: #ffe3d3;
+  --cream: #fbe4e7;
 }
 
 .dark {
@@ -161,9 +168,9 @@
   --primary: #6cc59d;
   --primary-hover: #86d3af;
   --primary-foreground: #06261b;
-  --support: #f08f78;
-  --support-hover: #f5a693;
-  --support-foreground: #2a0e07;
+  --support: #f2899c;
+  --support-hover: #f6a3b2;
+  --support-foreground: #2a0710;
   --support-soft: #3a231c;
   --secondary: #213129;
   --secondary-foreground: #eef2ec;
@@ -175,7 +182,11 @@
   --border: #2c3a33;
   --input: #2c3a33;
   --ring: #7aa7ff;
-  --highlight: #f7dc8a;
+  --highlight: #3a3216;
+  --tag: #f2c14e;
+  --tag-shadow: #8a6a12;
+  --track: #213129;
+  --track-border: #3d5046;
   --warning-bg: #3a2f12;
   --warning-fg: #f6d68e;
   --success-bg: #183324;
@@ -233,8 +244,8 @@
 .huellas-field {
   display: block;
   width: 100%;
-  min-height: 2.75rem;
-  border: 1px solid var(--border);
+  min-height: 3rem;
+  border: 2px solid var(--input);
   border-radius: 1rem;
   padding: 0.625rem 1rem;
   background: var(--card);
@@ -245,7 +256,7 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  min-height: 2.875rem;
+  min-height: 3rem;
   border-radius: 999px;
   border: 2px solid var(--primary);
   padding: 0.625rem 1.375rem;
@@ -259,11 +270,12 @@
   background: var(--primary-hover);
   border-color: var(--primary-hover);
 }
-/* Secundario: borde y texto verde sobre fondo claro. */
+/* Secundario: borde neutro y texto oscuro sobre fondo claro. */
 .huellas-button--secondary,
 .huellas-button--accent {
   background: var(--card);
-  color: var(--primary);
+  border-color: var(--input);
+  color: var(--foreground);
 }
 .huellas-button--secondary:hover,
 .huellas-button--accent:hover {
@@ -299,6 +311,39 @@
   outline-offset: 3px;
 }
 
+
+/* Placa de collar: el nombre de cada animal. Es el único adorno del sistema. */
+.huellas-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--tag);
+  color: #1e2b25;
+  border-radius: 999px;
+  padding: 0.45rem 1.4rem 0.45rem 0.75rem;
+  box-shadow: 0 3px 0 var(--tag-shadow);
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1;
+}
+.huellas-tag::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgb(30 43 37 / 0.35);
+}
+.huellas-tag--sm {
+  gap: 0.4rem;
+  padding: 0.3rem 0.9rem 0.3rem 0.5rem;
+  box-shadow: 0 2px 0 var(--tag-shadow);
+}
+.huellas-tag--sm::before {
+  width: 0.5rem;
+  height: 0.5rem;
+}
 
 /* Tarjeta con borde marcado y sombra plana (estilo "sticker" de la propuesta B). */
 .huellas-card-pop {

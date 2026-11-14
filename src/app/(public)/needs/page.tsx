@@ -68,7 +68,7 @@ export default async function Page({
                 </span>
                 <div className="min-w-0">
                   <h2 className="text-xl leading-snug">{n.title}</h2>
-                  <span className="mt-1 inline-block -rotate-1 rounded-full bg-support-soft px-3 py-0.5 text-sm font-extrabold">
+                  <span className="mt-1 inline-block rounded-full bg-support-soft px-3 py-0.5 text-sm font-extrabold">
                     {n.quantity}
                   </span>
                 </div>

@@ -14,7 +14,7 @@ export default function ImageUpload({
   disabled = false,
 }: {
   shelterId: string;
-  kind: "avatar" | "banner" | "animal";
+  kind: "avatar" | "banner" | "animal" | "campaign";
   label: string;
   onUploaded: (url: string) => void | Promise<void>;
   disabled?: boolean;

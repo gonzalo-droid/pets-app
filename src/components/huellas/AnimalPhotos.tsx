@@ -56,7 +56,7 @@ export default function AnimalPhotos({
               <div className="relative aspect-[4/3] bg-muted">
                 <Image src={p.url} alt="" fill className="object-cover" sizes="(max-width: 640px) 50vw, 200px" />
                 {p.is_cover && (
-                  <span className="absolute left-2 top-2 -rotate-2 rounded-full bg-highlight px-2.5 py-0.5 text-xs font-extrabold">
+                  <span className="absolute left-2 top-2 rounded-full bg-highlight px-2.5 py-0.5 text-xs font-extrabold">
                     Portada
                   </span>
                 )}

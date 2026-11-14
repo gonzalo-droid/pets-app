@@ -71,3 +71,32 @@ export const REQUEST_TRANSITIONS: Record<string, readonly string[]> = {
 export function canTransitionRequest(from: string, to: string) {
   return REQUEST_TRANSITIONS[from]?.includes(to) ?? false;
 }
+
+// ─── Campañas: tipo, foto y fecha de evento ──────────────────────────────────
+
+export const CAMPAIGN_KIND_LABEL = {
+  case: "Caso",
+  fund: "Fondo",
+  event: "Evento",
+} as const;
+
+/** Foto que representa a la campaña: la suya, la del animal o la portada del albergue. */
+export function campaignImage(c: {
+  image_url?: string | null;
+  animal?: { photo_url?: string | null } | null;
+  shelter: { banner_url?: string | null };
+}): string | null {
+  return c.image_url ?? c.animal?.photo_url ?? c.shelter.banner_url ?? null;
+}
+
+/** "sábado 12 de diciembre, 10:00 a. m." en hora de Perú. */
+export function eventDateLabel(iso: string): string {
+  return new Date(iso).toLocaleString("es-PE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/Lima",
+  });
+}

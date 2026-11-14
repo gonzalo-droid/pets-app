@@ -164,9 +164,16 @@ export interface DonationCampaign {
   is_active: boolean
   ends_at: string | null // ISO date
   slug: string
+  /** case = un rescatado, fund = gasto que se repite, event = jornada o colecta */
+  kind: CampaignKind
+  event_at: string | null // solo eventos
+  event_place: string | null // solo eventos
+  image_url: string | null // foto propia; si falta se usa la del animal o la portada del albergue
   created_at: string
   updated_at: string
 }
+
+export type CampaignKind = 'case' | 'fund' | 'event'
 
 export interface Donation {
   id: string
@@ -205,8 +212,8 @@ export interface AnimalWithShelter extends AnimalWithPhotos {
 }
 
 export interface CampaignWithShelter extends DonationCampaign {
-  shelter: Pick<Shelter, 'id' | 'name' | 'avatar_url'>
-  animal: Pick<Animal, 'id' | 'name' | 'species'> | null
+  shelter: Pick<Shelter, 'id' | 'name' | 'avatar_url'> & { banner_url?: string | null }
+  animal: (Pick<Animal, 'id' | 'name' | 'species'> & { photo_url?: string | null }) | null
 }
 
 export interface LostReportWithSightings extends LostFoundReport {

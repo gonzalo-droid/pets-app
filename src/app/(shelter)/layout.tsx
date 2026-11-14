@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ShelterSidebar from "@/components/layout/ShelterSidebar";
+import ShelterBottomNav from "@/components/layout/ShelterBottomNav";
 import { requireActor, shelterContext } from "@/lib/huellas/auth";
 import { getShelterById } from "@/lib/data/shelters";
 export default async function ShelterLayout({
@@ -18,30 +19,12 @@ export default async function ShelterLayout({
             <p className="text-xs font-bold text-muted-foreground">Panel del albergue</p>
             <p className="font-display text-xl font-semibold">{shelter?.name}</p>
           </div>
-          <Link className="text-sm font-bold text-primary hover:underline" href="/">
-            Ver comunidad
+          <Link className="inline-flex min-h-11 items-center text-sm font-bold text-primary hover:underline" href={shelter ? `/shelters/${shelter.id}` : "/"}>
+            Ver perfil público
           </Link>
-          <nav aria-label="Panel del albergue" className="lg:hidden flex w-full gap-2 overflow-x-auto text-sm pb-1">
-            {[
-              ["dashboard", "Resumen"],
-              ["campaigns", "Campañas"],
-              ["animals", "Animales"],
-              ["needs", "Necesidades"],
-              ["donations", "Apoyos"],
-              ["requests", "Adopciones"],
-              ["settings", "Perfil"],
-            ].map(([path, label]) => (
-              <Link
-                className="shrink-0 rounded-full bg-secondary px-4 py-2 font-bold text-secondary-foreground"
-                key={path}
-                href={"/shelter/" + path}
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
         </header>
-        <main className="p-5 md:p-8">{children}</main>
+        <main className="p-4 pb-28 sm:p-5 md:p-8 lg:pb-8">{children}</main>
+        <ShelterBottomNav />
       </div>
     </div>
   );

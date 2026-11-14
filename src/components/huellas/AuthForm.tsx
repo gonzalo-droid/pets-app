@@ -36,7 +36,7 @@ export default function AuthForm({
   return (
     <div className="space-y-6">
       <div>
-        <span className="inline-block -rotate-2 rounded-full bg-highlight px-3 py-1 text-xs font-extrabold">
+        <span className="inline-block rounded-full bg-highlight px-3 py-1 text-xs font-extrabold">
           Comunidad HUELLAS
         </span>
         <h1 className="mt-3 text-3xl">

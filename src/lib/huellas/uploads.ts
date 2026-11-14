@@ -5,7 +5,7 @@ import { isDemo } from "./config";
 import { createClient } from "@/lib/supabase/server";
 
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB (también límite del bucket)
-export const UPLOAD_KINDS = ["avatar", "banner", "animal"] as const;
+export const UPLOAD_KINDS = ["avatar", "banner", "animal", "campaign"] as const;
 export type UploadKind = (typeof UPLOAD_KINDS)[number];
 
 const BUCKET = "huellas";

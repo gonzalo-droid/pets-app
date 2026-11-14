@@ -48,7 +48,7 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
         {chip && (
           <span
             className={cn(
-              'absolute left-2 top-2 -rotate-2 rounded-full px-2.5 py-1 text-[11px] font-extrabold sm:left-3 sm:top-3 sm:text-xs',
+              'absolute left-2 top-2 rounded-full px-2.5 py-1 text-[11px] font-extrabold sm:left-3 sm:top-3 sm:text-xs',
               chip.className,
             )}
           >
@@ -57,8 +57,11 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-3 sm:gap-3 sm:p-5">
-        <h3 className="text-xl leading-tight text-foreground sm:text-2xl">{animal.name}</h3>
+      <div className="relative flex flex-1 flex-col gap-2 p-3 pt-6 sm:gap-3 sm:p-5 sm:pt-7">
+        {/* El nombre va en su placa de collar, sobre el borde de la foto. */}
+        <h3 className="huellas-tag huellas-tag--sm absolute -top-4 left-3 max-w-[calc(100%-1.5rem)] truncate text-lg sm:left-4 sm:text-xl">
+          {animal.name}
+        </h3>
         <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
           <li className="flex items-center gap-1.5">
             <PawPrint className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -72,7 +75,7 @@ export default function AnimalCard({ animal, shelterName }: AnimalCardProps) {
             </li>
           )}
         </ul>
-        <span className="mt-auto hidden min-h-11 items-center justify-center gap-2 rounded-full border-2 border-primary px-4 text-sm font-extrabold text-primary transition-colors group-hover:bg-secondary sm:inline-flex">
+        <span className="mt-auto hidden min-h-11 items-center justify-center gap-2 rounded-full border-2 border-input px-4 text-sm font-extrabold text-foreground transition-colors group-hover:bg-secondary sm:inline-flex">
           Conocer su historia
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </span>

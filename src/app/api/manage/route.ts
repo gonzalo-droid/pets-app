@@ -32,8 +32,9 @@ async function updateOne(
 }
 
 // Campos editables de una campaña. La fecha límite es opcional (AAAA-MM-DD) y
-// cierra la campaña al final de ese día, hora de Perú.
-const campaignSchema = z.object({
+// cierra la campaña al final de ese día, hora de Perú. Un caso necesita un
+// animal del albergue; un evento, fecha y lugar.
+const campaignFields = z.object({
   title: z.string().trim().min(4).max(120),
   description: z.string().trim().min(10).max(2000),
   goal_amount: z.coerce.number().min(1).max(1000000),
@@ -44,10 +45,63 @@ const campaignSchema = z.object({
     .refine((d) => !d || new Date(d).getTime() >= Date.now(), {
       message: "La fecha límite no puede estar en el pasado.",
     }),
+  kind: z.enum(["case", "fund", "event"]).default("fund"),
+  animal_id: z.union([z.literal(""), targetId]).optional().transform((v) => v || null),
+  // Fecha y hora del evento en hora de Perú (AAAA-MM-DDTHH:MM).
+  event_at: z
+    .union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)])
+    .optional()
+    .transform((d) => (d ? `${d}:00-05:00` : null)),
+  event_place: z.string().trim().max(160).optional().transform((v) => v || null),
+  image_url: z.string().optional().transform((v) => v || null),
 });
+
+function campaignValues(body: unknown, shelterId: string) {
+  const v = campaignFields.parse(body);
+  if (v.image_url && !isOwnUpload(v.image_url, shelterId))
+    throw new UserError("La foto debe subirse desde HUELLAS.");
+  if (v.kind === "case" && !v.animal_id)
+    throw new UserError("Elige a cuál de tus rescatados ayuda este caso.");
+  if (v.kind === "event") {
+    if (!v.event_at || !v.event_place || v.event_place.length < 2)
+      throw new UserError("Un evento necesita fecha, hora y lugar.");
+    if (new Date(v.event_at).getTime() < Date.now())
+      throw new UserError("La fecha del evento no puede estar en el pasado.");
+  }
+  return {
+    ...v,
+    animal_id: v.kind === "case" ? v.animal_id : null,
+    event_at: v.kind === "event" ? v.event_at : null,
+    event_place: v.kind === "event" ? v.event_place : null,
+  };
+}
+
+// Enlace legible para compartir: título sin tildes más un trozo del id.
+const slugify = (title: string, id: string) =>
+  `${title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60)}-${id.slice(0, 6)}`;
 
 // Error con un mensaje pensado para mostrarse tal cual a quien usa el panel.
 class UserError extends Error {}
+
+// Un caso solo puede ser de un animal de este mismo albergue.
+async function assertOwnAnimal(db: Db | null, animalId: string | null, shelterId: string) {
+  if (!animalId) return;
+  let ok: boolean;
+  if (!db) {
+    const { readDemo } = await import("@/lib/huellas/demo");
+    ok = (await readDemo()).animals.some((a) => a.id === animalId && a.shelter_id === shelterId);
+  } else {
+    const { data } = await db.from("animals").select("id").eq("id", animalId).eq("shelter_id", shelterId);
+    ok = !!data?.length;
+  }
+  if (!ok) throw new UserError("Ese animal no pertenece a tu albergue.");
+}
 
 // Estados desde los que se puede llegar a `to` (ver REQUEST_TRANSITIONS).
 const allowedFrom = (to: string) =>
@@ -263,15 +317,15 @@ export async function POST(request: Request) {
         });
       else await updateOne(db, "animals", { status }, id, shelterId);
     } else if (body.action === "campaign") {
-      const values = campaignSchema.parse(body);
+      const values = campaignValues(body, shelterId);
+      await assertOwnAnimal(db, values.animal_id, shelterId);
       const row = {
         ...values,
         id,
         shelter_id: shelterId,
-        animal_id: null,
         current_amount: 0,
         is_active: true,
-        slug: `campana-${id.slice(0, 8)}`,
+        slug: slugify(values.title, id),
         created_at: now,
         updated_at: now,
       };
@@ -279,27 +333,34 @@ export async function POST(request: Request) {
         await mutateDemo((d) => {
           const s = d.shelters.find((s) => s.id === shelterId);
           if (!s) throw new Error("Albergue no encontrado");
+          const a = d.animals.find((a) => a.id === values.animal_id);
           d.campaigns.unshift({
             ...row,
             currency: "PEN",
             shelter: { id: s.id, name: s.name, avatar_url: s.avatar_url },
-            animal: null,
+            animal: a ? { id: a.id, name: a.name, species: a.species } : null,
           });
         });
       else {
         const { error } = await db.from("donation_campaigns").insert(row);
         if (error) throw error;
       }
+      return NextResponse.json({ ok: true, slug: row.slug });
     } else if (body.action === "campaign_update") {
       const campaignId = targetId.parse(body.id);
-      const values = campaignSchema.parse(body);
+      const values = campaignValues(body, shelterId);
+      await assertOwnAnimal(db, values.animal_id, shelterId);
       if (!db)
         await mutateDemo((d) => {
           const c = d.campaigns.find(
             (c) => c.id === campaignId && c.shelter_id === shelterId,
           );
           if (!c) throw new Error("Campaña no encontrada");
-          Object.assign(c, values, { updated_at: now });
+          const a = d.animals.find((a) => a.id === values.animal_id);
+          Object.assign(c, values, {
+            updated_at: now,
+            animal: a ? { id: a.id, name: a.name, species: a.species } : null,
+          });
         });
       else await updateOne(db, "donation_campaigns", values, campaignId, shelterId);
     } else if (body.action === "campaign_active") {

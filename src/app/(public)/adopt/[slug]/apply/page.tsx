@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ArrowLeft } from 'lucide-react'
@@ -41,36 +42,36 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
     )
   }
 
+  const photo = animal.animal_photos.find((p) => p.is_cover) ?? animal.animal_photos[0]
+  const STEPS = [
+    ['Enviada', 'La ves en Mi espacio.'],
+    ['En revisión', 'El albergue lee tu solicitud.'],
+    ['Aprobada', 'Te llaman para conocerse.'],
+    ['Completada', `${animal.name} llega a tu casa.`],
+  ]
+
   return (
-    <div className="mx-auto max-w-2xl px-4 sm:px-6 py-10">
-      {/* Breadcrumb */}
+    <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
       <Link
         href={`/adopt/${slug}`}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+        className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-muted-foreground transition-colors hover:text-primary"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Volver al perfil de {animal.name}
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        {animal.name}
       </Link>
 
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground">
-          Solicitar adopción de {animal.name}
-        </h1>
-        <p className="mt-2 text-muted-foreground text-sm">
-          {SPECIES_LABELS[animal.species]} · El albergue revisará tu solicitud y se
-          contactará contigo por teléfono si es aprobada.
-        </p>
-      </div>
+      <header className="mb-6 flex items-center gap-4">
+        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-highlight">
+          {photo && <Image src={photo.url} alt="" fill sizes="64px" className="object-cover" />}
+        </span>
+        <div>
+          <h1 className="text-3xl leading-tight text-foreground">Quiero adoptar a {animal.name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {SPECIES_LABELS[animal.species]}. La revisa el albergue y no tiene costo.
+          </p>
+        </div>
+      </header>
 
-      {/* Aviso */}
-      <div className="mb-6 rounded-lg bg-accent/60 border border-primary/20 px-4 py-3 text-sm text-accent-foreground">
-        <strong>¿Cómo funciona?</strong> Completa el formulario → el albergue revisa tu
-        perfil → si hay compatibilidad te contactan por teléfono para coordinar el proceso.
-        No hay ningún costo.
-      </div>
-
-      {/* Formulario (Client Component) */}
       {actor ? (
         <AdoptionForm
           animalSlug={slug}
@@ -83,6 +84,22 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
           action={`solicitar la adopción de ${animal.name}`}
         />
       )}
+
+      <section aria-labelledby="despues" className="mt-8 rounded-[24px] bg-secondary p-5">
+        <h2 id="despues" className="font-body text-base font-extrabold">Qué pasa después</h2>
+        <ol className="mt-3 flex flex-col gap-3">
+          {STEPS.map(([title, text], i) => (
+            <li key={title} className="flex items-start gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-extrabold text-primary-foreground">
+                {i + 1}
+              </span>
+              <span className="leading-snug">
+                <strong>{title}.</strong> {text}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   )
 }

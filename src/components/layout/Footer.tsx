@@ -19,8 +19,8 @@ export default function Footer() {
           <Link href="/auth/login">Mi espacio</Link>
         </div>
         <p className="text-xs text-muted-foreground max-w-xs">
-          MVP · Los apoyos se registran como compromisos pendientes. Los pagos y
-          débitos automáticos no están habilitados.
+          Por ahora los apoyos son compromisos sin cobro: todavía no hay pagos
+          ni débitos automáticos.
         </p>
       </div>
     </footer>

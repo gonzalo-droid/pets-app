@@ -57,7 +57,7 @@ export default function ShelterCard({ shelter, stats }: ShelterCardProps) {
           )}
           {shelter.is_verified && (
             <span
-              className="mb-1 inline-flex -rotate-2 items-center gap-1 rounded-full bg-highlight px-3 py-1 text-xs font-extrabold text-foreground"
+              className="mb-1 inline-flex items-center gap-1 rounded-full bg-highlight px-3 py-1 text-xs font-extrabold text-foreground"
               title="HUELLAS revisó la identidad del albergue. No garantiza cada una de sus actuaciones."
             >
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />

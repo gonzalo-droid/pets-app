@@ -107,7 +107,7 @@ export default async function ShelterPublicPage({
             )}
             {shelter.is_verified && (
               <span
-                className="mb-1 -rotate-2 rounded-full bg-highlight px-3 py-1 text-sm font-extrabold"
+                className="mb-1 rounded-full bg-highlight px-3 py-1 text-sm font-extrabold"
                 title="HUELLAS revisó la identidad del albergue. No garantiza cada una de sus actuaciones."
               >
                 Verificado

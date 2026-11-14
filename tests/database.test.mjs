@@ -25,6 +25,7 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       "202611100003_request_transitions.sql",
       "202611110001_photo_uploads.sql",
       "202611110002_shelter_onboarding.sql",
+      "202611140001_campaign_kinds.sql",
     ])
       await db.exec(
         await readFile(
@@ -97,6 +98,20 @@ test("migraciones, seed y seguridad PostgreSQL", async (t) => {
       assert.equal((await db.query(`SELECT * FROM animals WHERE id='${invalid.id}'`)).rows.length,0);
       await assert.rejects(db.query('SELECT create_animal_with_photos($1::jsonb,$2::jsonb)',[JSON.stringify({...invalid,shelter_id:s2}),JSON.stringify([])]));
     }));
+    await t.test("tipos de campaña: caso, fondo y evento", async () =>
+      asUser(owner, async () => {
+        const ins = (slug, extra) =>
+          db.query(
+            `INSERT INTO donation_campaigns(shelter_id,title,goal_amount,slug,kind,animal_id,event_at,event_place)
+             VALUES('${s1}','Prueba',100,'${slug}',$1,$2,$3,$4) RETURNING kind`,
+            extra,
+          );
+        assert.equal((await ins("evento-ok", ["event", null, "2027-01-10T15:00:00Z", "Parque principal"])).rows[0].kind, "event");
+        await assert.rejects(ins("evento-sin-lugar", ["event", null, "2027-01-10T15:00:00Z", null]));
+        await assert.rejects(ins("caso-sin-animal", ["case", null, null, null]));
+        await assert.rejects(ins("fondo-con-fecha", ["fund", null, "2027-01-10T15:00:00Z", "Parque"]));
+        await assert.rejects(ins("tipo-raro", ["other", null, null, null]));
+      }));
     const target = (
       await db.query(
         `SELECT id,slug FROM donation_campaigns WHERE shelter_id='${s1}' LIMIT 1`,

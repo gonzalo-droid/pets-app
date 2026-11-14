@@ -1,6 +1,6 @@
 import { campaignProgress, formatPEN } from "@/lib/utils";
 
-// Huella compartida por el progreso y la marca.
+// Huella compartida por el progreso, los espacios sin foto y la marca.
 export function PawIcon({ className, fill = "currentColor" }: { className?: string; fill?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill={fill} aria-hidden="true">
@@ -14,39 +14,56 @@ export function PawIcon({ className, fill = "currentColor" }: { className?: stri
 }
 
 /**
- * Avance de la meta con 10 huellitas. El texto acompaña siempre al dibujo
- * (no solo color) y aclara que la recaudación es un dato registrado.
+ * Avance de la meta. La barra tiene borde para verse aun vacía (contraste 3:1)
+ * y el texto dice siempre el monto, así no depende solo del color.
+ * Sin apoyos todavía, invita a ser la primera persona en lugar de mostrar 0 %.
  */
 export default function PawProgress({
   current,
   goal,
   size = "md",
+  open = true,
 }: {
   current: number;
   goal: number;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
+  /** Una campaña cerrada no invita a apoyar. */
+  open?: boolean;
 }) {
   const pct = campaignProgress(current, goal);
-  const filled = Math.round(pct / 10);
-  const paw = size === "lg" ? "h-7 w-7" : "h-5 w-5";
+  const done = pct >= 100;
+  const bar = size === "lg" ? "h-3.5" : size === "sm" ? "h-2" : "h-3";
   return (
     <div className="flex flex-col gap-2">
       <div
-        className="flex flex-wrap gap-1"
-        role="img"
-        aria-label={`Avance de la meta: ${pct} %`}
+        role="progressbar"
+        aria-label="Avance de la meta"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+        aria-valuetext={`${formatPEN(current)} de ${formatPEN(goal)}`}
+        className={`${bar} overflow-hidden rounded-full border border-track-border bg-track`}
       >
-        {Array.from({ length: 10 }, (_, i) => (
-          <PawIcon
-            key={i}
-            className={`${paw} ${i < filled ? "text-support" : "text-support-soft"}`}
-          />
-        ))}
+        <div
+          className={`h-full rounded-full ${done ? "bg-primary" : "bg-support"}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
-      <p className="text-sm text-muted-foreground">
-        <strong className="font-extrabold text-foreground">{formatPEN(current)}</strong> de{" "}
-        {formatPEN(goal)} · {pct} %
-      </p>
+      {size !== "sm" && (
+        <p className="text-sm text-muted-foreground">
+          {current > 0 ? (
+            <>
+              <strong className="font-extrabold text-foreground">{formatPEN(current)}</strong> de{" "}
+              {formatPEN(goal)} ({pct} %)
+            </>
+          ) : (
+            <>
+              <strong className="font-extrabold text-foreground">Meta: {formatPEN(goal)}.</strong>{" "}
+              {open ? "Aún no hay apoyos registrados; el tuyo sería el primero." : "No recibió apoyos registrados."}
+            </>
+          )}
+        </p>
+      )}
     </div>
   );
 }
