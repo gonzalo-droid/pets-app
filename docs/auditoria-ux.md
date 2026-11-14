@@ -45,3 +45,14 @@ Lienzo con 8 pantallas: https://claude.ai/artifact/KeYtJkSzAaMPCdN6kcEPTh
 - **Papel #F6F7F2** reemplaza al crema #FFF8F1.
 - El nombre de cada animal va en su **placa de collar** amarilla (#F2C14E). Es el único adorno del sistema.
 - Un solo botón principal por pantalla, de 48 px de alto como mínimo.
+
+## Prioridad acordada (14/11/2026)
+
+El centro de HUELLAS son las campañas que publican los albergues: **casos** (un animal), **fondos** (gastos que se repiten) y **eventos** (jornadas, colectas). El objetivo es ayudarles a llegar a más gente y que puedan publicar su información por sí mismos.
+
+| Pieza | Qué cambia | ¿Requiere base de datos? |
+|---|---|---|
+| Inicio | Campañas primero, con filtro Casos / Fondos / Eventos; los animales pasan a un bloque secundario. | No (casos y fondos ya existen) |
+| Compartir | En cada campaña: WhatsApp con mensaje listo, copiar enlace, vista previa del enlace con foto, imagen para estados y QR para afiches. | No |
+| Publicar campaña | Asistente de 3 pasos con tipo, foto y vista previa en vivo. | Sí: tipo de campaña y, para eventos, fecha y lugar |
+| Panel del albergue | "Tus campañas" al centro con Compartir y Editar; "Para hoy"; perfil completo (qué le falta). | No |
