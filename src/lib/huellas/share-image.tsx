@@ -1,7 +1,33 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import type { CampaignWithShelter } from "@/types";
 import { CAMPAIGN_KIND_LABEL, campaignImage, eventDateLabel } from "./domain";
 import { campaignProgress, formatPEN } from "@/lib/utils";
+
+// Letras de HUELLAS (licencia OFL, ver assets/fonts). Se cargan una vez.
+type Fonts = NonNullable<NonNullable<ConstructorParameters<typeof ImageResponse>[1]>["fonts"]>;
+let fonts: Promise<Fonts | undefined> | undefined;
+function brandFonts() {
+  const load = (file: string) => readFile(join(process.cwd(), "assets/fonts", file));
+  fonts ??= Promise.all([
+    load("fredoka-latin-600-normal.woff"),
+    load("nunito-latin-400-normal.woff"),
+    load("nunito-latin-700-normal.woff"),
+  ])
+    .then(([fredoka, nunito, nunitoBold]) => [
+      { name: "Fredoka", data: fredoka, weight: 600 as const, style: "normal" as const },
+      { name: "Nunito", data: nunito, weight: 400 as const, style: "normal" as const },
+      { name: "Nunito", data: nunitoBold, weight: 700 as const, style: "normal" as const },
+    ])
+    .catch((e) => {
+      // Sin las letras, la imagen se genera igual con la letra por defecto.
+      console.error("[share-image] fonts:", (e as Error).message);
+      fonts = undefined;
+      return undefined;
+    });
+  return fonts;
+}
 
 // Trae la foto y la incrusta; si falla, la imagen se arma sin foto en vez de romperse.
 async function photoData(url: string | null, origin?: string): Promise<string | null> {
@@ -29,7 +55,7 @@ export async function campaignShareImage(
   { width, height, origin }: { width: number; height: number; origin?: string },
 ) {
   const vertical = height > width;
-  const photo = await photoData(campaignImage(c), origin);
+  const [photo, fontList] = await Promise.all([photoData(campaignImage(c), origin), brandFonts()]);
   const pct = campaignProgress(c.current_amount, c.goal_amount);
   const name = c.animal?.name;
   const detail =
@@ -50,7 +76,7 @@ export async function campaignShareImage(
           flexDirection: vertical ? "column" : "row",
           background: "#f6f7f2",
           color: "#1e2b25",
-          fontFamily: "sans-serif",
+          fontFamily: fontList ? "Nunito" : "sans-serif",
         }}
       >
         <div
@@ -80,7 +106,8 @@ export async function campaignShareImage(
                 padding: `${12 * scale}px ${34 * scale}px ${12 * scale}px ${18 * scale}px`,
                 boxShadow: `0 ${5 * scale}px 0 #c99a2e`,
                 fontSize: 48 * scale,
-                fontWeight: 700,
+                fontFamily: fontList ? "Fredoka" : undefined,
+                fontWeight: 600,
               }}
             >
               <div style={{ width: 16 * scale, height: 16 * scale, borderRadius: 999, background: "#ffffff" }} />
@@ -101,7 +128,15 @@ export async function campaignShareImage(
           <div style={{ display: "flex", fontSize: 24 * scale, fontWeight: 700, color: "#2f6b54" }}>
             {`${CAMPAIGN_KIND_LABEL[c.kind]} de ${c.shelter.name}`}
           </div>
-          <div style={{ display: "flex", fontSize: 50 * scale, fontWeight: 700, lineHeight: 1.1 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 50 * scale,
+              fontFamily: fontList ? "Fredoka" : undefined,
+              fontWeight: 600,
+              lineHeight: 1.1,
+            }}
+          >
             {c.title.length > 80 ? c.title.slice(0, 78) + "…" : c.title}
           </div>
           {c.kind !== "event" && (
@@ -133,6 +168,6 @@ export async function campaignShareImage(
         </div>
       </div>
     ),
-    { width, height },
+    { width, height, fonts: fontList },
   );
 }

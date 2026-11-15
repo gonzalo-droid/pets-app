@@ -126,14 +126,14 @@ Evidencia visual del flujo demo: [compromiso sin cobro](docs/huellas-support-dem
 - `supabase/migrations`: baseline y upgrade HUELLAS.
 - `tests`: pruebas de dominio, SQL y HTTP opcional.
 
-Los módulos de animales perdidos del proyecto anterior se conservan para consulta. El alta de reportes y avistamientos queda explícitamente inhabilitada mientras no esté integrada; no muestra éxitos ficticios. Los mocks heredados de usuarios/donaciones/solicitudes y los antiguos managers se conservan como material previo y no alimentan los flujos activos del MVP.
+Los módulos de animales perdidos del proyecto anterior se conservan en el código, pero sus páginas (`/lost`) responden 404: están fuera del alcance actual. Los mocks heredados de usuarios/donaciones/solicitudes y los antiguos managers se conservan como material previo y no alimentan los flujos activos del MVP.
 
 ## Pendiente para producción
 
 1. Probar migración y autenticación contra una instancia Supabase de staging con datos representativos; revisar los accesos heredados antes de publicar.
 2. Integrar una pasarela apropiada para Perú: checkout alojado, webhooks firmados, idempotencia del proveedor, conciliación, reembolsos y suscripciones. El estado cobrado debe venir de eventos verificados del proveedor.
 3. Configurar SMTP propio en Supabase y añadir `https://<tu-dominio>/auth/callback` a las Redirect URLs (Authentication → URL Configuration) para que funcionen la confirmación de cuentas y la recuperación de contraseña. Pendiente: invitaciones de equipo y notificaciones.
-4. Limpiar del almacenamiento las fotos que se quitan de una ficha (hoy quedan guardadas sin mostrarse).
+4. Los montos recaudados de las campañas de ejemplo se mantienen a propósito para explicar los flujos. Ponerlos en cero o quitar esas campañas antes de abrir al público.
 5. Definir política de privacidad, consentimiento, retención, responsabilidades y moderación antes de recoger datos de personas reales.
 6. Rate limiting, auditoría de cambios, observabilidad, backups y restauración, pruebas de concurrencia y accesibilidad ampliadas.
 7. Fichas veterinarias privadas, gastos/reportes de impacto, voluntariado y monetización SaaS siguen fuera del alcance de este MVP.

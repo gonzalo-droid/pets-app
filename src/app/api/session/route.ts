@@ -89,14 +89,10 @@ export async function POST(request: Request) {
         );
     }
     const actor = await currentActor();
-    return NextResponse.json({
-      redirect:
-        actor?.role === "admin"
-          ? "/admin"
-          : actor?.role === "shelter"
-            ? "/shelter/dashboard"
-            : safeRedirect(body.redirectTo, "/profile"),
-    });
+    // Vuelve a la página pedida; si no hay, cada rol va a su inicio.
+    const fallback =
+      actor?.role === "admin" ? "/admin" : actor?.role === "shelter" ? "/shelter/dashboard" : "/profile";
+    return NextResponse.json({ redirect: safeRedirect(body.redirectTo, fallback) });
   } catch {
     return NextResponse.json(
       { error: "Solicitud inválida. Revisa los campos." },

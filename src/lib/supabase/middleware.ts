@@ -3,8 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Helper que refresca la sesión de Supabase en cada request.
 // Requerido por @supabase/ssr para mantener los tokens actualizados.
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+// `requestHeaders`: cabeceras de la petición que deben llegar a las páginas
+// (por ejemplo, la ruta pedida para volver a ella tras iniciar sesión).
+export async function updateSession(
+  request: NextRequest,
+  requestHeaders: Headers = request.headers,
+) {
+  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +23,9 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          supabaseResponse = NextResponse.next({ request });
+          // Las páginas deben recibir los tokens recién renovados.
+          requestHeaders.set("cookie", request.headers.get("cookie") ?? "");
+          supabaseResponse = NextResponse.next({ request: { headers: requestHeaders } });
           Object.entries(headers ?? {}).forEach(([name, value]) =>
             supabaseResponse.headers.set(name, value),
           );

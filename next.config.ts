@@ -11,6 +11,12 @@ const supabaseHost = (() => {
 })()
 
 const nextConfig: NextConfig = {
+  // Letras de las imágenes para compartir (se leen del disco al generarlas).
+  outputFileTracingIncludes: {
+    '/api/share/[slug]': ['./assets/fonts/**'],
+    '/donate/[slug]/opengraph-image-*': ['./assets/fonts/**'],
+    '/donate/[slug]/*': ['./assets/fonts/**'],
+  },
   turbopack: {
     root: path.join(__dirname),
   },

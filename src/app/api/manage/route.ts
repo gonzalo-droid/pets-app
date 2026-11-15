@@ -7,7 +7,7 @@ import { canManage, canTransitionRequest, REQUEST_TRANSITIONS } from "@/lib/huel
 import { isDemo } from "@/lib/huellas/config";
 import { mutateDemo } from "@/lib/huellas/demo";
 import { createClient } from "@/lib/supabase/server";
-import { isOwnUpload } from "@/lib/huellas/uploads";
+import { isOwnUpload, removeUpload } from "@/lib/huellas/uploads";
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 const targetId = z.string().min(1).max(64);
@@ -204,13 +204,24 @@ export async function POST(request: Request) {
       const values = z
         .object({ avatar_url: image.optional(), banner_url: image.optional() })
         .parse(body);
+      let before: { avatar_url: string | null; banner_url: string | null } | null = null;
       if (!db)
         await mutateDemo((d) => {
           const s = d.shelters.find((s) => s.id === shelterId);
           if (!s) throw new Error("Albergue no encontrado");
+          before = { avatar_url: s.avatar_url, banner_url: s.banner_url };
           Object.assign(s, values);
         });
-      else await updateOne(db, "shelters", values, shelterId, shelterId);
+      else {
+        const { data } = await db.from("shelters").select("avatar_url, banner_url").eq("id", shelterId).maybeSingle();
+        before = data;
+        await updateOne(db, "shelters", values, shelterId, shelterId);
+      }
+      // La imagen reemplazada o quitada ya no se usa.
+      const old = before as { avatar_url: string | null; banner_url: string | null } | null;
+      for (const key of ["avatar_url", "banner_url"] as const)
+        if (values[key] !== undefined && old?.[key] && old[key] !== values[key])
+          await removeUpload(old[key], shelterId);
     } else if (body.action === "animal_photo_add") {
       const animalId = targetId.parse(body.animal_id);
       const url = z.string().refine((u) => isOwnUpload(u, shelterId)).parse(body.url);
@@ -246,12 +257,14 @@ export async function POST(request: Request) {
       const photoId = targetId.parse(body.id);
       const animalId = targetId.parse(body.animal_id);
       const remove = body.action === "animal_photo_remove";
+      let removedUrl: string | null = null;
       if (!db)
         await mutateDemo((d) => {
           const a = d.animals.find((a) => a.id === animalId && a.shelter_id === shelterId);
           const photo = a?.animal_photos.find((p) => p.id === photoId);
           if (!a || !photo) throw new Error("Foto no encontrada");
           if (remove) {
+            removedUrl = photo.url;
             a.animal_photos = a.animal_photos.filter((p) => p.id !== photoId);
             // Si era la portada, la siguiente foto pasa a serlo.
             if (photo.is_cover && a.animal_photos[0]) a.animal_photos[0].is_cover = true;
@@ -260,11 +273,11 @@ export async function POST(request: Request) {
       else {
         const { data: animal } = await db
           .from("animals")
-          .select("id, animal_photos(id, is_cover, order_index)")
+          .select("id, animal_photos(id, url, is_cover, order_index)")
           .eq("id", animalId)
           .eq("shelter_id", shelterId)
           .maybeSingle();
-        const photos = (animal?.animal_photos ?? []) as { id: string; is_cover: boolean; order_index: number }[];
+        const photos = (animal?.animal_photos ?? []) as { id: string; url: string; is_cover: boolean; order_index: number }[];
         const photo = photos.find((p) => p.id === photoId);
         if (!animal || !photo) throw new Error("Foto no encontrada");
         const coverId = remove
@@ -275,6 +288,7 @@ export async function POST(request: Request) {
         if (remove) {
           const { error } = await db.from("animal_photos").delete().eq("id", photoId).eq("animal_id", animalId);
           if (error) throw error;
+          removedUrl = photo.url;
         }
         if (coverId) {
           const { error: e1 } = await db.from("animal_photos").update({ is_cover: false }).eq("animal_id", animalId);
@@ -283,6 +297,7 @@ export async function POST(request: Request) {
           if (e2) throw e2;
         }
       }
+      await removeUpload(removedUrl, shelterId);
     } else if (body.action === "animal_update") {
       // Datos de la ficha. El estado, las fotos y el albergue no se cambian aquí.
       const animalId = targetId.parse(body.id);
@@ -350,19 +365,26 @@ export async function POST(request: Request) {
       const campaignId = targetId.parse(body.id);
       const values = campaignValues(body, shelterId);
       await assertOwnAnimal(db, values.animal_id, shelterId);
+      let oldImage: string | null = null;
       if (!db)
         await mutateDemo((d) => {
           const c = d.campaigns.find(
             (c) => c.id === campaignId && c.shelter_id === shelterId,
           );
           if (!c) throw new Error("Campaña no encontrada");
+          oldImage = c.image_url ?? null;
           const a = d.animals.find((a) => a.id === values.animal_id);
           Object.assign(c, values, {
             updated_at: now,
             animal: a ? { id: a.id, name: a.name, species: a.species } : null,
           });
         });
-      else await updateOne(db, "donation_campaigns", values, campaignId, shelterId);
+      else {
+        const { data } = await db.from("donation_campaigns").select("image_url").eq("id", campaignId).maybeSingle();
+        oldImage = data?.image_url ?? null;
+        await updateOne(db, "donation_campaigns", values, campaignId, shelterId);
+      }
+      if (oldImage && oldImage !== values.image_url) await removeUpload(oldImage, shelterId);
     } else if (body.action === "campaign_active") {
       // Cerrar o reabrir. Cerrar no borra la campaña ni sus compromisos.
       const campaignId = targetId.parse(body.id);

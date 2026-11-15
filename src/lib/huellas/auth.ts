@@ -1,10 +1,10 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isDemo } from "./config";
 import { readDemo } from "./demo";
-import type { Actor } from "./domain";
+import { safeRedirect, type Actor } from "./domain";
 const globalSecret = globalThis as typeof globalThis & {
   huellasSecret?: string;
 };
@@ -80,7 +80,11 @@ export async function currentActor(): Promise<Actor | null> {
 }
 export async function requireActor(roles?: Actor["role"][]) {
   const actor = await currentActor();
-  if (!actor) redirect("/auth/login");
+  if (!actor) {
+    // Vuelve a la página pedida después de iniciar sesión (ver proxy.ts).
+    const path = safeRedirect((await headers()).get("x-huellas-path"), "");
+    redirect("/auth/login" + (path ? "?redirect=" + encodeURIComponent(path) : ""));
+  }
   if (roles && !roles.includes(actor.role)) redirect("/profile");
   return actor;
 }

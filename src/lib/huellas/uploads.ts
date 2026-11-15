@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { isDemo } from "./config";
 import { createClient } from "@/lib/supabase/server";
@@ -69,12 +69,35 @@ export async function storeImage(file: File, shelterId: string, kind: UploadKind
 
 /** Lee una imagen de la demo (solo nombres generados por storeImage). */
 export async function readDemoUpload(name: string) {
-  if (!/^shelters__[\w-]+__(avatar|banner|animal)__[\w-]+\.(jpg|png|webp)$/.test(name)) return null;
+  if (!/^shelters__[\w-]+__(avatar|banner|animal|campaign)__[\w-]+\.(jpg|png|webp)$/.test(name)) return null;
   try {
     const data = await readFile(path.join(DEMO_DIR, name));
     const ext = name.split(".").pop() as keyof typeof CONTENT_TYPE;
     return { data, contentType: CONTENT_TYPE[ext] };
   } catch {
     return null;
+  }
+}
+
+/**
+ * Borra una imagen que ya no se usa (foto quitada o reemplazada) para no dejar
+ * archivos huérfanos. Solo toca archivos de la carpeta del propio albergue y
+ * nunca hace fallar el guardado: si no se puede borrar, solo lo registra.
+ */
+export async function removeUpload(url: string | null | undefined, shelterId: string) {
+  if (!url || !isOwnUpload(url, shelterId)) return;
+  try {
+    if (isDemo()) {
+      const name = url.slice(DEMO_UPLOAD_PREFIX.length);
+      if (!/^[\w.-]+$/.test(name)) return;
+      await unlink(path.join(DEMO_DIR, name));
+      return;
+    }
+    const key = url.slice(storagePublicPrefix().length);
+    const db = await createClient();
+    const { error } = await db.storage.from(BUCKET).remove([key]);
+    if (error) console.error("[uploads] removeUpload:", error.message);
+  } catch (e) {
+    console.error("[uploads] removeUpload:", (e as Error).message);
   }
 }
