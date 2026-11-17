@@ -126,7 +126,7 @@ Evidencia visual del flujo demo: [compromiso sin cobro](docs/huellas-support-dem
 - `supabase/migrations`: baseline y upgrade HUELLAS.
 - `tests`: pruebas de dominio, SQL y HTTP opcional.
 
-Los módulos de animales perdidos del proyecto anterior se conservan en el código, pero sus páginas (`/lost`) responden 404: están fuera del alcance actual. Los mocks heredados de usuarios/donaciones/solicitudes y los antiguos managers se conservan como material previo y no alimentan los flujos activos del MVP.
+Los módulos de animales perdidos del proyecto anterior se conservan en `src/legacy/lost`, fuera de las rutas: no se publican. Los mocks heredados de usuarios/donaciones/solicitudes y los antiguos managers se conservan como material previo y no alimentan los flujos activos del MVP.
 
 ## Pendiente para producción
 
